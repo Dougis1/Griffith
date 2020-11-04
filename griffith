@@ -1,30 +1,35 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 __revision__ = '$Id$'
+#               Updated to Gtk 3 2020 by Doug Lindquist
 
 # Copyright © 2005-2010 Vasco Nunes, Piotr Ożarowski
+# Copyright 2020 Doug Lindquist doug.lindquist@protonmail.com
 
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# Permission is hereby granted, free of charge, to any person obtaining
+# copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Library General Public License for more details.
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
-
-# You may use and distribute this software under the terms of the
-# GNU General Public License, version 2 or later
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import gettext
 import os.path
-gettext.install('griffith', unicode=1)
+import importlib
+gettext.install('griffith', codeset='utf-8')
 import sys
 import logging
 import platform
@@ -46,16 +51,16 @@ lib = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), 'lib'))
 if os.path.isdir(lib):
     sys.path.insert(1, lib)
 del lib
-    
+
 # macosx
 if os.name in ('mac') or \
         (hasattr(os, 'uname') and os.uname()[0] == 'Darwin'):
     import pygtk
-    pygtk.require('2.0')
+    pygtk.require('3.0')
     try:
-        from gtk_osxapplication import *
+        from Gtk_osxapplication import *
     except:
-        print "no gtk_osxapplication support."
+        print("no Gtk_osxapplication support.")
         exit(4)
 # end macosx
 
@@ -73,7 +78,7 @@ if len(missing) > 0:
     log.error('Error: missing modules:')
     for i in missing:
         log.error("%(module)s" % i)
-        if i.has_key('module_req'):
+        if 'module_req' in i:
             log.error("\t:: required version: %(module_req)s" % i)
             if i['version'] is not False and i['version'][0] == '-':
                 log.error("\t:: detected: %s" % i['version'][1:])
@@ -82,7 +87,9 @@ if len(missing) > 0:
 del missing
 
 # other imports
-import gtk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, Gdk
 import add
 import config
 import db
@@ -98,7 +105,7 @@ class Griffith(object):
     """The main application class"""
 
     debug_mode = False
-    Image = gtk.Image()
+    Image = Gtk.Image()
     founded_results_id = None
     initialized = False
     lang = {}
@@ -114,10 +121,10 @@ class Griffith(object):
 
         initialize.locations(self, home_dir)
         initialize.i18n(self, self.locations['i18n'])
-        
+
         self.selected = []
         self.selected_iter = []
-        
+
         # convert old database
         filename = os.path.join(self.locations['home'], config.get('file', 'griffith.db', section='database'))
         if config.get('file', 'griffith.db', section='database').lower().endswith('.gri'):
@@ -137,8 +144,8 @@ class Griffith(object):
         # let's check any console arguments to parse
         gconsole.check_args_with_db(self)
 
-        gtk.window_set_auto_startup_notification(True)
-        #self.Image = gtk.Image()
+##        Gtk.window_set_auto_startup_notification()
+        #self.Image = Gtk.Image()
         self.filter_l = False
         initialize.gui(self)
         initialize.toolbar(self)
@@ -158,17 +165,17 @@ class Griffith(object):
         self.clear_details()
         self.populate_treeview()
         initialize.spellcheck(self)
-        
+
         if self.mac:
             self.macapp=OSXApplication()
-            self.widgets['window'].connect("destroy", gtk.main_quit)
+            self.widgets['window'].connect("destroy", Gtk.main_quit)
             self.macapp.set_menu_bar(self.widgets['menu']['menubar'])
-            # lets hide the gtk menubar. using the macosx integrated one.
+            # lets hide the Gtk menubar. using the macosx integrated one.
             self.widgets['menu']['menubar'].hide()
             self.macapp.ready()
             self.macapp.insert_app_menu_item(self.widgets['menu']['about'],0)
             self.macapp.insert_app_menu_item(self.widgets['menu']['preferences'],1)
-        
+
         # add default folders to some select widgets
         if self.windows:
             from win32com.shell import shellcon, shell
@@ -189,24 +196,24 @@ class Griffith(object):
         if self.debug_mode:
             log.debug('reloading %s', plugin_name)
             import sys
-            reload(sys.modules[plugin_name])
+            importlib.reload(sys.modules[plugin_name])
         plugin = module.ExportPlugin(self.db, self.locations, self.widgets['window'], self._search_conditions, self.config)
         if plugin.initialize():
             try:
                 plugin.run()
-            except Exception, e:
+            except Exception as e:
                 log.exception('')
             plugin.cleanup()
 
     def on_import_activate(self, *args):
-        if self.widgets.has_key('import'):
+        if 'import' in self.widgets:
             self.widgets['import']['window'].show()
         else:
             initialize.import_plugins(self)
 
     def destroy(self, widget, data=None):
         self.save_state()
-        gtk.main_quit()
+        Gtk.main_quit()
 
     def on_configure(self, widget, data=None):
         # size should only be saved on microsoft windows systems
@@ -226,14 +233,14 @@ class Griffith(object):
         if self.windows and not windowstate is None:
             if not hasattr(self, 'mainwindow_state') or self.mainwindow_state is None:
                 self.mainwindow_state = {}
-            self.mainwindow_state['state'] = int(windowstate.new_window_state & gtk.gdk.WINDOW_STATE_MAXIMIZED)
+            self.mainwindow_state['state'] = int(windowstate.new_window_state & Gtk.gdk.WINDOW_STATE_MAXIMIZED)
 
     def toggle_fullscreen(self, widget):
         if widget is True or widget.get_active():
             self.widgets['window'].fullscreen()
         else:
             self.widgets['window'].unfullscreen()
-            
+
     def select_all(self, widget):
         self.widgets['treeview'].get_selection().select_all()
         main_treeview.treeview_clicked(self)
@@ -370,7 +377,7 @@ class Griffith(object):
         add.clone_movie(self)
 
     def on_m_seen_icon_button_press_event(self, widget, event):
-        if event.button == 1 and event.type == gtk.gdk._2BUTTON_PRESS:
+        if event.button == 1 and event.type == Gtk.gdk._2BUTTON_PRESS:
             self.toggle_seen()
 
     # poster --------------------------------------------------------------
@@ -392,7 +399,7 @@ class Griffith(object):
         delete_poster(self)
 
     def z_poster(self, *args):
-        if self.widgets['poster_window'].flags() & gtk.VISIBLE == gtk.VISIBLE:
+        if self.widgets['poster_window'].flags() & Gtk.VISIBLE == Gtk.VISIBLE:
             self.widgets['poster_window'].hide()
             return
         if len(self.selected) > 1:
@@ -451,11 +458,11 @@ class Griffith(object):
             self._selected_volume = self.volume_combo_ids[widget.get_active()]
 
     def add_volume(self, widget):
-        name = self.widgets['add']['volume'].get_active_text().decode('utf-8')
+        name = self.widgets['add']['volume'].get_active_text()
         add.add_volume(self, name)
 
     def add_collection(self, widget):
-        name = self.widgets['add']['collection'].get_active_text().decode('utf-8')
+        name = self.widgets['add']['collection'].get_active_text()
         add.add_collection(self, name)
 
     def remove_volume(self, widget):
@@ -466,7 +473,7 @@ class Griffith(object):
             session.delete(vol)
             try:
                 session.commit()
-            except Exception, e:
+            except Exception as e:
                 session.rollback()
                 log.warn("Cannot remove volume: %s", e.message)
             else:
@@ -481,7 +488,7 @@ class Griffith(object):
             session.delete(col)
             try:
                 session.commit()
-            except Exception, e:
+            except Exception as e:
                 session.rollback()
                 log.warn("Cannot remove collection: %s", e.message)
             else:
@@ -492,14 +499,14 @@ class Griffith(object):
         session = self.db.Session()
         vol_id = self._selected_volume
         if vol_id > 0:
-            new_name = self.widgets['add']['volume'].get_active_text().decode('utf-8')
+            new_name = self.widgets['add']['volume'].get_active_text()
             vol = session.query(db.Volume).filter_by(volume_id=vol_id).first()
             if vol:
                 vol.name=new_name
                 session.add(vol)
                 try:
                     session.commit()
-                except Exception, e:
+                except Exception as e:
                     session.rollback()
                     log.warn("Cannot rename volume: %s", e.message)
                 else:
@@ -509,14 +516,14 @@ class Griffith(object):
         session = self.db.Session()
         col_id = self.e_selected_collection
         if col_id > 0:
-            new_name = self.widgets['add']['collection'].get_active_text().decode('utf-8')
+            new_name = self.widgets['add']['collection'].get_active_text()
             col = session.query(db.Collection).filter_by(collection_id=col_id).first()
             if col:
                 col.name=new_name
                 session.add(col)
                 try:
                     session.commit()
-                except Exception, e:
+                except Exception as e:
                     session.rollback()
                     log.warn("Cannot rename collection: %s", e.message)
                 else:
@@ -600,7 +607,7 @@ class Griffith(object):
 
     def on_am_lang_add_clicked(self, widget):
         self.create_language_row()
-        
+
     def on_am_lang_remove_clicked(self, widget):
         treeselection = self.widgets['add']['lang_treeview'].get_selection()
         if treeselection:
@@ -612,11 +619,11 @@ class Griffith(object):
     def on_lang_add_clicked(self, widget):
         session = self.db.Session()
         lang = db.Lang()
-        lang.name = self.widgets['preferences']['lang_name'].get_active_text().decode('utf-8')
+        lang.name = self.widgets['preferences']['lang_name'].get_active_text()
         session.add(lang)
         try:
             session.commit()
-        except Exception, e:
+        except Exception as e:
             session.rollback()
             log.warn("Cannot add language: %s", e.message)
         else:
@@ -632,7 +639,7 @@ class Griffith(object):
                 session.delete(lang)
                 try:
                     session.commit()
-                except Exception, e:
+                except Exception as e:
                     session.rollback()
                     log.warn("Cannot remove language: %s", e.message)
                 else:
@@ -650,10 +657,10 @@ class Griffith(object):
         session = self.db.Session()
         lang = session.query(db.Lang).filter_by(lang_id=lang_id).first()
         if lang:
-            lang.name = self.widgets['preferences']['lang_name'].get_active_text().decode('utf-8')
+            lang.name = self.widgets['preferences']['lang_name'].get_active_text()
             try:
                 session.commit()
-            except Exception, e:
+            except Exception as e:
                 session.rollback()
                 log.warn("Cannot rename language: %s", e.message)
             else:
@@ -669,11 +676,11 @@ class Griffith(object):
     def on_tag_add_clicked(self, widget):
         session = self.db.Session()
         tag = db.Tag()
-        tag.name = self.widgets['preferences']['tag_name'].get_active_text().decode('utf-8')
+        tag.name = self.widgets['preferences']['tag_name'].get_active_text()
         session.add(tag)
         try:
             session.commit()
-        except Exception, e:
+        except Exception as e:
             session.rollback()
             log.warn("Cannot add tag: %s", e.message)
         else:
@@ -690,7 +697,7 @@ class Griffith(object):
                 session.delete(tag)
                 try:
                     session.commit()
-                except Exception, e:
+                except Exception as e:
                     session.rollback()
                     log.warn("Cannot remove tag: %s", e.message)
                 initialize.fill_preferences_tags_combo(self)
@@ -709,10 +716,10 @@ class Griffith(object):
         tag_id = self.tags_ids[active]
         tag = session.query(db.Tag).filter_by(tag_id=tag_id).first()
         if tag:
-            tag.name = self.widgets['preferences']['tag_name'].get_active_text().decode('utf-8')
+            tag.name = self.widgets['preferences']['tag_name'].get_active_text()
             try:
                 session.commit()
-            except Exception, e:
+            except Exception as e:
                 session.rollback()
                 log.warn("Cannot rename tag: %s", e.message)
             else:
@@ -729,11 +736,11 @@ class Griffith(object):
     def on_acodec_add_clicked(self, widget):
         session = self.db.Session()
         acodec = db.ACodec()
-        acodec.name = self.widgets['preferences']['acodec_name'].get_active_text().decode('utf-8')
+        acodec.name = self.widgets['preferences']['acodec_name'].get_active_text()
         session.add(acodec)
         try:
             session.commit()
-        except Exception, e:
+        except Exception as e:
             session.rollback()
             log.warn("Cannot add audio codec: %s", e.message)
         else:
@@ -749,7 +756,7 @@ class Griffith(object):
                 session.delete(acodec)
                 try:
                     session.commit()
-                except Exception, e:
+                except Exception as e:
                     session.rollback()
                     log.warn("Cannot remove audio codec: %s", e.message)
                 else:
@@ -767,10 +774,10 @@ class Griffith(object):
         session = self.db.Session()
         acodec = session.query(db.ACodec).filter_by(acodec_id=acodec_id).first()
         if acodec:
-            acodec.name = self.widgets['preferences']['acodec_name'].get_active_text().decode('utf-8')
+            acodec.name = self.widgets['preferences']['acodec_name'].get_active_text()
             try:
                 session.commit()
-            except Exception, e:
+            except Exception as e:
                 session.rollback()
                 log.warn("Cannot rename audio codec: %s", e.message)
             else:
@@ -786,11 +793,11 @@ class Griffith(object):
     def on_achannel_add_clicked(self, widget):
         session = self.db.Session()
         achannel = db.AChannel()
-        achannel.name = self.widgets['preferences']['achannel_name'].get_active_text().decode('utf-8')
+        achannel.name = self.widgets['preferences']['achannel_name'].get_active_text()
         session.add(achannel)
         try:
             session.commit()
-        except Exception, e:
+        except Exception as e:
             session.rollback()
             log.warn("Cannot add audio channel: %s", e.message)
         else:
@@ -806,7 +813,7 @@ class Griffith(object):
                 session.delete(achannel)
                 try:
                     session.commit()
-                except Exception, e:
+                except Exception as e:
                     session.rollback()
                     log.warn("Cannot remove audio channel: %s", e.message)
                 else:
@@ -824,10 +831,10 @@ class Griffith(object):
         session = self.db.Session()
         achannel = session.query(db.AChannel).filter_by(achannel_id=achannel_id).first()
         if achannel is not None:
-            achannel.name = self.widgets['preferences']['achannel_name'].get_active_text().decode('utf-8')
+            achannel.name = self.widgets['preferences']['achannel_name'].get_active_text()
             try:
                 session.commit()
-            except Exception, e:
+            except Exceptio as e:
                 session.rollback()
                 log.warn("Cannot rename audio channel entry: %s", e.message)
             else:
@@ -843,11 +850,11 @@ class Griffith(object):
     def on_subformat_add_clicked(self, widget):
         session = self.db.Session()
         subformat = db.SubFormat()
-        subformat.name = self.widgets['preferences']['subformat_name'].get_active_text().decode('utf-8')
+        subformat.name = self.widgets['preferences']['subformat_name'].get_active_text()
         session.add(subformat)
         try:
             session.commit()
-        except Exception, e:
+        except Exception as e:
             session.rollback()
             log.warn("Cannot add subtitle format entry: %s", e.message)
         else:
@@ -863,7 +870,7 @@ class Griffith(object):
                 session.delete(subformat)
                 try:
                     session.commit()
-                except Exception, e:
+                except Exception as e:
                     session.rollback()
                     log.warn("Cannot remove subtitle format entry: %s", e.message)
                 else:
@@ -881,10 +888,10 @@ class Griffith(object):
         session = self.db.Session()
         subformat = session.query(db.SubFormat).filter_by(subformat_id=subformat_id).first()
         if subformat is not None:
-            subformat.name = self.widgets['preferences']['subformat_name'].get_active_text().decode('utf-8')
+            subformat.name = self.widgets['preferences']['subformat_name'].get_active_text()
             try:
                 session.commit()
-            except Exception, e:
+            except Exception as e:
                 session.rollback()
                 log.warn("Cannot rename subtitle format entry: %s", e.message)
             else:
@@ -898,7 +905,7 @@ class Griffith(object):
 
     # media ------------------------------------------------------------{{{
     def on_medium_add_clicked(self, widget):
-        name = self.widgets['preferences']['medium_name'].get_active_text().decode('utf-8')
+        name = self.widgets['preferences']['medium_name'].get_active_text()
         add.add_medium(self, name)
 
     def on_medium_remove_clicked(self, widget):
@@ -911,7 +918,7 @@ class Griffith(object):
                 session.delete(medium)
                 try:
                     session.commit()
-                except Exception, e:
+                except Exception as e:
                     session.rollback()
                     log.warn("Cannot remove medium entry: %s", e.message)
                 else:
@@ -929,10 +936,10 @@ class Griffith(object):
         session = self.db.Session()
         medium = session.query(db.Medium).filter_by(medium_id=medium_id).first()
         if medium:
-            medium.name = self.widgets['preferences']['medium_name'].get_active_text().decode('utf-8')
+            medium.name = self.widgets['preferences']['medium_name'].get_active_text()
             try:
                 session.commit()
-            except Exception, e:
+            except Exception as e:
                 session.rollback()
                 log.warn("Cannot rename medium entry: %s", e.message)
             else:
@@ -946,7 +953,7 @@ class Griffith(object):
 
     # vcodecs -------------------------------------------------------------{{{
     def on_vcodec_add_clicked(self, widget):
-        name = self.widgets['preferences']['vcodec_name'].get_active_text().decode('utf-8')
+        name = self.widgets['preferences']['vcodec_name'].get_active_text()
         add.add_vcodec(self, name)
 
     def on_vcodec_remove_clicked(self, widget):
@@ -959,7 +966,7 @@ class Griffith(object):
                 session.delete(vcodec)
                 try:
                     session.commit()
-                except Exception, e:
+                except Exception as e:
                     session.rollback()
                     log.warn("Cannot remove video codec entry: %s", e.message)
                 else:
@@ -977,10 +984,10 @@ class Griffith(object):
         session = self.db.Session()
         vcodec = session.query(db.VCodec).filter_by(vcodec_id=vcodec_id).first()
         if vcodec:
-            vcodec.name = self.widgets['preferences']['vcodec_name'].get_active_text().decode('utf-8')
+            vcodec.name = self.widgets['preferences']['vcodec_name'].get_active_text()
             try:
                 session.commit()
-            except Exception, e:
+            except Exception as e:
                 session.rollback()
                 log.warn("Cannot rename video codec entry: %s", e.message)
             else:
@@ -1139,7 +1146,7 @@ class Griffith(object):
     # quick filter operations ---------------------------------------------
 
     def on_filter_criteria_changed(self, *args):
-        selected_criteria = self.widgets['filter']['criteria'].get_active_text().decode('utf-8')
+        selected_criteria = self.widgets['filter']['criteria'].get_active_text()
         self.config.set('criteria', selected_criteria, section='mainlist')
         quick_filter.change_filter(self)
 
@@ -1152,7 +1159,7 @@ class Griffith(object):
 
     def filter_txt_key_release(self, widget, event, *args):
         if bool(self.config.get('filter_on_enter', False, section='main')):
-            keyname = gtk.gdk.keyval_name(event.keyval)
+            keyname = Gtk.gdk.keyval_name(event.keyval)
             if keyname == "Return":
                 quick_filter.change_filter(self)
 
@@ -1200,7 +1207,7 @@ class Griffith(object):
                 self.config.set('height', self.mainwindow_state['height'], section='window')
                 self.config.set('left',   self.mainwindow_state['left'],   section='window')
                 self.config.set('top',    self.mainwindow_state['top'],    section='window')
-                if self.mainwindow_state.has_key('state'):
+                if 'state' in self.mainwindow_state:
                     self.config.set('state',  self.mainwindow_state['state'],  section='window')
                 else:
                     self.config.set('state',  0,  section='window')
@@ -1232,12 +1239,12 @@ class Griffith(object):
             # left offset of 4 points (Windows XP border size) and a top
             # offset of 30 points (height of the title bar) every time the
             # application is started. The window would move right-down.
-            self.widgets['window'].set_gravity(gtk.gdk.GRAVITY_STATIC)
+            self.widgets['window'].set_gravity(Gtk.gdk.GRAVITY_STATIC)
         if self.config.get("left", None, section='window') == None:
             pass
         else:
             state = self.config.get('state', '0', section='window')
-            if state == str(int(gtk.gdk.WINDOW_STATE_MAXIMIZED)):
+            if state == str(int(Gtk.gdk.WINDOW_STATE_MAXIMIZED)):
                 self.widgets['window'].maximize()
             else:
                 self.widgets['window'].move(int(self.config.get('left', section='window')), \
@@ -1359,13 +1366,13 @@ class Griffith(object):
 
     def on_key_press_event(self, widget, event):
         """some key events actions"""
-        keyname = gtk.gdk.keyval_name(event.keyval)
+        keyname = Gdk.keyval_name(event.keyval)
         if keyname == 'Delete' and self.widgets['treeview'].is_focus() == True:
             self.delete_movie()
 
     def on_p_tree_button_press_event(self, widget, event):
         """add a double click event to people tree"""
-        if event.type == gtk.gdk._2BUTTON_PRESS:
+        if event.type == Gtk.gdk._2BUTTON_PRESS:
             from people import edit_person
             edit_person(self)
 
@@ -1381,7 +1388,7 @@ class Griffith(object):
                 self.widgets['treeview'].grab_focus()
                 self.widgets['popups']['main'].popup( None, None, None, event.button, time)
             return 1
-        elif event.type == gtk.gdk._2BUTTON_PRESS:
+        elif event.type == Gtk.gdk._2BUTTON_PRESS:
             self.edit_movie()
 
     # -=[ results window ]=------------------------------------------------
@@ -1397,7 +1404,7 @@ class Griffith(object):
         return True
 
     def on_results_button_press_event(self, widget, event):
-        if event.type == gtk.gdk._2BUTTON_PRESS:
+        if event.type == Gtk.gdk._2BUTTON_PRESS:
             return self.on_results_select_press_event(widget)
         return self._resultswin_button_pressed_signal(widget, event)
 
@@ -1417,7 +1424,7 @@ class Griffith(object):
     def on_add_movie_results_button_press_event(self, widget, event):
         """add a double click event to add movie results"""
         # TODO: use on_results_select_press_event and its selected_key
-        if event.type == gtk.gdk._2BUTTON_PRESS:
+        if event.type == Gtk.gdk._2BUTTON_PRESS:
             add.populate_with_results(self)
 
     # -=[ treeview ]=------------------------------------------------------
@@ -1433,33 +1440,378 @@ class Griffith(object):
 
     def click_on(self, treeview, direction):
         treeselection = treeview.get_selection()
+        tp = Gtk.TreePath()
+        tc = Gtk.TreeViewColumn(0)
         if not treeselection:
-            treeview.set_cursor_on_cell(0)
-            return 2 # no selection => selecting first movie
-        if self.selected_iter[0] is None or direction=='first':
-            treeview.set_cursor_on_cell(0)
+            treeview.set_cursor_on_cell(tp, None, None, False)
+            return 2  # no selection => selecting first movie
+
+        if self.selected_iter[0] is None or direction == 'first':
+            treeview.set_cursor_on_cell(tp, None, None, False)
         elif direction == 'next':
             nextiter = treeview.get_model().iter_next(self.selected_iter[0])
             if not nextiter:
                 return
+
             if self.selected_iter[0] is None:
                 direction = 'last'
             else:
                 iterpath = treeview.get_model().get_path(nextiter)
-                treeview.set_cursor_on_cell(iterpath[0])
+                treeview.set_cursor_on_cell(Gtk.TreePath(iterpath[0]), None, None, False)
         elif direction == 'prev':
             iterpath = treeview.get_model().get_path(self.selected_iter[0])
             row = iterpath[0]
-            if row>0:
-                treeview.set_cursor_on_cell(row-1)
+            if row > 0:
+                treeview.set_cursor_on_cell(Gtk.TreePath(row-1), None, None, False)
             else:
-                treeview.set_cursor_on_cell(0)
+                treeview.set_cursor_on_cell(tp, tc, None, False)
+
         if direction == 'last':
             rows = len(treeview.get_model())
-            if rows>0:
-                treeview.set_cursor_on_cell(rows-1)
+            if rows > 0:
+                treeview.set_cursor_on_cell(Gtk.TreePath(rows-1), None, None, False)
             else:
-                treeview.set_cursor_on_cell(0)
+                treeview.set_cursor_on_cell(tp, None, None, False)
+
+############################################
+## Missing functions
+############################################
+    def on_b_print_cover_simple_clicked(self, event):
+        return
+
+    def on_cancel_print_cover_simple_clicked(self, event):
+        return
+
+    def on_b_print_cover_image_clicked(self, event):
+        return
+
+    def on_view_image_clicked(self, event):
+        return
+
+    def on_cb_reverse_toggled(self, event):
+        return
+
+    def on_save_preferences(self, event):
+        return
+
+    def on_cancel_preferences_clicked(self, event):
+        return
+
+    def on_people_edit_clicked(self, event):
+        return
+
+    def on_people_delete_clicked(self, event):
+        return
+
+    def on_people_add_clicked(self, event):
+        return
+
+    def on_cancel_people_clicked(self, event):
+        return
+
+    def on_loan_ok_clicked(self, event):
+        return
+
+    def on_cancel_loan_clicked(self, event):
+        return
+
+    def on_update_person_clicked(self, event):
+        return
+
+    def on_edit_person_cancel_clicked(self, event):
+        return
+
+    def on_advfilter_delete(self, event):
+        return
+
+    def on_advfilter_save(self, event):
+        return
+
+    def on_advfilter_open(self, event):
+        return
+
+    def on_advfilter_close(self, event):
+        return
+
+    def on_advfilter_clear(self, event):
+        return
+
+    def on_advfilter_add(self, event):
+        return
+
+    def on_add_person_db_clicked(self, event):
+        return
+
+    def on_add_person_cancel(self, event):
+        return
+
+    def on_results_select_clicked(self, event):
+        return
+
+    def on_results_cancel_clicked(self, event):
+        return
+
+    def on_popup_email_activate(self, event):
+        return
+
+    def on_popup_return_activate(self, event):
+        return
+
+    def on_popup_loan_activate(self, event):
+        return
+
+    def on_popup_choose_image_activate(self, event):
+        return
+
+    def on_popup_simple_activate(self, event):
+        return
+
+    def on_seen_activate(self, event):
+        return
+
+    def on_popup_clone_activate(self, event):
+        return
+
+    def on_popup_delete_activate(self, event):
+        return
+
+    def on_edit_button_clicked(self, event):
+        return
+
+    def gtk_main_quit(self, event):
+        return
+
+    def on_email_reminder_clicked(self, event):
+        return
+
+    def on_return_button_clicked(self, event):
+        return
+
+    def on_loan_button_clicked(self, event):
+        return
+
+    def on_m_show_collection_button_clicked(self, event):
+        return
+
+    def on_m_show_volume_button_clicked(self, event):
+        return
+
+    def on_zoom_poster(self, event):
+        return
+
+    def on_main_treeview_row_activated(self, event):
+        return
+
+    def on_main_treeview_row_activated(self, event):
+        return
+
+    def on_f_advfilter_changed(self, event):
+        return
+
+    def on_f_col_changed(self, event):
+        return
+
+    def on_clear_filter_clicked(self, event):
+        return
+
+    def on_filter_txt_changed(self, event):
+        return
+
+    def on_filter_txt_key_release(self, event):
+        return
+
+    def on_fetch_posters_from(self, event):
+        return
+
+    def on_open_advfilterwindow_clicked(self, event):
+        return
+
+    def on_delete_poster_clicked(self, event):
+        return
+
+    def on_open_poster_clickedon_go_trailer_clicked(self, event):
+        return
+
+    def on_go_site_clicked(self, event):
+        return
+
+    def on_go_o_site_clicked(self, event):
+        return
+
+    def on_edit_button_clicked(self, event):
+        return
+
+    def on_delete_movie_clicked(self, event):
+        return
+
+    def on_toolbar_add_clicked(self, event):
+        return
+
+    def on_go_last_clicked(self, event):
+        return
+
+    def on_go_forward_clicked(self, event):
+        return
+
+    def on_go_back_clicked(self, event):
+        return
+
+    def on_go_first_clicked(self, event):
+        return
+
+    def on_about1_activate(self, event):
+        return
+
+    def on_people_activate(self, event):
+        return
+
+    def on_email_reminder_clicked(self, event):
+        return
+
+    def on_return_button_clicked(self, event):
+        return
+
+    def on_loan_button_clicked(self, event):
+        return
+
+    def on_preferences1_activate(self, event):
+        return
+
+    def on_cover_choose_image_activate(self, event):
+        return
+
+    def on_cover_simple_activate(self, event):
+        return
+
+    def on_sugest_activate(self, event):
+        return
+
+    def on_open_advfilterwindow_clicked(self, event):
+        return
+
+    def on_all_movies_activate(self, event):
+        return
+
+    def on_list_loaned_movies_activate(self, event):
+        return
+
+    def on_seen_movies_activate(self, event):
+        return
+
+    def on_view_ext_toolbar_activate(self, event):
+        return
+
+    def on_view_toolbar_activate(self, event):
+        return
+
+    def on_fullscreen_activate(self, event):
+        return
+
+    def on_delete_poster_clicked(self, event):
+        return
+
+    def on_open_poster_clicked(self, event):
+        return
+
+    def on_select_all_activate(self, event):
+        return
+
+    def on_clone_activate(self, event):
+        return
+
+    def on_edit_button_clicked(self, event):
+        return
+
+    def on_delete1_movie_activate(self, event):
+        return
+
+    def on_add1_activate(self, event):
+        return
+
+    def on_quit1_activate(self, event):
+        return
+
+    def select_db_activate(self, event):
+        return
+
+    def on_restore_activate(self, event):
+        return
+
+    def on_backup_activate(self, event):
+        return
+
+    def on_new_activate(self, event):
+        return
+
+    def on_am_remove_collection_button_clicked(self, event):
+        return
+
+    def on_am_add_collection_button_clicked(self, event):
+        return
+
+    def on_am_remove_volume_button(self, event):
+        return
+
+    def on_am_add_volume_button_clicked(self, event):
+        return
+
+    def on_combo_source_changed(self, event):
+        return
+
+    def on_a_delete_poster(self, event):
+        return
+
+    def on_a_open_poster_clicked(self, event):
+        return
+
+    def on_rating_scale_add_value_changed(self, event):
+        return
+
+    def on_am_save_button_clicked(self, event):
+        return
+
+    def on_add_clear_clicked(self, event):
+        return
+
+    def on_add_movie_close_clicked(self, event):
+        return
+
+    def on_add_movie_clicked(self, event):
+        return
+
+    def on_cancel_add_movie_clicked(self, event):
+        return
+
+    def on_save_preferences_clicked(self, event):
+        return
+
+    def on_cancel_print_cover_image_clicked(self, event):
+        return
+
+    def on_add_person_cancel_clicked(self, event):
+        return
+
+    def on_zoom_poster_clicked(self, event):
+        return
+
+    def on_go_trailer_clicked(self, event):
+        return
+
+    def on_select_db_activate(self, event):
+        return
+
+    def on_am_remove_volume_button_clicked(self, event):
+        return
+
+    def on_get_from_web_clicked(self, event):
+        return
+
+    def on_a_delete_poster_clicked(self, event):
+        return
+
+    def on_hpaned1_move_handle(self, event):
+        return
+
 
 if __name__ == "__main__":
     # where Griffith should look for its data?
@@ -1467,6 +1819,7 @@ if __name__ == "__main__":
     if not (config_name.find('/') >= 0 or config_name.find('\\') >= 0):
         config_name = os.path.join(home_dir, config_name)
     log.debug("config file used: %s", config_name)
+    log.debug("home dir is: %s", home_dir)
     config = config.Config(file=config_name)
 
     if ('~' in version.pversion or '-' in version.pversion) and \
@@ -1482,6 +1835,4 @@ Do you want to proceed?""")):
             config.set('warned_version', version.pversion, section='devel')
 
     griffith = Griffith(home_dir, config)
-    gtk.main()
-
-# vim: fdm=marker
+    Gtk.main()
