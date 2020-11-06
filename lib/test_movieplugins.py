@@ -1,25 +1,29 @@
 # -*- coding: UTF-8 -*-
 
 __revision__ = '$Id: test_movieplugins.py 1651 2013-09-27 19:48:00Z mikej06 $'
+#               Updated to Gtk 3 2020 by Doug Lindquist
 
-# Copyright (c) 2006-2011
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Library General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+# Copyright © 2005-2010 Vasco Nunes, Piotr Ożarowski
+# Copyright 2020 Doug Lindquist doug.lindquist@protonmail.com
 
-# You may use and distribute this software under the terms of the
-# GNU General Public License, version 2 or later
+# Permission is hereby granted, free of charge, to any person obtaining
+# copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #
 # The code within this file is only used to automatically test movie plugins
@@ -52,7 +56,7 @@ from time import sleep
 try:
     import gi
     gi.require_version('Gtk', '3.0')
-    from gi.repository import Gtk
+    from gi.repository import Gtk, Gdk
 except:
     pass
 
@@ -314,31 +318,31 @@ class PluginTester:
         get_unsuccessful = ''
         # test all plugins ?
         test_all = True
-        dialog = gtk.MessageDialog(None,
-            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-            gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, 'Test all plugins ?')
-        dialog.add_buttons(gtk.STOCK_YES, gtk.RESPONSE_YES,
-            gtk.STOCK_NO, gtk.RESPONSE_NO)
-        dialog.set_default_response(gtk.RESPONSE_NO)
+        dialog = Gtk.MessageDialog(None,
+            Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+            Gtk.MESSAGE_QUESTION, Gtk.BUTTONS_NONE, 'Test all plugins ?')
+        dialog.add_buttons(Gtk.STOCK_YES, Gtk.RESPONSE_YES,
+            Gtk.STOCK_NO, Gtk.RESPONSE_NO)
+        dialog.set_default_response(Gtk.RESPONSE_NO)
         dialog.set_skip_taskbar_hint(False)
         response = dialog.run()
         dialog.destroy()
-        if not response == gtk.RESPONSE_YES:
+        if not response == Gtk.RESPONSE_YES:
             test_all = False
         # iterate through all testable plugins
         for i in self.test_plugins:
             if domsgbox and test_all == False:
                 # ask for test of that specific plugin
-                dialog = gtk.MessageDialog(None,
-                    gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                    gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, 'Test plugin %s ?' %i)
-                dialog.add_buttons(gtk.STOCK_YES, gtk.RESPONSE_YES,
-                    gtk.STOCK_NO, gtk.RESPONSE_NO)
-                dialog.set_default_response(gtk.RESPONSE_NO)
+                dialog = Gtk.MessageDialog(None,
+                    Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+                    Gtk.MESSAGE_QUESTION, Gtk.BUTTONS_NONE, 'Test plugin %s ?' %i)
+                dialog.add_buttons(Gtk.STOCK_YES, Gtk.RESPONSE_YES,
+                    Gtk.STOCK_NO, Gtk.RESPONSE_NO)
+                dialog.set_default_response(Gtk.RESPONSE_NO)
                 dialog.set_skip_taskbar_hint(False)
                 response = dialog.run()
                 dialog.destroy()
-                if not response == gtk.RESPONSE_YES:
+                if not response == Gtk.RESPONSE_YES:
                     continue
             print("Starting test of plugin: %s" % i)
             plugin = __import__(i)
@@ -358,8 +362,8 @@ class PluginTester:
 #
 # Start the tests
 #
-gtk.gdk.threads_init()
-gtk.gdk.threads_enter()
+Gtk.Gdk.threads_init()
+Gtk.Gdk.threads_enter()
 PluginTester().do_test()
-#gtk.main()
-gtk.gdk.threads_leave()
+#Gtk.main()
+Gtk.Gdk.threads_leave()

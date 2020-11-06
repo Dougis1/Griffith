@@ -1,28 +1,33 @@
 # -*- coding: UTF-8 -*-
 
 __revision__ = '$Id: gdebug.py 1326 2009-12-01 21:06:05Z mikej06 $'
+#               Updated to Gtk 3 2020 by Doug Lindquist
 
-# Copyright (c) 2009 Vasco Nunes, Piotr Ożarowski
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Library General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+# Copyright © 2005-2010 Vasco Nunes, Piotr Ożarowski
+# Copyright 2020 Doug Lindquist doug.lindquist@protonmail.com
 
-# You may use and distribute this software under the terms of the
-# GNU General Public License, version 2 or later
+# Permission is hereby granted, free of charge, to any person obtaining
+# copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import gtk
-import pygtk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 import sys
 import string
 import os
@@ -104,15 +109,15 @@ class GriffithDebug:
 #
 class DebugWindow:
     def __init__(self, window):
-        self.dialog = gtk.Dialog('Debug Window', window, gtk.DIALOG_MODAL, ())
+        self.dialog = Gtk.Dialog('Debug Window', window, Gtk.DIALOG_MODAL, ())
         self.dialog.set_destroy_with_parent(True)
         self.dialog.set_transient_for(window)
         self.dialog.set_modal(False)
-        self.textview = gtk.TextView()
+        self.textview = Gtk.TextView()
         self.textview.set_editable(False)
-        self.textview.set_wrap_mode(gtk.WRAP_WORD_CHAR)
-        self.textview.set_scroll_adjustments(gtk.Adjustment(1.0, 1.0, 100.0, 1.0, 10.0, 10.0), gtk.Adjustment(1.0, 1.0, 100.0, 1.0, 10.0, 10.0))
-        self.scrolledwindow = gtk.ScrolledWindow(None, None)
+        self.textview.set_wrap_mode(Gtk.WRAP_WORD_CHAR)
+        self.textview.set_scroll_adjustments(Gtk.Adjustment(1.0, 1.0, 100.0, 1.0, 10.0, 10.0), Gtk.Adjustment(1.0, 1.0, 100.0, 1.0, 10.0, 10.0))
+        self.scrolledwindow = Gtk.ScrolledWindow(None, None)
         self.scrolledwindow.add(self.textview)
         self.dialog.vbox.pack_start(self.scrolledwindow)
         self.dialog.set_default_size(640, 480)
@@ -129,7 +134,7 @@ class DebugWindow:
 
 #
 # used on windows system
-# redirects sys.stderr and sys.stdout to a debug window and 
+# redirects sys.stderr and sys.stdout to a debug window and
 # a program-defined log-file (py2exe independent)
 #
 class DebugWindowRedirector(object):
@@ -148,7 +153,7 @@ class DebugWindowRedirector(object):
             defaultLang, defaultEnc = getdefaultlocale()
             if defaultEnc is None:
                 defaultEnc = 'UTF-8'
-            self.debugFileName = os.path.join(logdir, 'griffith.log').decode(defaultEnc)
+            self.debugFileName = os.path.join(logdir, 'griffith.log')
             try:
                 # create the file to show that debug is running
                 f = open(self.debugFileName, 'w')
@@ -194,17 +199,17 @@ class DebugBlackholeBufferRedirector(object):
             defaultLang, defaultEnc = getdefaultlocale()
             if defaultEnc is None:
                 defaultEnc = 'UTF-8'
-            self.debugFileName = os.path.join(logdir, 'griffith.log').decode(defaultEnc)
+            self.debugFileName = os.path.join(logdir, 'griffith.log')
         else:
             self.debugFileName = None
     def write(self, text):
         try:
             log.info(text)
             self.buffer = string.join([self.buffer, text])
-        except Exception, e:
+        except Exception as e:
             # resetting to old output streams as last hope
             sys.stdout = sys.stderr = self.oldstream
-            print str(e)
+            print(str(e))
     def flush(self):
         if self.debugFileName and self.buffer:
             logfile = open(self.debugFileName, 'at')

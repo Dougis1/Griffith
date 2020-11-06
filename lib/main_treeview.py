@@ -50,10 +50,10 @@ def on_tree_selection(tree_selection, self):
         self.widgets['menu']['make_cover'].set_sensitive(True)
         self.widgets['menu']['loan'].set_sensitive(True)
         self.widgets['menu']['edit'].set_sensitive(True)
-#        self.widgets['popups']['edit'].set_sensitive(True)
-#        self.widgets['popups']['loan'].set_sensitive(True)
-#        self.widgets['popups']['clone'].set_sensitive(True)
-#        self.widgets['popups']['print_cover'].set_sensitive(True)
+        self.widgets['popups']['edit'].set_sensitive(True)
+        self.widgets['popups']['loan'].set_sensitive(True)
+        self.widgets['popups']['clone'].set_sensitive(True)
+        self.widgets['popups']['print_cover'].set_sensitive(True)
     else:
         set_details(self)
         # lets make some options unavailable when multiselction is active. for now.
@@ -62,10 +62,10 @@ def on_tree_selection(tree_selection, self):
         self.widgets['menu']['make_cover'].set_sensitive(False)
         self.widgets['menu']['loan'].set_sensitive(False)
         self.widgets['menu']['edit'].set_sensitive(False)
-#        self.widgets['popups']['edit'].set_sensitive(False)
-#        self.widgets['popups']['loan'].set_sensitive(False)
-#        self.widgets['popups']['clone'].set_sensitive(False)
-#        self.widgets['popups']['print_cover'].set_sensitive(False)
+        self.widgets['popups']['edit'].set_sensitive(False)
+        self.widgets['popups']['loan'].set_sensitive(False)
+        self.widgets['popups']['clone'].set_sensitive(False)
+        self.widgets['popups']['print_cover'].set_sensitive(False)
     treeview_clicked(self)
 
 
@@ -348,9 +348,9 @@ def set_details(self, item=None):  # {{{
             w['loan_info'].set_label(_("This movie has been loaned to %s on %s") % (self.person_name, self.loan_date[:10]))
 
     if 'loaned' in item and not item['loaned']:  # "loaned" status can be changed above, so don't use "else:" in this line
-#        self.widgets['popups']['loan'].set_sensitive(True)
-#        self.widgets['popups']['email'].set_sensitive(False)
-#        self.widgets['popups']['return'].set_sensitive(False)
+        self.widgets['popups']['loan'].set_sensitive(True)
+        self.widgets['popups']['email'].set_sensitive(False)
+        self.widgets['popups']['return'].set_sensitive(False)
         self.widgets['menu']['loan'].set_sensitive(True)
         self.widgets['menu']['email'].set_sensitive(False)
         self.widgets['menu']['return'].set_sensitive(False)
@@ -410,7 +410,7 @@ def set_details(self, item=None):  # {{{
                     tmp = "%s - %s" % (i.language.name, i.subformat.name)
                 else:
                     tmp = "%s" % i.language.name
-                w['subtitle_vbox'].pack_start(gtk.Label(tmp))
+                w['subtitle_vbox'].pack_start(Gtk.Label(tmp))
             else:
                 language = i.language.name
                 if i.type is not None and len(self._lang_types[i.type]) > 0:
@@ -427,7 +427,7 @@ def set_details(self, item=None):  # {{{
                     tmp = "%s (%s)" % (language, tmp)
                 else:
                     tmp = language
-                widget = gtk.Label(tmp)
+                widget = Gtk.Label(tmp)
                 widget.set_use_markup(True)
                 w['audio_vbox'].pack_start(widget)
 

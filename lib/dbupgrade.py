@@ -42,51 +42,51 @@ def upgrade_database(self, version, config):
         log.info('Creating new database...')
         # version is 0 or none only for new databases
         db.metadata.create_all(b)
-        db.tables.configuration.insert(bind=b).execute(param=u'version', value=unicode(self.version))
-        db.tables.media.insert(bind=b).execute(name=u'DVD')
-        db.tables.media.insert(bind=b).execute(name=u'DVD-R')
-        db.tables.media.insert(bind=b).execute(name=u'DVD-RW')
-        db.tables.media.insert(bind=b).execute(name=u'DVD+R')
-        db.tables.media.insert(bind=b).execute(name=u'DVD+RW')
-        db.tables.media.insert(bind=b).execute(name=u'DVD-RAM')
-        db.tables.media.insert(bind=b).execute(name=u'CD')
-        db.tables.media.insert(bind=b).execute(name=u'CD-RW')
-        db.tables.media.insert(bind=b).execute(name=u'VCD')
-        db.tables.media.insert(bind=b).execute(name=u'SVCD')
-        db.tables.media.insert(bind=b).execute(name=u'VHS')
-        db.tables.media.insert(bind=b).execute(name=u'BETACAM')
-        db.tables.media.insert(bind=b).execute(name=u'LaserDisc')
-        db.tables.media.insert(bind=b).execute(name=u'HD DVD')
-        db.tables.media.insert(bind=b).execute(name=u'Blu-ray')
-        db.tables.ratios.insert(bind=b).execute(name=u'16:9')
-        db.tables.ratios.insert(bind=b).execute(name=u'16:10')
-        db.tables.ratios.insert(bind=b).execute(name=u'4:3')
-        db.tables.acodecs.insert(bind=b).execute(name=u'AC-3 Dolby audio')
-        db.tables.acodecs.insert(bind=b).execute(name=u'OGG')
-        db.tables.acodecs.insert(bind=b).execute(name=u'MP3')
-        db.tables.acodecs.insert(bind=b).execute(name=u'MPEG-1')
-        db.tables.acodecs.insert(bind=b).execute(name=u'MPEG-2')
-        db.tables.acodecs.insert(bind=b).execute(name=u'AAC')
-        db.tables.acodecs.insert(bind=b).execute(name=u'Windows Media Audio')
-        db.tables.vcodecs.insert(bind=b).execute(name=u'MPEG-1')
-        db.tables.vcodecs.insert(bind=b).execute(name=u'MPEG-2')
-        db.tables.vcodecs.insert(bind=b).execute(name=u'XviD')
-        db.tables.vcodecs.insert(bind=b).execute(name=u'DivX')
-        db.tables.vcodecs.insert(bind=b).execute(name=u'H.264')
-        db.tables.vcodecs.insert(bind=b).execute(name=u'RealVideo')
-        db.tables.vcodecs.insert(bind=b).execute(name=u'QuickTime')
-        db.tables.vcodecs.insert(bind=b).execute(name=u'Windows Media Video')
-        db.tables.achannels.insert(bind=b).execute(name=u'mono')
-        db.tables.achannels.insert(bind=b).execute(name=u'stereo')
-        db.tables.achannels.insert(bind=b).execute(name=u'5.1')
-        db.tables.achannels.insert(bind=b).execute(name=u'7.1')
-        db.tables.subformats.insert(bind=b).execute(name=u'DVD VOB')
-        db.tables.subformats.insert(bind=b).execute(name=u'MPL2 (.txt)')
-        db.tables.subformats.insert(bind=b).execute(name=u'MicroDVD (.sub)')
-        db.tables.subformats.insert(bind=b).execute(name=u'SubRip (.srt)')
-        db.tables.subformats.insert(bind=b).execute(name=u'SubViewer2 (.sub)')
-        db.tables.subformats.insert(bind=b).execute(name=u'Sub Station Alpha (.ssa)')
-        db.tables.subformats.insert(bind=b).execute(name=u'Advanced Sub Station Alpha (.ssa)')
+        db.tables.configuration.insert(bind=b).execute(param='version', value=str(self.version))
+        db.tables.media.insert(bind=b).execute(name='DVD')
+        db.tables.media.insert(bind=b).execute(name='DVD-R')
+        db.tables.media.insert(bind=b).execute(name='DVD-RW')
+        db.tables.media.insert(bind=b).execute(name='DVD+R')
+        db.tables.media.insert(bind=b).execute(name='DVD+RW')
+        db.tables.media.insert(bind=b).execute(name='DVD-RAM')
+        db.tables.media.insert(bind=b).execute(name='CD')
+        db.tables.media.insert(bind=b).execute(name='CD-RW')
+        db.tables.media.insert(bind=b).execute(name='VCD')
+        db.tables.media.insert(bind=b).execute(name='SVCD')
+        db.tables.media.insert(bind=b).execute(name='VHS')
+        db.tables.media.insert(bind=b).execute(name='BETACAM')
+        db.tables.media.insert(bind=b).execute(name='LaserDisc')
+        db.tables.media.insert(bind=b).execute(name='HD DVD')
+        db.tables.media.insert(bind=b).execute(name='Blu-ray')
+        db.tables.ratios.insert(bind=b).execute(name='16:9')
+        db.tables.ratios.insert(bind=b).execute(name='16:10')
+        db.tables.ratios.insert(bind=b).execute(name='4:3')
+        db.tables.acodecs.insert(bind=b).execute(name='AC-3 Dolby audio')
+        db.tables.acodecs.insert(bind=b).execute(name='OGG')
+        db.tables.acodecs.insert(bind=b).execute(name='MP3')
+        db.tables.acodecs.insert(bind=b).execute(name='MPEG-1')
+        db.tables.acodecs.insert(bind=b).execute(name='MPEG-2')
+        db.tables.acodecs.insert(bind=b).execute(name='AAC')
+        db.tables.acodecs.insert(bind=b).execute(name='Windows Media Audio')
+        db.tables.vcodecs.insert(bind=b).execute(name='MPEG-1')
+        db.tables.vcodecs.insert(bind=b).execute(name='MPEG-2')
+        db.tables.vcodecs.insert(bind=b).execute(name='XviD')
+        db.tables.vcodecs.insert(bind=b).execute(name='DivX')
+        db.tables.vcodecs.insert(bind=b).execute(name='H.264')
+        db.tables.vcodecs.insert(bind=b).execute(name='RealVideo')
+        db.tables.vcodecs.insert(bind=b).execute(name='QuickTime')
+        db.tables.vcodecs.insert(bind=b).execute(name='Windows Media Video')
+        db.tables.achannels.insert(bind=b).execute(name='mono')
+        db.tables.achannels.insert(bind=b).execute(name='stereo')
+        db.tables.achannels.insert(bind=b).execute(name='5.1')
+        db.tables.achannels.insert(bind=b).execute(name='7.1')
+        db.tables.subformats.insert(bind=b).execute(name='DVD VOB')
+        db.tables.subformats.insert(bind=b).execute(name='MPL2 (.txt)')
+        db.tables.subformats.insert(bind=b).execute(name='MicroDVD (.sub)')
+        db.tables.subformats.insert(bind=b).execute(name='SubRip (.srt)')
+        db.tables.subformats.insert(bind=b).execute(name='SubViewer2 (.sub)')
+        db.tables.subformats.insert(bind=b).execute(name='Sub Station Alpha (.ssa)')
+        db.tables.subformats.insert(bind=b).execute(name='Advanced Sub Station Alpha (.ssa)')
         db.tables.languages.insert(bind=b).execute(name=_('Brazilian Portuguese'))
         db.tables.languages.insert(bind=b).execute(name=_('Bulgarian'))
         db.tables.languages.insert(bind=b).execute(name=_('Catalan'))
@@ -125,8 +125,8 @@ def upgrade_database(self, version, config):
         version += 1
         log.info("Upgrading database to version %d...", version)
         b.execute("UPDATE loans SET return_date='2007-01-01' WHERE return_date='None';")
-        db_version = self.session.query(db.Configuration).filter_by(param=u'version').one()
-        db_version.value = unicode(version)
+        db_version = self.session.query(db.Configuration).filter_by(param='version').one()
+        db_version.value = str(version)
         self.session.add(db_version)
         self.session.commit()
     if version == 2:    # fix changes between v2 and v3
@@ -140,9 +140,9 @@ def upgrade_database(self, version, config):
         db.tables.filters.create(checkfirst=True, bind=b)
         db.tables.ratios.create(checkfirst=True, bind=b)
         try:
-            db.tables.ratios.insert(bind=b).execute(name=u'16:9')
-            db.tables.ratios.insert(bind=b).execute(name=u'4:3')
-        except IntegrityError, e:
+            db.tables.ratios.insert(bind=b).execute(name='16:9')
+            db.tables.ratios.insert(bind=b).execute(name='4:3')
+        except IntegrityError as e:
             # if the following conversion of the posters takes to long and the user
             # kills the application the database is in a undefined state which throughs that exception
             log.warn("Cannot add values because they exist already: %s", e)
@@ -158,17 +158,17 @@ def upgrade_database(self, version, config):
             pass
         elif e_type == 'mssql':
             pass
-        for key, query in queries.items():
+        for key, query in list(queries.items()):
             try:
                 self.session.bind.execute(query)
-            except OperationalError, e:
+            except OperationalError as e:
                 if e.message.lower().find('duplicate column name') > -1:
                     log.warn("Cannot add '%s' column because it exists already: %s", key, e)
                     continue
                 else:
                     log.error("Cannot add '%s' column: %s", key, e)
                     return False
-            except Exception, e:
+            except Exception as e:
                 log.error("Cannot add '%s' column: %s", key, e)
                 return False
 
@@ -197,7 +197,7 @@ def upgrade_database(self, version, config):
                     # it slows down the process a lot, but at least we can skip buggy posters
                     update_query.execute()
                     self.session.commit()
-                except Exception, e:
+                except Exception as e:
                     self.session.rollback()
                     log.error(e)
                 else:
@@ -221,8 +221,8 @@ def upgrade_database(self, version, config):
                 updated[poster_file_name] = True
         del updated
 
-        db_version = self.session.query(db.Configuration).filter_by(param=u'version').one()
-        db_version.value = unicode(version)
+        db_version = self.session.query(db.Configuration).filter_by(param='version').one()
+        db_version.value = str(version)
         self.session.add(db_version)
         self.session.commit()
 
@@ -236,15 +236,15 @@ def upgrade_database(self, version, config):
                    'width': 'ALTER TABLE movies ADD width SMALLINT NULL;',
                    'height': 'ALTER TABLE movies ADD height SMALLINT NULL;'}
 
-        for key, query in queries.items():
+        for key, query in list(queries.items()):
             try:
                 self.session.bind.execute(query)
-            except Exception, e:
+            except Exception as e:
                 log.error("Cannot add '%s' column: %s", key, e)
                 return False
 
-        db_version = self.session.query(db.Configuration).filter_by(param=u'version').one()
-        db_version.value = unicode(version)
+        db_version = self.session.query(db.Configuration).filter_by(param='version').one()
+        db_version.value = str(version)
         self.session.add(db_version)
         self.session.commit()
 
@@ -257,8 +257,8 @@ def upgrade_database(self, version, config):
         query = 'DELETE FROM filters;'
         self.session.bind.execute(query)
 
-        db_version = self.session.query(db.Configuration).filter_by(param=u'version').one()
-        db_version.value = unicode(version)
+        db_version = self.session.query(db.Configuration).filter_by(param='version').one()
+        db_version.value = str(version)
         self.session.add(db_version)
         self.session.commit()
 
@@ -273,15 +273,15 @@ def upgrade_database(self, version, config):
         else:
             queries = {'created': 'ALTER TABLE movies ADD created DATETIME;',
                        'updated': 'ALTER TABLE movies ADD updated DATETIME;'}
-        for key, query in queries.items():
+        for key, query in list(queries.items()):
             try:
                 self.session.bind.execute(query)
-            except Exception, e:
+            except Exception as e:
                 log.error("Cannot add '%s' column: %s", key, e)
                 return False
 
-        db_version = self.session.query(db.Configuration).filter_by(param=u'version').one()
-        db_version.value = unicode(version)
+        db_version = self.session.query(db.Configuration).filter_by(param='version').one()
+        db_version.value = str(version)
         self.session.add(db_version)
         self.session.commit()
 
@@ -338,13 +338,13 @@ def convert_from_old_db(config, source_file, destination_file, locations):    #{
 
     try:
         old_db = sqlite.connect(source_file)
-    except sqlite.DatabaseError, e:
+    except sqlite.DatabaseError as e:
         if str(e) == 'file is encrypted or is not a database':
-            print 'Your database is most probably in SQLite2 format, please convert it to SQLite3:'
-            print '$ sqlite ~/.griffith/griffith.gri .dump | sqlite3 ~/.griffith/griffith.gri3'
-            print '$ mv ~/.griffith/griffith.gri{,2}'
-            print '$ mv ~/.griffith/griffith.gri{3,}'
-            print 'or install pysqlite in version 1.0'
+            print('Your database is most probably in SQLite2 format, please convert it to SQLite3:')
+            print('$ sqlite ~/.griffith/griffith.gri .dump | sqlite3 ~/.griffith/griffith.gri3')
+            print('$ mv ~/.griffith/griffith.gri{,2}')
+            print('$ mv ~/.griffith/griffith.gri{3,}')
+            print('or install pysqlite in version 1.0')
             gutils.warning(_("Your database is most probably in SQLite2 format, please convert it to SQLite3"))
         else:
             raise
@@ -400,27 +400,27 @@ def convert_from_old_db(config, source_file, destination_file, locations):    #{
     new_db = GriffithSQL(config, locations['home'], fallback=False)
 
     # collections
-    collection_mapper = {'': None, u'': None, 0: None, '0': None, -1: None, '-1': None}
+    collection_mapper = {'': None, '': None, 0: None, '0': None, -1: None, '-1': None}
     old_cursor.execute("SELECT id, name FROM collections;") # loaned status will be set later - buggy databases :-(
     for i in old_cursor.fetchall():
         o = db.Collection(name=i[1])
         try:
             new_db.session.add(o)
             new_db.session.commit()
-        except Exception, e:
+        except Exception as e:
             log.error(e)
             continue
         collection_mapper[i[0]] = o.collection_id
 
     # volumes
-    volume_mapper = {'': None, u'': None, 0: None, '0': None, -1: None, '-1': None}
+    volume_mapper = {'': None, '': None, 0: None, '0': None, -1: None, '-1': None}
     old_cursor.execute("SELECT id, name FROM volumes;") # loaned status will be set later - buggy databases :-(
     for i in old_cursor.fetchall():
         o = db.Volume(name=i[1])
         try:
             new_db.session.add(o)
             new_db.session.commit()
-        except Exception, e:
+        except Exception as e:
             log.error(e)
             continue
         volume_mapper[i[0]] = o.volume_id
@@ -433,13 +433,13 @@ def convert_from_old_db(config, source_file, destination_file, locations):    #{
         try:
             new_db.session.add(o)
             new_db.session.commit()
-        except Exception, e:
+        except Exception as e:
             log.error(e)
             continue
         person_mapper[i[0]] = o.person_id
 
     # languages
-    language_mapper = {'': None, u'': None, 0: None, '0': None, -1: None, '-1': None}
+    language_mapper = {'': None, '': None, 0: None, '0': None, -1: None, '-1': None}
     old_cursor.execute("SELECT id, name FROM languages;")
     for i in old_cursor.fetchall():
         o = new_db.session.query(db.Lang).filter_by(name=i[1]).first()
@@ -450,13 +450,13 @@ def convert_from_old_db(config, source_file, destination_file, locations):    #{
             try:
                 new_db.session.add(o)
                 new_db.session.commit()
-            except Exception, e:
+            except Exception as e:
                 log.error(e)
                 continue
             language_mapper[i[0]] = o.lang_id
 
     # media
-    medium_mapper = {'': None, u'': None, 0: None, '0': None, -1: None, '-1': None}
+    medium_mapper = {'': None, '': None, 0: None, '0': None, -1: None, '-1': None}
     old_cursor.execute("SELECT id, name FROM media;")
     for i in old_cursor.fetchall():
         o = new_db.session.query(db.Medium).filter_by(name=i[1]).first()
@@ -467,7 +467,7 @@ def convert_from_old_db(config, source_file, destination_file, locations):    #{
             try:
                 new_db.session.add(o)
                 new_db.session.commit()
-            except Exception, e:
+            except Exception as e:
                 log.error(e)
                 continue
             medium_mapper[i[0]] = o.medium_id
@@ -484,7 +484,7 @@ def convert_from_old_db(config, source_file, destination_file, locations):    #{
             try:
                 new_db.session.add(o)
                 new_db.session.commit()
-            except Exception, e:
+            except Exception as e:
                 log.error(e)
                 continue
             tag_mapper[i[0]] = o.tag_id
@@ -534,7 +534,7 @@ def convert_from_old_db(config, source_file, destination_file, locations):    #{
         try:
             new_db.session.add(o)
             new_db.session.commit()
-        except Exception, e:
+        except Exception as e:
             log.error(e)
             continue
         movie_mapper[i[0]] = o.movie_id
@@ -550,7 +550,7 @@ def convert_from_old_db(config, source_file, destination_file, locations):    #{
             try:
                 new_db.session.add(m)
                 new_db.session.commit()
-            except Exception, e:
+            except Exception as e:
                 log.error(e)
                 continue
 
@@ -565,7 +565,7 @@ def convert_from_old_db(config, source_file, destination_file, locations):    #{
             try:
                 new_db.session.add(m)
                 new_db.session.commit()
-            except Exception, e:
+            except Exception as e:
                 log.error(e)
                 continue
 
@@ -578,13 +578,13 @@ def convert_from_old_db(config, source_file, destination_file, locations):    #{
         if int(i[2]) > 0:
             try:
                 vol = new_db.session.query(db.Volume).filter_by(volume_id=volume_mapper[i[2]]).one()
-            except Exception, e:
+            except Exception as e:
                 log.error(e)
                 continue
         if int(i[3]) > 0:
             try:
                 col = new_db.session.query(db.Collection).filter_by(collection_id=collection_mapper[i[3]]).one()
-            except Exception, e:
+            except Exception as e:
                 log.error(e)
                 continue
         if int(i[1]) == 0:
@@ -598,7 +598,7 @@ def convert_from_old_db(config, source_file, destination_file, locations):    #{
         else:
             try:
                 m = new_db.session.query(db.Movie).filter_by(movie_id=movie_mapper[i[1]]).one()
-            except Exception, e:
+            except Exception as e:
                 log.error(e)
                 continue
 
@@ -627,7 +627,7 @@ def convert_from_old_db(config, source_file, destination_file, locations):    #{
         try:
             new_db.session.add(m)
             new_db.session.commit()
-        except Exception, e:
+        except Exception as e:
             log.error(e)
             continue
     #clear_mappers()

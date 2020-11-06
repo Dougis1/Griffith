@@ -2,23 +2,29 @@
 __revision__ = '$Id: advfilter.py 1478 2010-11-23 20:25:16Z mikej06 $'
 
 # Copyright (c) 2008 Vasco Nunes, Piotr Ożarowski
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Library General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+#               Updated to Gtk 3 2020 by Doug Lindquist
 
-# You may use and distribute this software under the terms of the
-# GNU General Public License, version 2 or later
+# Copyright © 2005-2010 Vasco Nunes, Piotr Ożarowski
+# Copyright 2020 Doug Lindquist doug.lindquist@protonmail.com
+
+# Permission is hereby granted, free of charge, to any person obtaining
+# copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
 from copy import deepcopy
@@ -76,7 +82,7 @@ QUERY_COMMAND_NAMES = {
 
 
 def show_window(self):
-    if self.widgets['advfilter']['window'].flags() & gtk.VISIBLE == gtk.VISIBLE:
+    if self.widgets['advfilter']['window'].flags() & Gtk.VISIBLE == Gtk.VISIBLE:
         self.widgets['advfilter']['window'].present()
         return True
     initialize(self.widgets['advfilter'], self.db, self.field_names)
@@ -113,19 +119,19 @@ def hide_window(self):
 
 def _fill_container(container, items, options, id_name):
     for item in items:
-        hbox = gtk.HBox()
+        hbox = Gtk.HBox()
 
-        label_id = gtk.Label()
+        label_id = Gtk.Label()
         label_id.set_text(str(getattr(item, id_name)))
         hbox.pack_start(label_id, expand=False)
 
-        widget = gtk.RadioButton(label=options[0]) # first widget
+        widget = Gtk.RadioButton(label=options[0]) # first widget
         hbox.pack_start(widget, expand=False, padding=4)
         for option in options[1:]: # create rest of the widgets, use first one as a group
-            next_widget = gtk.RadioButton(widget, label=option)
+            next_widget = Gtk.RadioButton(widget, label=option)
             hbox.pack_start(next_widget, expand=False, padding=4)
 
-        label = gtk.Label()
+        label = Gtk.Label()
         label.set_text(item.name)
         hbox.pack_start(label, padding=16, expand=False)
 
@@ -179,9 +185,9 @@ def initialize(widgets, gsql, field_names):
 
 
 def add_query_widget(container, field_names, sel_qf='title', sel_comm='contains', text=''):
-    hbox = gtk.HBox()
+    hbox = Gtk.HBox()
 
-    cb = gtk.combo_box_new_text()
+    cb = Gtk.combo_box_new_text()
     select = 0
     for i, field in enumerate(QUERY_FIELDS):
         if sel_qf == field:
@@ -189,7 +195,7 @@ def add_query_widget(container, field_names, sel_qf='title', sel_comm='contains'
         cb.append_text(field_names[field])
     cb.set_active(select)
 
-    action_cb = gtk.combo_box_new_text()
+    action_cb = Gtk.combo_box_new_text()
     select = 0
     for i, command in enumerate(QUERY_COMMANDS):
         if sel_comm == command:
@@ -197,10 +203,10 @@ def add_query_widget(container, field_names, sel_qf='title', sel_comm='contains'
         action_cb.append_text(QUERY_COMMAND_NAMES[command])
     action_cb.set_active(select)
 
-    entry = gtk.Entry()
+    entry = Gtk.Entry()
     entry.set_text(text)
 
-    button = gtk.Button(stock=gtk.STOCK_DELETE)
+    button = Gtk.Button(stock=Gtk.STOCK_DELETE)
     button.connect("clicked", lambda w: hbox.destroy())
 
     hbox.pack_start(cb, expand=False)

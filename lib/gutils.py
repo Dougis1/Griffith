@@ -1,25 +1,29 @@
 # -*- coding: UTF-8 -*-
 
 __revision__ = '$Id: gutils.py 1582 2011-09-04 21:08:14Z piotrek $'
+#               Updated to Gtk 3 2020 by Doug Lindquist
 
-# Copyright (c) 2005-2009 Vasco Nunes, Piotr Ożarowski
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Library General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+# Copyright © 2005-2010 Vasco Nunes, Piotr Ożarowski
+# Copyright 2020 Doug Lindquist doug.lindquist@protonmail.com
 
-# You may use and distribute this software under the terms of the
-# GNU General Public License, version 2 or later
+# Permission is hereby granted, free of charge, to any person obtaining
+# copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import gzip
 import html.entities
@@ -35,10 +39,10 @@ import platform
 try:
     import gi
     gi.require_version('Gtk', '3.0')
-    from gi.repository import Gtk
+    from gi.repository import Gtk, Gdk
     import db
 except:
-    gtk = None
+    Gtk = None
     pass
 
 mac = False
@@ -164,14 +168,14 @@ def progress(blocks, size_block, size):
 
 def set_model_from_list(cb, items):
     """Setup a ComboBox or ComboBoxEntry based on a list of strings."""
-    model = gtk.ListStore(str)
+    model = Gtk.ListStore(str)
     for i in items:
         model.append([i])
     cb.set_model(model)
-    if type(cb) == gtk.ComboBoxEntry:
+    if type(cb) == Gtk.ComboBoxEntry:
         cb.set_text_column(0)
-    elif type(cb) == gtk.ComboBox:
-        cell = gtk.CellRendererText()
+    elif type(cb) == Gtk.ComboBox:
+        cell = Gtk.CellRendererText()
         cb.pack_start(cell, True)
         cb.add_attribute(cell, 'text', 0)
 
@@ -264,18 +268,18 @@ def gdecode(txt, encode):
 
 
 def error(msg, parent=None):
-    dialog = gtk.MessageDialog(parent,
-            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-            gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, msg)
+    dialog = Gtk.MessageDialog(parent,
+            Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+            Gtk.MESSAGE_ERROR, Gtk.BUTTONS_OK, msg)
     dialog.set_skip_taskbar_hint(False)
     dialog.run()
     dialog.destroy()
 
 
 def urllib_error(msg, parent=None):
-    dialog = gtk.MessageDialog(parent,
-            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-            gtk.MESSAGE_ERROR, gtk.BUTTONS_OK, msg)
+    dialog = Gtk.MessageDialog(parent,
+            Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+            Gtk.MESSAGE_ERROR, Gtk.BUTTONS_OK, msg)
     dialog.set_skip_taskbar_hint(False)
     dialog.run()
     dialog.destroy()
@@ -285,9 +289,9 @@ def warning(msg, parent=None):
     if mac:
         macutils.createAlert(msg)
     else:
-        dialog = gtk.MessageDialog(parent,
-            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-            gtk.MESSAGE_WARNING, gtk.BUTTONS_OK, msg)
+        dialog = Gtk.MessageDialog(parent,
+            Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+            Gtk.MESSAGE_WARNING, Gtk.BUTTONS_OK, msg)
         dialog.set_skip_taskbar_hint(False)
         dialog.run()
         dialog.destroy()
@@ -296,9 +300,9 @@ def info(msg, parent=None):
     if mac:
         macutils.createAlert(msg)
     else:
-        dialog = gtk.MessageDialog(parent,
-                gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-                gtk.MESSAGE_INFO, gtk.BUTTONS_OK, msg)
+        dialog = Gtk.MessageDialog(parent,
+                Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+                Gtk.MESSAGE_INFO, Gtk.BUTTONS_OK, msg)
         dialog.set_skip_taskbar_hint(False)
         dialog.run()
         dialog.destroy()
@@ -308,16 +312,16 @@ def question(msg, window=None):
         response = macutils.question(msg)
         return response
     else:
-        dialog = gtk.MessageDialog(window,
-            gtk.DIALOG_MODAL | gtk.DIALOG_DESTROY_WITH_PARENT,
-            gtk.MESSAGE_QUESTION, gtk.BUTTONS_NONE, msg)
-        dialog.add_buttons(gtk.STOCK_YES, gtk.RESPONSE_YES,
-            gtk.STOCK_NO, gtk.RESPONSE_NO)
-        dialog.set_default_response(gtk.RESPONSE_NO)
+        dialog = Gtk.MessageDialog(window,
+            Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+            Gtk.MESSAGE_QUESTION, Gtk.BUTTONS_NONE, msg)
+        dialog.add_buttons(Gtk.STOCK_YES, Gtk.RESPONSE_YES,
+            Gtk.STOCK_NO, Gtk.RESPONSE_NO)
+        dialog.set_default_response(Gtk.RESPONSE_NO)
         dialog.set_skip_taskbar_hint(False)
         response = dialog.run()
         dialog.destroy()
-        return response in (gtk.RESPONSE_OK, gtk.RESPONSE_YES)
+        return response in (Gtk.RESPONSE_OK, Gtk.RESPONSE_YES)
 
 def popup_message(message):
     """shows popup message while executing decorated function"""
@@ -326,21 +330,21 @@ def popup_message(message):
 
         def wrapped_f(*args, **kwargs):
             if gtk:
-                window = gtk.Window()
+                window = Gtk.Window()
                 window.set_title('Griffith info')
-                window.set_position(gtk.WIN_POS_CENTER)
+                window.set_position(Gtk.WIN_POS_CENTER)
                 window.set_keep_above(True)
                 window.stick()
                 window.set_default_size(200, 50)
-                label = gtk.Label()
+                label = Gtk.Label()
                 label.set_markup("""<big><b>Griffith:</b>
 %s</big>""" % message)
                 window.add(label)
                 window.set_modal(True)
-                window.set_type_hint(gtk.gdk.WINDOW_TYPE_HINT_DIALOG)
+                window.set_type_hint(Gtk.Gdk.WINDOW_TYPE_HINT_DIALOG)
                 window.show_all()
-                while gtk.events_pending():    # give GTK some time for updates
-                    gtk.main_iteration()
+                while Gtk.events_pending():    # give GTK some time for updates
+                    Gtk.main_iteration()
             else:
                 print(message, end=' ')
             res = f(*args, **kwargs)
@@ -371,15 +375,15 @@ def file_chooser(title, action=None, buttons=None, name='', folder=os.path.expan
         else:
             return False
     else:
-        dialog = gtk.FileChooserDialog(title=title, action=action, buttons=buttons)
-        dialog.set_default_response(gtk.RESPONSE_OK)
+        dialog = Gtk.FileChooserDialog(title=title, action=action, buttons=buttons)
+        dialog.set_default_response(Gtk.RESPONSE_OK)
         if name:
             dialog.set_current_name(name)
         if folder:
             dialog.set_current_folder(folder)
-        mfilter = gtk.FileFilter()
+        mfilter = Gtk.FileFilter()
         if picture:
-            preview = gtk.Image()
+            preview = Gtk.Image()
             dialog.set_preview_widget(preview)
             dialog.connect("update-preview", update_preview_cb, preview)
             mfilter.set_name(_("Images"))
@@ -398,16 +402,16 @@ def file_chooser(title, action=None, buttons=None, name='', folder=os.path.expan
             mfilter.add_pattern('*.[gG][rR][iI]')
             mfilter.add_pattern('*.[dD][bB]')
             dialog.add_filter(mfilter)
-        mfilter = gtk.FileFilter()
+        mfilter = Gtk.FileFilter()
         mfilter.set_name(_("All files"))
         mfilter.add_pattern("*")
         dialog.add_filter(mfilter)
 
 
         response = dialog.run()
-        if response == gtk.RESPONSE_OK:
+        if response == Gtk.RESPONSE_OK:
             filename = dialog.get_filename()
-        elif response == gtk.RESPONSE_CANCEL:
+        elif response == Gtk.RESPONSE_CANCEL:
             filename = None
         else:
             return False
@@ -419,7 +423,7 @@ def file_chooser(title, action=None, buttons=None, name='', folder=os.path.expan
 def update_preview_cb(file_chooser, preview):
     filename = file_chooser.get_preview_filename()
     try:
-        pixbuf = gtk.gdk.pixbuf_new_from_file_at_size(filename, 128, 128)
+        pixbuf = Gtk.Gdk.pixbuf_new_from_file_at_size(filename, 128, 128)
         preview.set_from_pixbuf(pixbuf)
         have_preview = True
     except:
@@ -504,28 +508,28 @@ def get_dependencies():
 
 #    try:
 #        import gtk
-#        version = '.'.join([str(i) for i in gtk.pygtk_version])
-#        if gtk.pygtk_version <= (2, 6, 0):
+#        version = '.'.join([str(i) for i in Gtk.pygtk_version])
+#        if Gtk.pygtk_version <= (2, 6, 0):
 #            version = '-%s' % version
 #    except:
 #        version = False
 #    depend.append({'module': 'gtk',
 #        'version': version,
 #        'module_req': '2.6',
-#        'url': 'http://www.pygtk.org/',
+#        'url': 'http://www.pyGtk.org/',
 #        'debian': 'python-gtk2',
 #        'debian_req': '2.8.6-1'})
 #        # TODO: 'fedora', 'suse', etc.
 
 #    try:
-#        import gtk.glade
-#        # (version == gtk.pygtk_version)
+#        import Gtk.glade
+#        # (version == Gtk.pygtk_version)
 #    except:
 #        version = False
-#    depend.append({'module': 'gtk.glade',
+#    depend.append({'module': 'Gtk.glade',
 #        'version': version,
 #        'module_req': '2.6',
-#        'url': 'http://www.pygtk.org/',
+#        'url': 'http://www.pyGtk.org/',
 #        'debian': 'python-glade2',
 #        'debian_req': '2.8.6-1'})
 
@@ -750,7 +754,7 @@ def create_image_cache(md5sum, gsql):
         f.write(poster.data)
         f.close()
 
-    image = gtk.Image()
+    image = Gtk.Image()
     image.set_from_file(fn_big)
 
     if not os.path.isfile(fn_medium):

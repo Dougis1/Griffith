@@ -1,25 +1,33 @@
 # -*- coding: UTF-8 -*-
 
 __revision__ = '$Id$'
+#               Updated to Gtk 3 2020 by Doug Lindquist
 
-# Copyright (c) 2010
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Library General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+# Copyright © 2005-2010 Vasco Nunes, Piotr Ożarowski
+# Copyright 2020 Doug Lindquist doug.lindquist@protonmail.com
 
-# You may use and distribute this software under the terms of the
-# GNU General Public License, version 2 or later
+# Permission is hereby granted, free of charge, to any person obtaining
+# copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, Gdk
 
 import logging
 import string
@@ -27,7 +35,6 @@ import threading
 import time
 import urllib2
 import cookielib
-import gtk
 import gutils
 
 log = logging.getLogger("Griffith")
@@ -58,8 +65,8 @@ class WebAccess(object):
             #if self.progress.status:
             # waits infinite if retriever thread hangs in urllib
             #    retriever.join()
-            while gtk.events_pending():
-                gtk.main_iteration()
+            while Gtk.events_pending():
+                Gtk.main_iteration()
         data = ''
         if retriever.data:
             data = retriever.data
@@ -205,17 +212,17 @@ class Progress:
 
     def __init__(self, window, title='', message=''):
         self.status = False
-        self.dialog = gtk.Dialog(title, window, gtk.DIALOG_MODAL, ())
+        self.dialog = Gtk.Dialog(title, window, Gtk.DIALOG_MODAL, ())
         self.dialog.set_urgency_hint(False)
-        self.dialog.set_position(gtk.WIN_POS_CENTER)
+        self.dialog.set_position(Gtk.WIN_POS_CENTER)
         self.dialog.stick()
-        self.label = gtk.Label()
+        self.label = Gtk.Label()
         self.label.set_markup(message)
         self.dialog.vbox.pack_start(self.label)
-        self.progress = gtk.ProgressBar()
+        self.progress = Gtk.ProgressBar()
         self.progress.set_pulse_step(0.01)
         self.dialog.vbox.pack_start(self.progress, False, False)
-        self.button = gtk.Button(_("Cancel"), gtk.STOCK_CANCEL)
+        self.button = Gtk.Button(_("Cancel"), Gtk.STOCK_CANCEL)
         self.button.connect("clicked", self.callback)
         self.dialog.vbox.pack_start(self.button, False, False)
 

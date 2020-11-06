@@ -369,15 +369,16 @@ def define_widgets(self, gladefile):
         'edit': get('edit1'),
     }#}}}
 
-#    self.widgets['popups'] = {#{{{
-#        'main': get('popup'),
-#        'loan': get('popup_loan'),
-#        'return': get('popup_return'),
-#        'email': get('popup_email'),
-#        'clone': get('clone1'),
-#        'print_cover': get('print_cover1'),
-#        'edit': get('edit2'),
-#    }#}}}
+    self.widgets['popups'] = {#{{{
+        'main': get('popup'),
+        'loan': get('popup_loan'),
+        'return': get('popup_return'),
+        'email': get('popup_email'),
+        'clone': get('clone1'),
+        'print_cover': get('print_cover1'),
+        'edit': get('edit2'),
+    }#}}}
+
     self.widgets['extensions'] = {
         'toolbar': get('ext_toolbar'),
         'toolbar_hb': get('ext_toolbar_hb'),
