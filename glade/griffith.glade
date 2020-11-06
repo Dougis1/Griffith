@@ -8361,6 +8361,138 @@
       </row>
     </data>
   </object>
+  <object class="GtkMenu" id="popup">
+    <property name="can_focus">False</property>
+    <child>
+      <object class="GtkImageMenuItem" id="edit2">
+        <property name="label">gtk-edit</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
+        <signal name="activate" handler="on_edit_button_clicked" swapped="no"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="delete2">
+        <property name="label">gtk-remove</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
+        <signal name="activate" handler="on_popup_delete_activate" swapped="no"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="clone1">
+        <property name="label" translatable="yes">Clone</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">False</property>
+        <signal name="activate" handler="on_popup_clone_activate" swapped="no"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparatorMenuItem" id="separator4">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="seen1">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Seen it</property>
+        <property name="use_underline">True</property>
+        <signal name="activate" handler="on_seen_activate" swapped="no"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparatorMenuItem" id="separator11">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="print_cover1">
+        <property name="label" translatable="yes">Print Cover</property>
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">False</property>
+        <child type="submenu">
+          <object class="GtkMenu" id="print_cover1_menu">
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkMenuItem" id="simple1">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Simple</property>
+                <property name="use_underline">True</property>
+                <signal name="activate" handler="on_popup_simple_activate" swapped="no"/>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="choose_image1">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Choose Image</property>
+                <property name="use_underline">True</property>
+                <signal name="activate" handler="on_popup_choose_image_activate" swapped="no"/>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparatorMenuItem" id="separator5">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="loan_management1">
+        <property name="visible">True</property>
+        <property name="can_focus">False</property>
+        <property name="label" translatable="yes">Loan Management</property>
+        <property name="use_underline">True</property>
+        <child type="submenu">
+          <object class="GtkMenu" id="loan_management1_menu">
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkMenuItem" id="popup_loan">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Loan</property>
+                <property name="use_underline">True</property>
+                <signal name="activate" handler="on_popup_loan_activate" swapped="no"/>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="popup_return">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">Return</property>
+                <property name="use_underline">True</property>
+                <signal name="activate" handler="on_popup_return_activate" swapped="no"/>
+              </object>
+            </child>
+            <child>
+              <object class="GtkMenuItem" id="popup_email">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="label" translatable="yes">E-mail reminder</property>
+                <property name="use_underline">True</property>
+                <signal name="activate" handler="on_popup_email_activate" swapped="no"/>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
   <object class="GtkWindow" id="poster_window">
     <property name="can_focus">True</property>
     <property name="title" translatable="yes">Poster viewer</property>
