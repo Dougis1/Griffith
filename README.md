@@ -117,15 +117,6 @@ Installation
 See INSTALL file
 
 
-Reporting Bugs
-==============
-
-If you want to help or report any bugs founded please visit:
-  http://www.griffith.cc/
-or
-  https://bugs.launchpad.net/griffith/
-
-
 TODO
 ====
 
