@@ -22,23 +22,25 @@ __revision__ = '$Id: gutils.py 1582 2011-09-04 21:08:14Z piotrek $'
 # GNU General Public License, version 2 or later
 
 import gzip
-import htmlentitydefs
+import html.entities
 import logging
 import os
 import re
 import string
 import sys
 import webbrowser
-from StringIO import StringIO
+from io import StringIO
 import platform
 
 try:
-    import gtk
+    import gi
+    gi.require_version('Gtk', '3.0')
+    from gi.repository import Gtk
     import db
 except:
     gtk = None
     pass
-    
+
 mac = False
 
 if os.name in ('mac') or \
@@ -142,8 +144,10 @@ def before(text, key):
 
 
 def gescape(text):
-    text = string.replace(text, "'", "''")
-    text = string.replace(text, "--", "-")
+##    text = string.replace(text, "'", "''")
+##    text = string.replace(text, "--", "-")
+    text.replace("'", "''")
+    text.replace("--", "-")
     return text
 
 
@@ -153,7 +157,7 @@ def progress(blocks, size_block, size):
         transfered = size
     elif size < 0:
         size = "?"
-    print transfered, '/', size, 'bytes'
+    print(transfered, '/', size, 'bytes')
 
 # functions to handle comboboxentry stuff
 
@@ -178,7 +182,7 @@ def on_combo_box_entry_changed(widget):
     if m_iter:
         value = model.get_value(m_iter, 0)
         if type(value) is str:
-            value = value.decode('utf-8')
+            value = value
         return value
     else:
         return 0
@@ -191,16 +195,16 @@ def on_combo_box_entry_changed_name(widget):
 def convert_entities(text):
 
     def conv(ents):
-        entities = htmlentitydefs.entitydefs
+        entities = html.entities.entitydefs
         ents = ents.group(0)
         ent_code = entities.get(ents[1:-1], None)
         if ent_code:
             try:
-                ents = unicode(ent_code, 'UTF-8')
+                ents = str(ent_code, 'UTF-8')
             except UnicodeDecodeError:
-                ents = unicode(ent_code, 'latin-1')
-            except Exception, ex:
-                print("error occurred while converting entity %s: %s" % (ents, ex))
+                ents = str(ent_code, 'latin-1')
+            except Exception as ex:
+                print(("error occurred while converting entity %s: %s" % (ents, ex)))
 
             # check if it still needs conversion
             if not ENTITY.search(ents):
@@ -212,7 +216,7 @@ def convert_entities(text):
             if code[0] == 'x':
                 code = code[1:]
                 base = 16
-            return unichr(int(code, base))
+            return chr(int(code, base))
         else:
             return
 
@@ -252,7 +256,7 @@ def clean(text):
 
 def gdecode(txt, encode):
     try:
-        return txt.decode(encode)
+        return txt
     except:
         return txt
 
@@ -338,12 +342,12 @@ def popup_message(message):
                 while gtk.events_pending():    # give GTK some time for updates
                     gtk.main_iteration()
             else:
-                print message,
+                print(message, end=' ')
             res = f(*args, **kwargs)
             if gtk:
                 window.destroy()
             else:
-                print ' [done]'
+                print(' [done]')
             return res
         return wrapped_f
     return wrap
@@ -365,7 +369,7 @@ def file_chooser(title, action=None, buttons=None, name='', folder=os.path.expan
                 filename = filename+".zip"
             return filename, path
         else:
-            return False 
+            return False
     else:
         dialog = gtk.FileChooserDialog(title=title, action=action, buttons=buttons)
         dialog.set_default_response(gtk.RESPONSE_OK)
@@ -438,7 +442,7 @@ def read_plugins(prefix, directory):
 
 
 def findKey(val, dict):
-    for key, value in dict.items():
+    for key, value in list(dict.items()):
         if value == val:
             return key
     return None
@@ -467,9 +471,9 @@ def clean_posters_dir(self):
                     os.unlink(filepath)
 
     if counter:
-        print "%d orphan files cleaned." % counter
+        print("%d orphan files cleaned." % counter)
     else:
-        print "No orphan files found."
+        print("No orphan files found.")
 
 
 def decompress(data):
@@ -477,7 +481,7 @@ def decompress(data):
         compressedStream = StringIO(data)
         gzipper = gzip.GzipFile(fileobj=compressedStream)
         data = gzipper.read()
-    except Exception, e:
+    except Exception as e:
         log.debug("Cannot decompress data: ", e)
         pass
     return data
@@ -487,44 +491,47 @@ def get_dependencies():
     depend = []
 
     # Python version
-    if sys.version_info[:2] < (2, 5):
+    if sys.version_info[:2] < (3, 3):
         depend.append({'module': 'python',
             'version': '-' + '.'.join(map(str, sys.version_info)),
-            'module_req': '2.5',
+            'module_req': '3.3',
             'url': 'http://www.python.org/',
             'debian': 'python',
-            'debian_req': '2.5'})
-            # TODO: 'fedora', 'suse', etc.
+            'debian_req': '3.3',
+            'fedora, centos, rhel': 'python',
+            'fedora/centos/rhel_req': '3.3'})
+            # TODO: 'suse', etc.
 
-    try:
-        import gtk
-        version = '.'.join([str(i) for i in gtk.pygtk_version])
-        if gtk.pygtk_version <= (2, 6, 0):
-            version = '-%s' % version
-    except:
-        version = False
-    depend.append({'module': 'gtk',
-        'version': version,
-        'module_req': '2.6',
-        'url': 'http://www.pygtk.org/',
-        'debian': 'python-gtk2',
-        'debian_req': '2.8.6-1'})
-        # TODO: 'fedora', 'suse', etc.
+#    try:
+#        import gtk
+#        version = '.'.join([str(i) for i in gtk.pygtk_version])
+#        if gtk.pygtk_version <= (2, 6, 0):
+#            version = '-%s' % version
+#    except:
+#        version = False
+#    depend.append({'module': 'gtk',
+#        'version': version,
+#        'module_req': '2.6',
+#        'url': 'http://www.pygtk.org/',
+#        'debian': 'python-gtk2',
+#        'debian_req': '2.8.6-1'})
+#        # TODO: 'fedora', 'suse', etc.
 
-    try:
-        import gtk.glade
-        # (version == gtk.pygtk_version)
-    except:
-        version = False
-    depend.append({'module': 'gtk.glade',
-        'version': version,
-        'module_req': '2.6',
-        'url': 'http://www.pygtk.org/',
-        'debian': 'python-glade2',
-        'debian_req': '2.8.6-1'})
+#    try:
+#        import gtk.glade
+#        # (version == gtk.pygtk_version)
+#    except:
+#        version = False
+#    depend.append({'module': 'gtk.glade',
+#        'version': version,
+#        'module_req': '2.6',
+#        'url': 'http://www.pygtk.org/',
+#        'debian': 'python-glade2',
+#        'debian_req': '2.8.6-1'})
+
     try:
         import sqlalchemy
-        if map(int, sqlalchemy.__version__[:3].split('.')) < [0, 5]:
+        if list(map(int, sqlalchemy.__version__[:3].split('.'))) < [0, 5]:
             version = "-%s" % sqlalchemy.__version__
         else:
             version = sqlalchemy.__version__
@@ -536,6 +543,7 @@ def get_dependencies():
         'url': 'http://www.sqlalchemy.org/',
         'debian': 'python-sqlalchemy',
         'debian_req': '0.5~rc3'})
+
     try:
         import sqlite3
         version = sqlite3.version
@@ -560,6 +568,7 @@ def get_dependencies():
             'url': 'http://www.python.org',
             'debian': 'python',
             'debian_req': '2.5'})
+
     try:
         import reportlab
         version = reportlab.Version
@@ -570,6 +579,7 @@ def get_dependencies():
         'url': 'http://www.reportlab.org/',
         'debian': 'python-reportlab',
         'debian_req': '1.20debian-6'})
+
     try:
         import PIL
         version = True
@@ -582,6 +592,7 @@ def get_dependencies():
         'debian_req': '1.1.5-6'})
     # extra dependencies:
     optional = []
+
     try:
         import psycopg2
         version = psycopg2.__version__
@@ -592,6 +603,7 @@ def get_dependencies():
         'url': 'http://initd.org/psycopg/',
         'debian': 'python-psycopg2',
         'debian_req': '1.1.21-6'})
+
     try:
         import MySQLdb
         version = '.'.join([str(i) for i in MySQLdb.version_info])
@@ -602,6 +614,7 @@ def get_dependencies():
         'url': 'http://sourceforge.net/projects/mysql-python',
         'debian': 'python-mysqldb',
         'debian_req': '1.2.1-p2-2'})
+
     try:
         import chardet
         version = chardet.__version__
@@ -611,6 +624,7 @@ def get_dependencies():
         'version': version,
         'url': 'http://chardet.feedparser.org/',
         'debian': 'python-chardet'})
+
     try:
         import sqlite
         version = sqlite.version
@@ -620,6 +634,7 @@ def get_dependencies():
         'version': version,
         'url': 'http://initd.org/tracker/pysqlite',
         'debian': 'python-sqlite'})
+
     try:
         import lxml
         version = True
@@ -629,11 +644,12 @@ def get_dependencies():
         'version': version,
         'url': 'http://lxml.de/',
         'debian': 'python-lxml'})
+
     return depend, optional
 
 
 def html_encode(s):
-    if not isinstance(s, basestring):
+    if not isinstance(s, str):
         s = str(s)
     s = s.replace('&', '&amp;')
     s = s.replace('<', '&lt;')
@@ -681,11 +697,11 @@ def copytree(src, dst, symlinks=False):
                 copytree(srcname, dstname, symlinks)
             else:
                 copy2(srcname, dstname)
-        except (IOError, os.error), why:
+        except (IOError, os.error) as why:
             errors.append((srcname, dstname, why))
         # catch the Error from the recursive copytree so that we can
         # continue with other files
-        except EnvironmentError, err:
+        except EnvironmentError as err:
             errors.extend(err.args[0])
     if errors:
         raise EnvironmentError(errors)
@@ -713,7 +729,7 @@ def md5sum(fobj):
             m.update(d)
     else:
         m.update(fobj)
-    return unicode(m.hexdigest())
+    return str(m.hexdigest())
 
 
 def create_image_cache(md5sum, gsql):
@@ -813,7 +829,7 @@ def get_filesystem_pagesize(path):
             drive = os.path.splitdrive(path)
             sectorsPerCluster = ctypes.c_ulonglong(0)
             bytesPerSector = ctypes.c_ulonglong(0)
-            rootPathName = ctypes.c_wchar_p(unicode(drive[0]))
+            rootPathName = ctypes.c_wchar_p(str(drive[0]))
 
             ctypes.windll.kernel32.GetDiskFreeSpaceW(rootPathName,
                 ctypes.pointer(sectorsPerCluster),

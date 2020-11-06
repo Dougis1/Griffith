@@ -1,31 +1,36 @@
 # -*- coding: UTF-8 -*-
-# vim: fdm=marker
 
 __revision__ = '$Id: add.py 1659 2013-12-16 21:39:36Z mikej06 $'
+#               Updated to Gtk 3 2020 by Doug Lindquist  doug.lindquist@protonmail.com
 
 # Copyright (c) 2005-2011 Vasco Nunes, Piotr Ożarowski
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published byp
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Library General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+# Copyright 2020 Doug Lindquist doug.lindquist@protonmail.com
 
-# You may use and distribute this software under the terms of the
-# GNU General Public License, version 2 or later
+# Permission is hereby granted, free of charge, to any person obtaining
+# copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
 import os
-import urllib2
-import gtk
+import urllib.request, urllib.error, urllib.parse
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, Gdk, GdkPixbuf
 from sqlalchemy.exc import IntegrityError
 
 import quick_filter
@@ -33,6 +38,7 @@ import db
 import gutils
 import initialize
 import main_treeview
+import importlib
 
 log = logging.getLogger("Griffith")
 
@@ -96,7 +102,7 @@ def update_movie(self):
                 if session.query(db.Poster).filter_by(md5sum=new_poster_md5).count() == 0:
                     try:
                         data = file(new_image_path, 'rb').read()
-                    except Exception, e:
+                    except Exception as e:
                         log.warning("cannot read poster data")
                         old_poster_md5 = new_poster_md5
                     else:
@@ -111,7 +117,7 @@ def update_movie(self):
 
     update_movie_instance(movie, details, session)
     session.add(movie)
-    
+
     # delete old image
     if old_poster_md5 and old_poster_md5 != new_poster_md5:
         import delete
@@ -142,7 +148,7 @@ def change_rating_from_slider(self):
     else:
         prefix = "meter"
     rating_file = "%s/%s0%d.png" % (self.locations['images'], prefix, rating)
-    handler = self.widgets['add']['image_rating'].set_from_pixbuf(gtk.gdk.pixbuf_new_from_file(rating_file))
+    handler = self.widgets['add']['image_rating'].set_from_pixbuf(GdkPixbuf.Pixbuf.new_from_file(rating_file))
 
 
 def populate_with_results(self):
@@ -250,10 +256,10 @@ def show_websearch_results(self):
         key = 0
         for row in self.search_movie.ids:
             if (str(row) != ''):
-                if isinstance(self.search_movie.titles[key], unicode):
+                if isinstance(self.search_movie.titles[key], str):
                     title = self.search_movie.titles[key]
                 else:
-                    title = str(self.search_movie.titles[key]).decode(self.search_movie.encode)
+                    title = str(self.search_movie.titles[key])  ##.decode(self.search_movie.encode)
                 movieslist.append((row, title))
             key += 1
         movieslist = sorted(movieslist, key=lambda titel: titel[1])
@@ -275,7 +281,7 @@ def show_websearch_results(self):
 
 def get_from_web(self):
     """search the movie in web using the active plugin"""
-        
+
     title = self.widgets['add']['title'].get_text()
     o_title = self.widgets['add']['o_title'].get_text()
 
@@ -287,7 +293,7 @@ def get_from_web(self):
         if self.debug_mode:
             log.debug('reloading %s', plugin_name)
             import sys
-            reload(sys.modules[plugin_name])
+            importlib.reload(sys.modules[plugin_name])
         self.search_movie = plugin.SearchPlugin()
         self.search_movie.config = self.config
         self.search_movie.locations = self.locations
@@ -296,16 +302,16 @@ def get_from_web(self):
             if self.search_movie.remove_accents:
                 self.search_movie.title = gutils.remove_accents(o_title, 'utf-8')
             else:
-                self.search_movie.title = unicode(o_title, 'utf-8')
+                self.search_movie.title = str(o_title, 'utf-8')
         elif title:
             self.search_movie.url = self.search_movie.translated_url_search
             if self.search_movie.remove_accents:
                 self.search_movie.title = gutils.remove_accents(title, 'utf-8')
             else:
-                self.search_movie.title = unicode(title, 'utf-8')
+                self.search_movie.title = str(title, 'utf-8')
         # check if internet connection is available
         try:
-            urllib2.urlopen("http://www.google.com")
+            urllib.request.urlopen("http://www.google.com")
             if self.search_movie.search_movies(self.widgets['add']['window']):
                 self.search_movie.get_searches()
             if len(self.search_movie.ids) == 1 and o_title and title:
@@ -313,7 +319,7 @@ def get_from_web(self):
                 if self.search_movie.remove_accents:
                     self.search_movie.title = gutils.remove_accents(title, 'utf-8')
                 else:
-                    self.search_movie.title = unicode(title, 'utf-8')
+                    self.search_movie.title = str(title, 'utf-8')
                 if self.search_movie.search_movies(self.widgets['add']['window']):
                     self.search_movie.get_searches()
             self.show_search_results(self.search_movie)
@@ -335,7 +341,7 @@ def source_changed(self):
     image = os.path.join(self.locations['images'], plugin_name + ".png")
     # if movie plugin logo exists lets use it
     if os.path.exists(image):
-        handler = self.widgets['add']['plugin_image'].set_from_pixbuf(gtk.gdk.pixbuf_new_from_file(image))
+        handler = self.widgets['add']['plugin_image'].set_from_pixbuf(GdkPixbuf.Pixbuf.new_from_file(image))
 
 
 def get_details(self): #{{{
@@ -346,37 +352,37 @@ def get_details(self): #{{{
     plot_buffer = w['plot'].get_buffer()
 
     t_movies = {
-        'cameraman': w['cameraman'].get_text().decode('utf-8'),
-        'classification': w['classification'].get_text().decode('utf-8'),
-        'barcode': unicode(gutils.digits_only(w['barcode'].get_text().decode('utf-8'))),
+        'cameraman': w['cameraman'].get_text(),
+        'classification': w['classification'].get_text(),
+        'barcode': str(gutils.digits_only(w['barcode'].get_text())),
         'color': w['color'].get_active(),
         'cond': w['condition'].get_active(),
-        'country': w['country'].get_text().decode('utf-8'),
-        'director': w['director'].get_text().decode('utf-8'),
-        'genre': w['genre'].get_text().decode('utf-8'),
-        'image': w['image'].get_text().decode('utf-8'),
+        'country': w['country'].get_text(),
+        'director': w['director'].get_text(),
+        'genre': w['genre'].get_text(),
+        'image': w['image'].get_text(),
         'layers': w['layers'].get_active(),
         'media_num': w['discs'].get_value(),
         'number': w['number'].get_value(),
-        'o_site': w['o_site'].get_text().decode('utf-8'),
-        'o_title': w['o_title'].get_text().decode('utf-8'),
+        'o_site': w['o_site'].get_text(),
+        'o_title': w['o_title'].get_text(),
         'rating': w['rating_slider'].get_value(),
         'region': w['region'].get_active(),
-        'resolution': w['resolution'].get_child().get_text().strip().decode('utf-8'),
-        'runtime': w['runtime'].get_text().decode('utf-8'),
-        'screenplay': w['screenplay'].get_text().decode('utf-8'),
-        'site': w['site'].get_text().decode('utf-8'),
-        'studio': w['studio'].get_text().decode('utf-8'),
-        'title': w['title'].get_text().decode('utf-8'),
-        'trailer': w['trailer'].get_text().decode('utf-8'),
+        'resolution': w['resolution'].get_child().get_text().strip(),
+        'runtime': w['runtime'].get_text(),
+        'screenplay': w['screenplay'].get_text(),
+        'site': w['site'].get_text(),
+        'studio': w['studio'].get_text(),
+        'title': w['title'].get_text(),
+        'trailer': w['trailer'].get_text(),
         'year': w['year'].get_value(),
         'collection_id': w['collection'].get_active(),
         'medium_id': w['media'].get_active(),
         'volume_id': w['volume'].get_active(),
         'vcodec_id': w['vcodec'].get_active(),
-        'cast': cast_buffer.get_text(cast_buffer.get_start_iter(), cast_buffer.get_end_iter()).decode('utf-8'),
-        'notes': notes_buffer.get_text(notes_buffer.get_start_iter(), notes_buffer.get_end_iter()).decode('utf-8'),
-        'plot': plot_buffer.get_text(plot_buffer.get_start_iter(), plot_buffer.get_end_iter()).decode('utf-8'),
+        'cast': cast_buffer.get_text(cast_buffer.get_start_iter(), cast_buffer.get_end_iter()),
+        'notes': notes_buffer.get_text(notes_buffer.get_start_iter(), notes_buffer.get_end_iter()),
+        'plot': plot_buffer.get_text(plot_buffer.get_start_iter(), plot_buffer.get_end_iter()),
         'created': None,
         'updated': None
     }
@@ -417,7 +423,7 @@ def get_details(self): #{{{
     # languages
     t_movies['languages'] = set()
      # isn't the best but it works. without it the current selection of a language field is lost
-    w['lang_treeview'].child_focus(gtk.DIR_TAB_FORWARD)
+    w['lang_treeview'].child_focus(Gtk.DIR_TAB_FORWARD)
     for row in self.lang['model']:
         lang_id = get_id(self.lang['lang'], row[0])
         lang_type = get_id(self.lang['type'], row[1])
@@ -440,12 +446,13 @@ def get_details(self): #{{{
 def set_details(self, item=None):#{{{
     if item is None:
         item = {}
+
     if 'movie_id' in item and item['movie_id']:
         self._am_movie_id = item['movie_id']
     else:
         self._am_movie_id = None
-    w = self.widgets['add']
 
+    w = self.widgets['add']
     cast_buffer = w['cast'].get_buffer()
     notes_buffer = w['notes'].get_buffer()
     plot_buffer = w['plot'].get_buffer()
@@ -454,20 +461,25 @@ def set_details(self, item=None):#{{{
         w['o_title'].set_text(item['o_title'])
     else:
         w['o_title'].set_text('')
+
     if 'title' in item and item['title']:
         w['title'].set_text(item['title'])
     else:
         w['title'].set_text('')
+
     if 'number' in item and item['number']:
         w['number'].set_value(int(item['number']))
     else:
         w['number'].set_value(int(gutils.find_next_available(self.db)))
+
     if 'title' in item and item['title']:
         w['title'].set_text(item['title'])
+
     if 'year' in item and item['year']:
         w['year'].set_value(gutils.digits_only(item['year'], 2100))
     else:
         w['year'].set_value(0)
+
     if 'resolution' in item and item['resolution']:
         if self.config.get('use_resolution_alias', True):
             w['resolution'].get_child().set_text(item['resolution'])
@@ -477,78 +489,97 @@ def set_details(self, item=None):#{{{
             w['resolution'].get_child().set_text(item['resolution'])
     else:
         w['resolution'].get_child().set_text('')
+
     if 'runtime' in item and item['runtime']:
         w['runtime'].set_value(gutils.digits_only(item['runtime']))
     else:
         w['runtime'].set_value(0)
+
     if 'barcode' in item and item['barcode']:
         w['barcode'].set_text(item['barcode'])
     else:
         w['barcode'].set_text('')
+
     if 'cameraman' in item and item['cameraman']:
         w['cameraman'].set_text(item['cameraman'])
     else:
         w['cameraman'].set_text('')
+
     if 'screenplay' in item and item['screenplay']:
         w['screenplay'].set_text(item['screenplay'])
     else:
         w['screenplay'].set_text('')
+
     if 'country' in item and item['country']:
         w['country'].set_text(item['country'])
     else:
         w['country'].set_text('')
+
     if 'classification' in item and item['classification']:
         w['classification'].set_text(item['classification'])
     else:
         w['classification'].set_text('')
+
     if 'studio' in item and item['studio']:
         w['studio'].set_text(item['studio'])
     else:
         w['studio'].set_text('')
+
     if 'o_site' in item and item['o_site']:
         w['o_site'].set_text(item['o_site'])
     else:
         w['o_site'].set_text('')
+
     if 'director' in item and item['director']:
         w['director'].set_text(item['director'])
     else:
         w['director'].set_text('')
+
     if 'site' in item and item['site']:
         w['site'].set_text(item['site'])
     else:
         w['site'].set_text('')
+
     if 'trailer' in item and item['trailer']:
         w['trailer'].set_text(item['trailer'])
     else:
         w['trailer'].set_text('')
+
     if 'genre' in item and item['genre']:
         w['genre'].set_text(item['genre'])
     else:
         w['genre'].set_text('')
+
     if 'color' in item and item['color']:
         w['color'].set_active(gutils.digits_only(item['color'], 3))
     else:
         w['color'].set_active(gutils.digits_only(self.config.get('color', 0, section='defaults'), 3))
+
     if 'layers' in item and item['layers']:
         w['layers'].set_active(gutils.digits_only(item['layers'], 4))
     else:
         w['layers'].set_active(gutils.digits_only(self.config.get('layers', 0, section='defaults'), 4))
+
     if 'region' in item and item['region'] >= 0:
         w['region'].set_active(gutils.digits_only(item['region'], 11))
     else:
         w['region'].set_active(gutils.digits_only(self.config.get('region', 0, section='defaults'), 11))
+
     if 'cond' in item and item['cond'] >= 0:
         w['condition'].set_active(gutils.digits_only(item['cond'], 5))
     else:
         w['condition'].set_active(gutils.digits_only(self.config.get('condition', 0, section='defaults'), 5))
+
     if 'media_num' in item and item['media_num']:
         w['discs'].set_value(gutils.digits_only(item['media_num']))
     else:
         w['discs'].set_value(1)
+
     if 'rating' in item and item['rating']:
         w['rating_slider'].set_value(gutils.digits_only(item['rating'], 10))
     else:
         w['rating_slider'].set_value(0)
+
     if 'seen' in item:
         if item['seen'] is True:
             w['seen'].set_active(True)
@@ -556,53 +587,66 @@ def set_details(self, item=None):#{{{
             w['seen'].set_active(False)
     else:
         w['seen'].set_active(bool(self.config.get('seen', True, section='defaults')))
+
     if 'cast' in item and item['cast']:
         cast_buffer.set_text(item['cast'])
     else:
         cast_buffer.set_text('')
+
     if 'notes' in item and item['notes']:
         notes_buffer.set_text(item['notes'])
     else:
         notes_buffer.set_text('')
+
     if 'plot' in item and item['plot']:
         plot_buffer.set_text(item['plot'])
     else:
         plot_buffer.set_text('')
+
     pos = 0
     if 'medium_id' in item and item['medium_id']:
         pos = gutils.findKey(item['medium_id'], self.media_ids)
     else:
         pos = gutils.findKey(int(self.config.get('media', 0, section='defaults')), self.media_ids)
+
     if pos is not None:
         w['media'].set_active(int(pos))
     else:
         w['media'].set_active(0)
+
     pos = 0
     if 'vcodec_id' in item and item['vcodec_id']:
         pos = gutils.findKey(item['vcodec_id'], self.vcodecs_ids)
     else:
         pos = gutils.findKey(int(self.config.get('vcodec', 0, section='defaults')), self.vcodecs_ids)
+
     if pos is not None:
         w['vcodec'].set_active(int(pos))
     else:
         w['vcodec'].set_active(0)
+
     pos = 0
     if 'volume_id' in item and item['volume_id']:
         pos = gutils.findKey(item['volume_id'], self.volume_combo_ids)
+
     if pos is not None:
         w['volume'].set_active(int(pos))
     else:
         w['volume'].set_active(0)
+
     pos = 0
     if 'collection_id' in item and item['collection_id']:
         pos = gutils.findKey(item['collection_id'], self.collection_combo_ids)
+
     if pos is not None:
         w['collection'].set_active(int(pos))
     else:
         w['collection'].set_active(0)
+
     # tags
     for tag in self.am_tags:
         self.am_tags[tag].set_active(False)
+
     if 'tags' in item:
         for tag in item['tags']:
             i = gutils.findKey(tag.tag_id, self.tags_ids)
@@ -612,6 +656,7 @@ def set_details(self, item=None):#{{{
     if 'languages' in item and len(item['languages']) > 0:
         for i in item['languages']:
             self.create_language_row(i)
+
     # poster
     w['aremove_poster'].set_sensitive(True)
     if 'poster_md5' in item and item['poster_md5']:
@@ -619,6 +664,7 @@ def set_details(self, item=None):#{{{
         if not image_path:
             image_path = '' # isfile doesn't like bool
             w['aremove_poster'].set_sensitive(False)
+
         w['image'].set_text(item['poster_md5'])
     elif 'image' in item and item['image']:
         if len(item['image']) == 32: # md5
@@ -635,18 +681,19 @@ def set_details(self, item=None):#{{{
         w['image'].set_text('')
         image_path = gutils.get_defaultimage_fname(self)
         w['aremove_poster'].set_sensitive(False)
+
     if not os.path.isfile(image_path):
         image_path = gutils.get_defaultimage_fname(self)
         w['aremove_poster'].set_sensitive(False)
-    w['picture'].set_from_file(image_path)
 
+    w['picture'].set_from_file(image_path)
     w['notebook'].set_current_page(0)
     w['o_title'].grab_focus()
     #}}}
 
 
 def validate_details(t_movies, allow_only=None):
-    for i in t_movies.keys():
+    for i in list(t_movies.keys()):
         if t_movies[i] == '':
             t_movies[i] = None
     for i in ('color', 'cond', 'layers', 'media', 'vcodec'):
@@ -658,7 +705,7 @@ def validate_details(t_movies, allow_only=None):
     if allow_only is not None:
         # iterate over a copy of keys of the dict because removing elements of a dict
         # within a for enumeration of the same dict instance isn't supported
-        for i in t_movies.keys():
+        for i in list(t_movies.keys()):
             if not i in allow_only:
                 t_movies.pop(i)
 
@@ -669,7 +716,7 @@ def validate_details(t_movies, allow_only=None):
 def add_movie_db(self, close):
     session = self.db.Session()
     details = get_details(self)
-    
+
     if not details['o_title'] and not details['title']:
         gutils.error(_("You should fill the original title\nor the movie title."),
             parent=self.widgets['add']['window'])
@@ -700,7 +747,7 @@ def add_movie_db(self, close):
                     try:
                         file_object.seek(0, 0);
                         data = file_object.read()
-                    except Exception, e:
+                    except Exception as e:
                         log.warning("cannot read poster data")
                     else:
                         poster = db.Poster(md5sum=new_poster_md5, data=data)
@@ -714,7 +761,7 @@ def add_movie_db(self, close):
             try:
                 if not tmp_image_path == original_image_path:
                     os.remove(tmp_image_path)
-            except Exception, e:
+            except Exception as e:
                 log.warn("cannot remove temporary file %s", tmp_image_path)
         else:
             log.warn("cannot read temporary file: %s", tmp_image_path)
@@ -729,11 +776,11 @@ def add_movie_db(self, close):
     myiter = main_treeview.addmovie(self, movie)
     main_treeview.select(self, None)
     main_treeview.select(self, myiter)
-    
+
     # update statusbar
     self.total += 1
     self.count_statusbar()
-    
+
     clear(self)
 
     if close:
@@ -742,7 +789,7 @@ def add_movie_db(self, close):
 
 def clone_movie(self):
     session = self.db.Session()
-    
+
     if self.selected_iter[0] is None:
         log.warn("cannot clone movie: no item selected")
         return False
@@ -844,7 +891,7 @@ def update_movie_instance(movie, details, session):
                     movie.languages.append(ml)
         # tags
         if t_tags is not None:
-            for tag in t_tags.keys():
+            for tag in list(t_tags.keys()):
                 dbTag = session.query(db.Tag).filter_by(tag_id=tag).one()
                 #movie.tags.append(db.MovieTag(tag_id=tag))
                 movie.tags.append(dbTag)
@@ -856,12 +903,12 @@ def update_movie_instance(movie, details, session):
 def commit(session):
     try:
         session.commit()
-    except IntegrityError, e:
+    except IntegrityError as e:
         session.rollback()
         log.warn("Cannot commit movie: %s", e.message)
-        gutils.warning(unicode(e.orig))
+        gutils.warning(str(e.orig))
         return False
-    except Exception, e:
+    except Exception as e:
         log.error("Unexpected problem: %s", e)
         return False
     return True
@@ -873,7 +920,7 @@ def add_medium(self, name):
     session.add(medium)
     try:
         session.commit()
-    except Exception, e:
+    except Exception as e:
         session.rollback()
         log.warn("Cannot add medium entry: %s", e.message)
     else:
@@ -887,7 +934,7 @@ def add_vcodec(self, name):
     session.add(vcodec)
     try:
         session.commit()
-    except Exception, e:
+    except Exception as e:
         session.rollback()
         log.warn("Cannot add video codec entry: %s", e.message)
     else:
@@ -901,7 +948,7 @@ def add_volume(self, name):
     session.add(vol)
     try:
         session.commit()
-    except Exception, e:
+    except Exception as e:
         session.rollback()
         log.warn("Cannot add volume: %s", e.message)
     else:
@@ -916,7 +963,7 @@ def add_collection(self, name):
     session.add(col)
     try:
         session.commit()
-    except Exception, e:
+    except Exception as e:
         session.rollback()
         log.warn("Cannot add collection: %s", e.message)
     else:

@@ -21,7 +21,9 @@ __revision__ = '$Id: cover.py 1154 2009-02-08 23:20:39Z piotrek $'
 # You may use and distribute this software under the terms of the
 # GNU General Public License, version 2 or later
 
-import gtk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 import os
 import pango
 import string
@@ -30,7 +32,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
+import TTFont
 from reportlab.platypus import Image
 from reportlab.lib import colors
 import db
@@ -207,4 +209,3 @@ def cover_simple(self, number):
         os.popen3("open -a Preview" + " " + cover_file)
     else:
         os.popen3(self.pdf_reader + " " + cover_file)
-

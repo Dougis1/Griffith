@@ -20,22 +20,22 @@ __revision__ = '$Id: quick_filter.py 1601 2011-12-12 20:07:03Z mikej06 $'
 
 # You may use and distribute this software under the terms of the
 # GNU General Public License, version 2 or later
-
 import gutils
 import db
 
 def change_filter(self):
     from sqlalchemy import select, or_
     from sqlalchemy.orm.util import class_mapper, object_mapper
+
     statement = select(db.tables.movies.columns, bind=self.db.session.bind)
-    
     change_filter_update_whereclause(self, statement)
     self.populate_treeview(statement)
 
 
 def change_filter_update_whereclause(self, statement):
     from sqlalchemy import or_
-    text = gutils.gescape(self.widgets['filter']['text'].get_text().decode('utf-8'))
+
+    text = gutils.gescape(self.widgets['filter']['text'].get_text())
     if text:
         (criterianame, criteria) = self.search_criteria_sorted[self.widgets['filter']['criteria'].get_active()]
         if criteria in ('year', 'runtime', 'media_num', 'rating'):
@@ -47,13 +47,14 @@ def change_filter_update_whereclause(self, statement):
             statement.append_whereclause(or_(*crits))
         else:
             statement.append_whereclause(db.tables.movies.c[criteria].like('%'+text+'%'))
+
     if self.widgets['filter']['text'].is_focus():
-        if len(text)<4: # filter mode
+        if len(text) < 4: # filter mode
             limit = int(self.config.get('limit', 0, section='mainlist'))
             if limit > 0:
                 statement.limit = limit
 
-    
+
 def clear_filter(self, populate=True):
     # prevent multiple treeview updates
     self.initialized = False

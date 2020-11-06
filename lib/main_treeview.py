@@ -1,29 +1,35 @@
 # -*- coding: UTF-8 -*-
 
 __revision__ = '$Id: main_treeview.py 1616 2012-01-23 21:07:53Z piotrek $'
+#               Updated to Gtk 3 2020 by Doug Lindquist
 
 # Copyright (c) 2005-2011 Vasco Nunes, Piotr Ożarowski
+# Copyright 2020 Doug Lindquist doug.lindquist@protonmail.com
 
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
+# Permission is hereby granted, free of charge, to any person obtaining
+# copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
 #
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Library General Public License for more details.
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
-
-# You may use and distribute this software under the terms of the
-# GNU General Public License, version 2 or later
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 import logging
 import os
-import gtk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, Gdk, GdkPixbuf
 from sqlalchemy.sql.expression import Select
 import db
 import gutils
@@ -44,10 +50,10 @@ def on_tree_selection(tree_selection, self):
         self.widgets['menu']['make_cover'].set_sensitive(True)
         self.widgets['menu']['loan'].set_sensitive(True)
         self.widgets['menu']['edit'].set_sensitive(True)
-        self.widgets['popups']['edit'].set_sensitive(True)
-        self.widgets['popups']['loan'].set_sensitive(True)
-        self.widgets['popups']['clone'].set_sensitive(True)
-        self.widgets['popups']['print_cover'].set_sensitive(True)
+#        self.widgets['popups']['edit'].set_sensitive(True)
+#        self.widgets['popups']['loan'].set_sensitive(True)
+#        self.widgets['popups']['clone'].set_sensitive(True)
+#        self.widgets['popups']['print_cover'].set_sensitive(True)
     else:
         set_details(self)
         # lets make some options unavailable when multiselction is active. for now.
@@ -56,10 +62,10 @@ def on_tree_selection(tree_selection, self):
         self.widgets['menu']['make_cover'].set_sensitive(False)
         self.widgets['menu']['loan'].set_sensitive(False)
         self.widgets['menu']['edit'].set_sensitive(False)
-        self.widgets['popups']['edit'].set_sensitive(False)
-        self.widgets['popups']['loan'].set_sensitive(False)
-        self.widgets['popups']['clone'].set_sensitive(False)
-        self.widgets['popups']['print_cover'].set_sensitive(False)
+#        self.widgets['popups']['edit'].set_sensitive(False)
+#        self.widgets['popups']['loan'].set_sensitive(False)
+#        self.widgets['popups']['clone'].set_sensitive(False)
+#        self.widgets['popups']['print_cover'].set_sensitive(False)
     treeview_clicked(self)
 
 
@@ -76,15 +82,18 @@ def treeview_selection_on_event(self, treeview, iter=False):
 def treeview_clicked(self):
     if self.initialized is False:
         return False
+
     if len(self.selected) == 1:
         movie = self.db.session.query(db.Movie).filter_by(number=int(self.selected[0])).first()
-        if self.widgets['poster_window'].flags() & gtk.VISIBLE == gtk.VISIBLE:
+        if self.widgets['poster_window'].props.visible:
             # poster window is visible
             filename = None
             if movie.poster_md5:
                 filename = gutils.get_image_fname(movie.poster_md5, self.db)
+
             if not filename:
                 filename = gutils.get_defaultimage_fname(self)
+
             self.widgets['big_poster'].set_from_file(filename)
         #for ext in self.extensions:
             #ext.maintree_clicked(treeselection, movie)
@@ -106,26 +115,32 @@ def set_details(self, item=None):  # {{{
         w['number'].set_text(str(int(item['number'])))
     else:
         w['number'].set_text('')
+
     if 'title' in item and item['title']:
         w['title'].set_markup("<b><span size='large'>%s</span></b>" % gutils.html_encode(item['title']))
     else:
         w['title'].set_text('')
+
     if 'o_title' in item and item['o_title']:
         w['o_title'].set_markup("<span size='medium'><i>%s</i></span>" % gutils.html_encode(item['o_title']))
     else:
         w['o_title'].set_text('')
+
     if 'director' in item and item['director']:
         w['director'].set_markup("<i>%s</i>" % gutils.html_encode(item['director']))
     else:
         w['director'].set_text('')
+
     if 'plot' in item and item['plot']:
         w['plot'].set_text(str(item['plot']))
     else:
         w['plot'].set_text('')
+
     if 'year' in item and item['year']:
         w['year'].set_text(str(item['year']))
     else:
         w['year'].set_text('')
+
     if 'resolution' in item and item['resolution']:
         if self.config.get('use_resolution_alias', True):
             w['resolution'].set_text(item['resolution'])
@@ -136,30 +151,37 @@ def set_details(self, item=None):  # {{{
     else:
         w['resolution'].set_text('')
         pass
+
     if 'runtime' in item and item['runtime']:
         w['runtime'].set_text(str(int(item['runtime'])))
     else:
         w['runtime'].set_text('x')
+
     if 'cameraman' in item and item['cameraman']:
         w['cameraman'].set_markup("<i>%s</i>" % gutils.html_encode(item['cameraman']))
     else:
         w['cameraman'].set_text('')
+
     if 'screenplay' in item and item['screenplay']:
         w['screenplay'].set_markup("<i>%s</i>" % gutils.html_encode(item['screenplay']))
     else:
         w['screenplay'].set_text('')
+
     if 'cast' in item and item['cast']:
         w['cast'].set_text(str(item['cast']))
     else:
         w['cast'].set_text('')
+
     if 'country' in item and item['country']:
         w['country'].set_markup("<i>%s</i>" % gutils.html_encode(item['country']))
     else:
         w['country'].set_text('')
+
     if 'genre' in item and item['genre']:
         w['genre'].set_markup("<i>%s</i>" % gutils.html_encode(item['genre']))
     else:
         w['genre'].set_text('')
+
     if 'cond' in item and item['cond']:
         if str(item['cond']) in [str(i) for i in range(len(self._conditions))]:
             w['condition'].set_markup("<i>%s</i>" % self._conditions[item['cond']])
@@ -168,6 +190,7 @@ def set_details(self, item=None):  # {{{
             log.info("Wrong value in 'condition' field (movie_id=%s, cond=%s)" % (item['movie_id'], item['cond']))
     else:
         w['condition'].set_text('')
+
     if 'region' in item and item['region']:
         if item['region'] < len(self._regions):
             w['region'].set_markup("<i>%s</i>" % gutils.html_encode(self._regions[item['region']]))
@@ -179,7 +202,10 @@ def set_details(self, item=None):  # {{{
             self.widgets['tooltips'].set_tip(w['region'], self._regions[0])  # N/A
     else:
         w['region'].set_text('')
-        self.widgets['tooltips'].set_tip(w['region'], self._regions[0])  # N/A
+
+##        self.widgets['tooltips'].set_text(w['region'], self._regions[0])  # N/A
+        w['region'].set_text(self._regions[0])  # N/A
+
     if 'layers' in item and item['layers']:
         if str(item['layers']) in [str(i) for i in range(len(self._layers))]:
             w['layers'].set_markup("<i>%s</i>" % self._layers[item['layers']])
@@ -188,6 +214,7 @@ def set_details(self, item=None):  # {{{
             w['layers'].set_text('')
     else:
         w['layers'].set_text('')
+
     if 'color' in item and item['color']:
         if str(item['color']) in [str(i) for i in range(len(self._colors))]:
             w['color'].set_markup("<i>%s</i>" % self._colors[item['color']])
@@ -196,51 +223,61 @@ def set_details(self, item=None):  # {{{
             w['color'].set_markup('')
     else:
         w['color'].set_markup('')
+
     if 'classification' in item and item['classification']:
         w['classification'].set_markup("<i>%s</i>" % gutils.html_encode(item['classification']))
     else:
         w['classification'].set_text('')
+
     if 'studio' in item and item['studio']:
         w['studio'].set_markup("<i>%s</i>" % gutils.html_encode(item['studio']))
     else:
         w['studio'].set_text('')
+
     if 'o_site' in item and item['o_site']:
         self._o_site_url = str(item['o_site'])
         w['go_o_site_button'].set_sensitive(True)
     else:
         self._o_site_url = None
         w['go_o_site_button'].set_sensitive(False)
+
     if 'site' in item and item['site']:
         self._site_url = str(item['site'])
         w['go_site_button'].set_sensitive(True)
     else:
         self._site_url = None
         w['go_site_button'].set_sensitive(False)
+
     if 'trailer' in item and item['trailer']:
         self._trailer_url = str(item.trailer)
         w['go_trailer_button'].set_sensitive(True)
     else:
         self._trailer_url = None
         w['go_trailer_button'].set_sensitive(False)
+
     if 'seen' in item and item['seen'] == True:
         w['seen_icon'].set_from_file(os.path.join(self.locations['images'], 'seen.png'))
     else:
         w['seen_icon'].set_from_file(os.path.join(self.locations['images'], 'unseen.png'))
+
     if 'notes' in item and item['notes']:
         w['notes'].set_text(str(item.notes))
     else:
         w['notes'].set_text('')
     tmp = ''
+
     if 'media_num' in item and item['media_num']:
         tmp = str(item.media_num)
     else:
         tmp = '0'
+
     if 'medium_id' in item and item['medium_id']:
         if item.medium is not None:
             tmp += ' x ' + item.medium.name
         else:
             pass
     w['medium'].set_markup("<i>%s</i>" % gutils.html_encode(tmp))
+
     if 'vcodec_id' in item:
         if item.vcodec is not None:
             w['vcodec'].set_markup("<i>%s</i>" % gutils.html_encode(item.vcodec.name))
@@ -279,11 +316,13 @@ def set_details(self, item=None):  # {{{
         prefix = ''
     else:
         prefix = 'meter'
+
     if 'rating' in item and item['rating']:
         rating_file = "%s/%s0%d.png" % (self.locations['images'], prefix, item['rating'])
     else:
         rating_file = "%s/%s0%d.png" % (self.locations['images'], prefix, 0)
-    handler = w['image_rating'].set_from_pixbuf(gtk.gdk.pixbuf_new_from_file(rating_file))
+
+    handler = w['image_rating'].set_from_pixbuf(GdkPixbuf.Pixbuf.new_from_file(rating_file))
     gutils.garbage(handler)
 
     # check loan status and adjust buttons and history box
@@ -307,10 +346,11 @@ def set_details(self, item=None):  # {{{
             self.loan_date = str(item.loan_details.date)
             w['loan_info'].set_use_markup(False)
             w['loan_info'].set_label(_("This movie has been loaned to %s on %s") % (self.person_name, self.loan_date[:10]))
+
     if 'loaned' in item and not item['loaned']:  # "loaned" status can be changed above, so don't use "else:" in this line
-        self.widgets['popups']['loan'].set_sensitive(True)
-        self.widgets['popups']['email'].set_sensitive(False)
-        self.widgets['popups']['return'].set_sensitive(False)
+#        self.widgets['popups']['loan'].set_sensitive(True)
+#        self.widgets['popups']['email'].set_sensitive(False)
+#        self.widgets['popups']['return'].set_sensitive(False)
         self.widgets['menu']['loan'].set_sensitive(True)
         self.widgets['menu']['email'].set_sensitive(False)
         self.widgets['menu']['return'].set_sensitive(False)
@@ -334,7 +374,7 @@ def set_details(self, item=None):  # {{{
                 self.loans_treemodel.set_value(myiter, 2, person.name)
 
     # volumes/collections
-    if 'volume_id' in item and item['volume_id'] > 0:
+    if 'volume_id' in item and isinstance(item['volume_id'], int) and item['volume_id'] > 0:
         if 'volume' in item and item['volume']:
             w['volume'].set_markup("<b>%s</b>" % gutils.html_encode(item['volume'].name))
             w['show_volume_button'].set_sensitive(True)
@@ -342,9 +382,10 @@ def set_details(self, item=None):  # {{{
             w['volume'].set_text('')
             w['show_volume_button'].set_sensitive(False)
     else:
-            w['volume'].set_text('')
-            w['show_volume_button'].set_sensitive(False)
-    if 'collection_id' in item and item['collection_id'] > 0:
+        w['volume'].set_text('')
+        w['show_volume_button'].set_sensitive(False)
+
+    if 'collection_id' in item and isinstance(item['collection_id'], int) and item['collection_id'] > 0:
         if 'collection' in item and item['collection']:
             w['collection'].set_markup("<b>%s</b>" % gutils.html_encode(item['collection'].name))
             w['show_collection_button'].set_sensitive(True)
@@ -358,8 +399,10 @@ def set_details(self, item=None):  # {{{
     # languages
     for i in w['audio_vbox'].get_children():
         i.destroy()
+
     for i in w['subtitle_vbox'].get_children():
         i.destroy()
+
     if 'languages' in item and len(item['languages']) > 0:
         for i in item['languages']:
             if i.type == 3:  # subtitles
@@ -387,6 +430,7 @@ def set_details(self, item=None):  # {{{
                 widget = gtk.Label(tmp)
                 widget.set_use_markup(True)
                 w['audio_vbox'].pack_start(widget)
+
     w['audio_vbox'].show_all()
     w['subtitle_vbox'].show_all()
     #tags
@@ -408,7 +452,7 @@ def populate(self, movies=None, where=None, qf=True):  # {{{
             import advfilter
 
             # saved in advfilter
-            name = self.widgets['filter']['advfilter'].get_active_text()[:-3].decode('utf-8')  # :-3 due to additional '   ' in the name
+            name = self.widgets['filter']['advfilter'].get_active_text()[:-3]  # :-3 due to additional '   ' in the name
             if name:
                 cond = self.db.session.query(db.Filter).filter_by(name=name).first()
                 if not cond:
@@ -417,6 +461,7 @@ def populate(self, movies=None, where=None, qf=True):  # {{{
                     cond = cond.data
             else:
                 cond = advfilter.get_def_conditions()
+
             # add sorting from config
             sort_column_name = self.config.get('sortby', 'number', section='mainlist')
             sort_reverse = self.config.get('sortby_reverse', False, section='mainlist')
@@ -428,8 +473,10 @@ def populate(self, movies=None, where=None, qf=True):  # {{{
             # seen / loaned
             if self.widgets['menu']['loaned_movies'].get_active():
                 cond['loaned'] = True
+
             if self.widgets['menu']['not_seen_movies'].get_active():
                 cond["seen"] = False
+
             # collection
             pos = self.widgets['filter']['collection'].get_active()
             if pos >= 0:
@@ -448,6 +495,7 @@ def populate(self, movies=None, where=None, qf=True):  # {{{
                 cond['sort_by'] = set((sort_column_name + ' DESC', ))
             else:
                 cond['sort_by'] = set((sort_column_name, ))
+
             movies = sql.update_whereclause(movies, cond)
 
         # additional whereclause (volume_id, collection_id, ...)
@@ -466,54 +514,65 @@ def populate(self, movies=None, where=None, qf=True):  # {{{
     sort_column_id, order = self.treemodel.get_sort_column_id()
 
     # new treemodel (faster and prevents some problems)
-    self.treemodel = gtk.TreeStore(str, gtk.gdk.Pixbuf, str, str, str, str, bool, str, str, int, str, str)
+    self.treemodel = Gtk.TreeStore(str, GdkPixbuf.Pixbuf, str, str, str, str, bool, str, str, int, str, str)
 
     # check preferences to hide or show columns
-    if self.config.get('number', True, 'mainlist') == True:
+    if self.config.get('number', True, 'mainlist') is True:
         self.number_column.set_visible(True)
     else:
         self.number_column.set_visible(False)
-    if self.config.get('otitle', True, 'mainlist') == True:
+
+    if self.config.get('otitle', True, 'mainlist') is True:
         self.otitle_column.set_visible(True)
     else:
         self.otitle_column.set_visible(False)
-    if self.config.get('title', True, 'mainlist') == True:
+
+    if self.config.get('title', True, 'mainlist') is True:
         self.title_column.set_visible(True)
     else:
         self.title_column.set_visible(False)
-    if self.config.get('director', True, 'mainlist') == True:
+
+    if self.config.get('director', True, 'mainlist') is True:
         self.director_column.set_visible(True)
     else:
         self.director_column.set_visible(False)
-    if self.config.get('image', True, 'mainlist') == True:
+
+    if self.config.get('image', True, 'mainlist') is True:
         self.image_column.set_visible(True)
     else:
         self.image_column.set_visible(False)
-    if self.config.get('genre', True, 'mainlist') == True:
+
+    if self.config.get('genre', True, 'mainlist') is True:
         self.genre_column.set_visible(True)
     else:
         self.genre_column.set_visible(False)
-    if self.config.get('seen', True, 'mainlist') == True:
+
+    if self.config.get('seen', True, 'mainlist') is True:
         self.seen_column.set_visible(True)
     else:
         self.seen_column.set_visible(False)
-    if self.config.get('year', True, 'mainlist') == True:
+
+    if self.config.get('year', True, 'mainlist') is True:
         self.year_column.set_visible(True)
     else:
         self.year_column.set_visible(False)
-    if self.config.get('runtime', True, 'mainlist') == True:
+
+    if self.config.get('runtime', True, 'mainlist') is True:
         self.runtime_column.set_visible(True)
     else:
         self.runtime_column.set_visible(False)
-    if self.config.get('rating', True, 'mainlist') == True:
+
+    if self.config.get('rating', True, 'mainlist') is True:
         self.rating_column.set_visible(True)
     else:
         self.rating_column.set_visible(False)
-    if self.config.get('created', True, 'mainlist') == True:
+
+    if self.config.get('created', True, 'mainlist') is True:
         self.created_column.set_visible(True)
     else:
         self.created_column.set_visible(False)
-    if self.config.get('updated', True, 'mainlist') == True:
+
+    if self.config.get('updated', True, 'mainlist') is True:
         self.updated_column.set_visible(True)
     else:
         self.updated_column.set_visible(False)
@@ -529,7 +588,10 @@ def populate(self, movies=None, where=None, qf=True):  # {{{
     self.widgets['treeview'].set_model(self.treemodel)
     self.widgets['treeview'].thaw_child_notify()
     if self.total:
-        self.widgets['treeview'].set_cursor_on_cell(0)
+        tp = Gtk.TreePath()
+        tc = Gtk.TreeViewColumn(0)
+        self.widgets['treeview'].set_cursor_on_cell(tp, None, None, False)
+
     self.count_statusbar()
 #}}}
 
@@ -547,10 +609,11 @@ def setmovie(self, movie, iter, treemodel=None):  # {{{
 
     treemodel.set_value(iter, 0, '%005d' % int(movie.number))
 
-    if self.config.get('image', True, section='mainlist') == True:
+    if self.config.get('image', True, section='mainlist') is True:
         filename = None
         if movie.poster_md5:
             filename = gutils.get_image_fname(movie.poster_md5, self.db, "s")
+
         if not filename:
             filename = os.path.join(self.locations['images'], 'default_thumbnail.png')
 
@@ -566,16 +629,21 @@ def setmovie(self, movie, iter, treemodel=None):  # {{{
     treemodel.set_value(iter, 4, movie.director)
     treemodel.set_value(iter, 5, movie.genre)
     treemodel.set_value(iter, 6, movie.seen)
-    if movie.year is not None and (isinstance(movie.year, int) or isinstance(movie.year, long)):
+    if movie.year is not None and (isinstance(movie.year, int) or isinstance(movie.year, int)):
         treemodel.set_value(iter, 7, str(movie.year))
-    if movie.runtime is not None and (isinstance(movie.runtime, int) or isinstance(movie.runtime, long)):
+
+    if movie.runtime is not None and (isinstance(movie.runtime, int) or isinstance(movie.runtime, int)):
         treemodel.set_value(iter, 8, '%003d' % movie.runtime + _(' min'))
-    if movie.rating is not None and (isinstance(movie.rating, int) or isinstance(movie.rating, long)):
+
+    if movie.rating is not None and (isinstance(movie.rating, int) or isinstance(movie.rating, int)):
         treemodel.set_value(iter, 9, movie.rating)
+
     if movie.created:
         treemodel.set_value(iter, 10, movie.created.strftime('%Y-%m-%d %H:%M'))
+
     if movie.updated:
         treemodel.set_value(iter, 11, movie.updated.strftime('%Y-%m-%d %H:%M'))
+
     return iter
 #}}}
 
@@ -587,7 +655,6 @@ def select(self, iter, ensurevisible=True):  # {{{
             self.widgets['treeview'].scroll_to_cell(self.treemodel.get_path(iter))
     else:
         self.widgets['treeview'].get_selection().unselect_all()
+
     self.treeview_clicked()
 #}}}
-
-# vim: fdm=marker

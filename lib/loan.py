@@ -23,7 +23,10 @@ __revision__ = '$Id: loan.py 1522 2011-02-05 19:59:38Z iznogoud $'
 
 import logging
 
-import gtk
+import gtkimport gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+
 
 import db
 import gutils
@@ -76,7 +79,7 @@ def commit(self):
     try:
         if movie.loan_to(person, whole_collection=loan_whole_collection):
             session.commit()
-    except Exception, e:
+    except Exception as e:
         session.rollback()
         if e.message == 'loaned movies in the collection already':
             gutils.warning(_("Collection contains loaned movie.\nLoan aborted!"))
@@ -102,4 +105,3 @@ def return_loan(self):
     session.commit()
     self.treeview_clicked()
     self.populate_treeview()
-

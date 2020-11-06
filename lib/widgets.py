@@ -1,33 +1,39 @@
 # -*- coding: UTF-8 -*-
-# vim: fdm=marker
 
 __revision__ = '$Id: widgets.py 1572 2011-08-23 18:47:22Z mikej06 $'
+#               Updated to Gtk 3 2020 by Doug Lindquist
 
 # Copyright (c) 2005-2011 Vasco Nunes, Piotr Ożarowski
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU Library General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+## Copyright 2020 Doug Lindquist doug.lindquist@protonmail.com
 
-# You may use and distribute this software under the terms of the
-# GNU General Public License, version 2 or later
+# Permission is hereby granted, free of charge, to any person obtaining
+# copy of this software and associated documentation files (the
+# "Software"), to deal in the Software without restriction, including
+# without limitation the rights to use, copy, modify, merge, publish,
+# distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to
+# the following conditions:
+#
+# The above copyright notice and this permission notice shall be
+# included in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+# MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+# CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+# SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-import gtk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
+from gi.repository import GObject
 import advfilter
 
 
 def define_widgets(self, gladefile):
-    get = lambda x: gladefile.get_widget(x)
+    get = lambda x: gladefile.get_object(x)
     self.widgets = {}
 
     self.widgets['window'] = get('main_window')
@@ -41,7 +47,7 @@ def define_widgets(self, gladefile):
     self.widgets['toolbar'] = get('toolbar1')
 
 
-    self.widgets['movie'] = {#{{{
+    self.widgets['movie'] = {
         'cast': get('m_cast'),
         'classification': get('m_classification'),
         'cameraman': get('m_cameraman'),
@@ -90,9 +96,9 @@ def define_widgets(self, gladefile):
         'image_rating': get('m_image_rating'),
     }
     get('m_seen_icon_eventbox').connect('button_press_event', self.on_m_seen_icon_button_press_event)
-    #}}}
 
-    self.widgets['add'] = {#{{{
+
+    self.widgets['add'] = {
         'window': get('add_movie'),
         'notebook': get('notebook_add'),
         'barcode': get('am_barcode'),
@@ -156,7 +162,6 @@ def define_widgets(self, gladefile):
     self.widgets['add']['aadd_poster'].connect('button_press_event', self.a_change_poster)
     self.widgets['add']['aremove_poster'].connect('button_press_event', self.a_del_poster)
 
-    #}}}
 
     self.widgets['advfilter'] = {#{{{
         'window': get('w_advfilter'),
@@ -364,15 +369,15 @@ def define_widgets(self, gladefile):
         'edit': get('edit1'),
     }#}}}
 
-    self.widgets['popups'] = {#{{{
-        'main': get('popup'),
-        'loan': get('popup_loan'),
-        'return': get('popup_return'),
-        'email': get('popup_email'),
-        'clone': get('clone1'),
-        'print_cover': get('print_cover1'),
-        'edit': get('edit2'),
-    }#}}}
+#    self.widgets['popups'] = {#{{{
+#        'main': get('popup'),
+#        'loan': get('popup_loan'),
+#        'return': get('popup_return'),
+#        'email': get('popup_email'),
+#        'clone': get('clone1'),
+#        'print_cover': get('print_cover1'),
+#        'edit': get('edit2'),
+#    }#}}}
     self.widgets['extensions'] = {
         'toolbar': get('ext_toolbar'),
         'toolbar_hb': get('ext_toolbar_hb'),
@@ -388,16 +393,24 @@ def define_widgets(self, gladefile):
     self.widgets['big_poster'] = get('big_poster')
 
     #add some tooltips
-    self.widgets['tooltips'] = gtk.Tooltips()
-    self.widgets['tooltips'].set_tip(self.widgets['preferences']['epdf_reader'], _('Define here the PDF reader you want to use within Griffith. Popular choices are xpdf, gpdf, evince or kpdf. Make sure you have this program installed and working first.'))
-    self.widgets['tooltips'].set_tip(self.widgets['preferences']['spell_lang'], _("Here you can define the desired language to use while spell checking some fields. Use you locale setting. For example, to use european portuguese spell checking enter 'pt'"))
-    self.widgets['tooltips'].set_tip(self.widgets['preferences']['mail_smtp_server'], _("Use this entry to define the SMTP server you want to use to send e-mails. On *nix systems, 'localhost' should work. Alternatively, you can use your Internet Service Provider's SMTP server address."))
-    self.widgets['tooltips'].set_tip(self.widgets['preferences']['mail_email'], _("This is the from e-mail address that should be used to all outgoing e-mail. You want to include your own e-mail address here probably."))
-    self.widgets['tooltips'].set_tip(self.widgets['preferences']['mail_smtp_port'], _("Here you can define the smtp server port to use. If you want to use your gmail account service to send e-mails, try to enter '587' here. Default (and the most common one) is '25'"))
-    self.widgets['tooltips'].set_tip(self.widgets['preferences']['mail_use_tls'], _("If you need TLS support, please check this checkbox. This is needed, for example, when using gmail service to send your reminder e-mails."))
+    self.widgets['tooltips'] = {}
+    self.widgets['tooltips'][self.widgets['preferences']['epdf_reader']] =  _('Define here the PDF reader you want to use within Griffith. Popular choices are xpdf, gpdf, evince or kpdf. Make sure you have this program installed and working first.')
+    self.widgets['tooltips'][self.widgets['preferences']['epdf_reader']] = _('Define here the PDF reader you want to use within Griffith. Popular choices are xpdf, gpdf, evince or kpdf. Make sure you have this program installed and working first.')
+    self.widgets['tooltips'][self.widgets['preferences']['spell_lang']] = _("Here you can define the desired language to use while spell checking some fields. Use you locale setting. For example, to use european portuguese spell checking enter 'pt'")
+    self.widgets['tooltips'][self.widgets['preferences']['mail_smtp_server']] = _("Use this entry to define the SMTP server you want to use to send e-mails. On *nix systems, 'localhost' should work. Alternatively, you can use your Internet Service Provider's SMTP server address.")
+    self.widgets['tooltips'][self.widgets['preferences']['mail_email']] = _("This is the from e-mail address that should be used to all outgoing e-mail. You want to include your own e-mail address here probably.")
+    self.widgets['tooltips'][self.widgets['preferences']['mail_smtp_port']] = _("Here you can define the smtp server port to use. If you want to use your gmail account service to send e-mails, try to enter '587' here. Default (and the most common one) is '25'")
+    self.widgets['tooltips'][self.widgets['preferences']['mail_use_tls']] = _("If you need TLS support, please check this checkbox. This is needed, for example, when using gmail service to send your reminder e-mails.")
+
+    self.widgets['preferences']['epdf_reader'].set_text(_('Define here the PDF reader you want to use within Griffith. Popular choices are xpdf, gpdf, evince or kpdf. Make sure you have this program installed and working first.'))
+    self.widgets['preferences']['spell_lang'].set_text(_("Here you can define the desired language to use while spell checking some fields. Use you locale setting. For example, to use european portuguese spell checking enter 'pt'"))
+    self.widgets['preferences']['mail_smtp_server'].set_text(_("Use this entry to define the SMTP server you want to use to send e-mails. On *nix systems, 'localhost' should work. Alternatively, you can use your Internet Service Provider's SMTP server address."))
+    self.widgets['preferences']['mail_email'].set_text(_("This is the from e-mail address that should be used to all outgoing e-mail. You want to include your own e-mail address here probably."))
+    self.widgets['preferences']['mail_smtp_port'].set_text(_("Here you can define the smtp server port to use. If you want to use your gmail account service to send e-mails, try to enter '587' here. Default (and the most common one) is '25'"))
+##    self.widgets['preferences']['mail_use_tls'].set_text(_("If you need TLS support, please check this checkbox. This is needed, for example, when using gmail service to send your reminder e-mails."))
 
     # define handlers for general events
-    gladefile.signal_autoconnect({#{{{
+    self.builder.connect_signals({
         'gtk_main_quit': self.destroy,
         'on_window_state': self.on_window_state,
         'on_configure': self.on_configure,
@@ -419,7 +432,7 @@ def define_widgets(self, gladefile):
         'on_seen_activate': self.toggle_seen,
         'on_select_all_activate': self.select_all,
         'on_fullscreen_activate': self.toggle_fullscreen,
-        # preferences
+        'on_hpaned1_move_handle': self.on_hpaned1_move_handle,
         'on_preferences1_activate': self.show_preferences,
         'on_select_db_activate': lambda w: self.show_preferences(w, page=6),
         'on_cancel_preferences_clicked': self.hide_preferences,
@@ -549,14 +562,22 @@ def define_widgets(self, gladefile):
         'on_advfilter_save': lambda w: advfilter.save(self.db, self.widgets['advfilter']),
         'on_advfilter_open': lambda w: advfilter.load(self.db, self.widgets['advfilter'], self.field_names),
         'on_advfilter_delete': lambda w: advfilter.delete(self.db, self.widgets['advfilter']),
-    })#}}}
-
+        # missing
+        'on_view_image_clicked': self.on_view_image_clicked,
+        'on_cb_reverse_toggled': self.on_cb_reverse_toggled,
+        'on_results_select_clicked': self.on_results_select_clicked,
+        'on_m_seen_icon_button_press_event': self.on_m_seen_icon_button_press_event,
+        'on_lang_treeview_button_press_event': self.on_lang_treeview_button_press_event,
+        'on_a_delete_poster_clicked': self.on_a_delete_poster_clicked,
+        'on_a_open_poster_clicked': self.on_a_open_poster_clicked,
+        'on_fetch_posters_from': self.on_fetch_posters_from,
+        })
 
 def populate_results_window(treemodel, items):
     treemodel.clear()
 
     if isinstance(items, dict):
-        iterable = items.iteritems()
+        iterable = iter(items.items())
     else:
         iterable = items
 

@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-# vim: fdm=marker
 
 __revision__ = '$Id: sql.py 1538 2011-02-13 20:04:22Z piotrek $'
 
@@ -80,7 +79,7 @@ class GriffithSQL(object):
         elif config.get('type', section='database') == 'postgres':
             # sqlalchemy version check because postgres dialect is renamed in sqlalchemy>=0.6 from postgres to postgresql
             from sqlalchemy import __version__ as sqlalchemyversion
-            if map(int, sqlalchemyversion[:3].split('.')) < [0, 6]:
+            if list(map(int, sqlalchemyversion[:3].split('.'))) < [0, 6]:
                 url = "postgres"
             else:
                 url = "postgresql"
@@ -109,7 +108,7 @@ class GriffithSQL(object):
             conn = engine.connect()
             if dbinitializingsql is not None:
                 engine.execute(dbinitializingsql)
-        except Exception, e:    # InvalidRequestError, ImportError
+        except Exception as e:    # InvalidRequestError, ImportError
             log.info("MetaData: %s", e)
             if not fallback:
                 raise e
@@ -129,15 +128,15 @@ class GriffithSQL(object):
         # check if database needs an upgrade
         db.metadata.create_all(engine)
         try:
-            v = self.session.query(db.Configuration).filter_by(param=u'version').first()    # returns None if table exists && param ISNULL
-        except OperationalError, e:
+            v = self.session.query(db.Configuration).filter_by(param='version').first()    # returns None if table exists && param ISNULL
+        except OperationalError as e:
             log.info(e)
             v = 0
-        except Exception, e:
+        except Exception as e:
             log.error(e)
             v = 0
 
-        if v is not None and v > 1:
+        if v is not None and int(v.value) > 1:
             v = int(v.value)
         if v < self.version:
             from dbupgrade import upgrade_database

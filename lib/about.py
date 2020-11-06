@@ -21,7 +21,9 @@ __revision__ = '$Id: about.py 1519 2011-02-05 15:32:36Z iznogoud $'
 # You may use and distribute this software under the terms of the
 # GNU General Public License, version 2 or later
 
-import gtk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 import version
 import os
 import sys

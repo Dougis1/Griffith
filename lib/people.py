@@ -48,21 +48,21 @@ def clear_person(self):
     self.widgets['person']['phone'].set_text('')
 
 def add_person_db(self):
-    name = self.widgets['person']['name'].get_text().decode('utf-8')
+    name = self.widgets['person']['name'].get_text()
     if name:
         p = db.Person()
         try:
-            p.name = self.widgets['person']['name'].get_text().decode('utf-8')
-            p.email = self.widgets['person']['email'].get_text().decode('utf-8')
-            p.phone = gutils.digits_only(self.widgets['person']['phone'].get_text().decode('utf-8'))
-        except ValueError, e:
+            p.name = self.widgets['person']['name'].get_text()
+            p.email = self.widgets['person']['email'].get_text()
+            p.phone = gutils.digits_only(self.widgets['person']['phone'].get_text())
+        except ValueError as e:
             gutils.warning(e.message)
             return False
         self.widgets['person']['window'].hide()
         self.db.session.add(p)
         try:
             self.db.session.commit()
-        except Exception, e:
+        except Exception as e:
             self.db.session.rollback()
             log.info(str(e))
         else:
@@ -77,7 +77,7 @@ def edit_person(self):
     try:
         treeselection = self.widgets['people']['treeview'].get_selection()
         (tmp_model, tmp_iter) = treeselection.get_selected()
-        name = tmp_model.get_value(tmp_iter,0).decode('utf-8')
+        name = tmp_model.get_value(tmp_iter,0)
     except:
         return
     p = self.db.session.query(db.Person).filter_by(name=name).first()
@@ -93,21 +93,21 @@ def edit_person_cancel(self):
     self.widgets['people']['window'].present()
 
 def update_person(self):
-    p = self.db.session.query(db.Person).filter_by(person_id=self.widgets['person']['e_id'].get_text().decode('utf-8')).first()
+    p = self.db.session.query(db.Person).filter_by(person_id=self.widgets['person']['e_id'].get_text()).first()
     if not p:
         log.warning('Person not found')
         return False
     try:
-        p.name = self.widgets['person']['e_name'].get_text().decode('utf-8')
-        p.email = self.widgets['person']['e_email'].get_text().decode('utf-8')
-        p.phone = self.widgets['person']['e_phone'].get_text().decode('utf-8')
-    except ValueError, e:
+        p.name = self.widgets['person']['e_name'].get_text()
+        p.email = self.widgets['person']['e_email'].get_text()
+        p.phone = self.widgets['person']['e_phone'].get_text()
+    except ValueError as e:
         gutils.warning(e.message)
         return False
     self.db.session.add(p)
     try:
         self.db.session.commit()
-    except Exception, e:
+    except Exception as e:
         self.db.session.rollback()
         log.info(str(e))
     else:
@@ -125,7 +125,7 @@ def delete_person(self):
     try:
         treeselection = self.widgets['people']['treeview'].get_selection()
         (tmp_model, tmp_iter) = treeselection.get_selected()
-        person = tmp_model.get_value(tmp_iter,0).decode('utf-8')
+        person = tmp_model.get_value(tmp_iter,0)
     except:
         return
     person = self.db.session.query(db.Person).filter_by(name=person).first()
@@ -137,14 +137,14 @@ def delete_person(self):
     if person.returned_movies_count > 0:
         has_history = True
         has_history_msg = _("This person has data in the loan history. This data will be erased if you continue.")
-    
+
     if gutils.question(_("%s\nAre you sure you want to delete this person?" % has_history_msg), self.widgets['people']['window']):
         treeselection = self.widgets['people']['treeview'].get_selection()
         (tmp_model, tmp_iter) = treeselection.get_selected()
         self.db.session.delete(person)
         try:
             self.db.session.commit()
-        except Exception, e:
+        except Exception as e:
             log.info(str(e))
         else:
             self.p_treemodel.remove(tmp_iter)

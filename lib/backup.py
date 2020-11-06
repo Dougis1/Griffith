@@ -26,11 +26,13 @@ import datetime
 import logging
 import os.path
 import zipfile
-from StringIO import StringIO
+from io import StringIO
 from shutil import rmtree, move
 from tempfile import mkdtemp
 
-import gtk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 from sqlalchemy import create_engine
 from platform import system
 
@@ -44,7 +46,7 @@ try:
     import EasyDialogs
 except:
     pass
-    
+
 log = logging.getLogger('Griffith')
 
 def create(self):
@@ -52,7 +54,7 @@ def create(self):
     #if self.db.session.bind.engine.name != 'sqlite':
     #    gutils.error(_("Backup function is available only for SQLite engine for now"), self.widgets['window'])
     #    return False
-    
+
     default_name = "%s_backup_%s.zip" % (self.config.get('name', 'griffith', section='database'),\
                     datetime.date.isoformat(datetime.datetime.now()))
     filename = gutils.file_chooser(_("Save Griffith backup"), \
@@ -61,7 +63,7 @@ def create(self):
 
     if filename and filename[0]:
         proceed = True
-        zipfilename = filename[0].decode('utf-8')
+#        zipfilename = filename[0]
         log.debug('Backup filename: %s', zipfilename)
         if os.path.isfile(zipfilename):
             if not gutils.question(_("File exists. Do you want to overwrite it?"), window=self.widgets['window']):
@@ -148,14 +150,14 @@ def copy_db(src_engine, dst_engine):
 
             if dst_engine.name == 'postgres':
                 # update current value of sequences
-                primary_column_name = table.primary_key.keys()[0]
+                primary_column_name = list(table.primary_key.keys())[0]
                 if primary_column_name.endswith('_id'):
                     currval = max(row[primary_column_name] for row in data)
                     query = "SELECT setval('%s_%s_seq', %s)" % (table.name, primary_column_name, currval)
                     log.debug('updating sequence: %s', query)
                     try:
                         dst_engine.execute(query)
-                    except Exception, e:
+                    except Exception as e:
                         e = getattr(e, 'message', e)
                         log.error('... cannot update sequence: %s', e)
 
@@ -170,7 +172,7 @@ def merge_db(src_db, dst_db):  # FIXME
         if dst_session.query(db.Movie).filter_by(o_title=movie.o_title).first() is not None:
             continue
         t_movies = {}
-        for column in movie.mapper.c.keys():
+        for column in list(movie.mapper.c.keys()):
             t_movies[column] = eval("movie.%s" % column)
 
         # replace number with new one
@@ -183,7 +185,7 @@ def merge_db(src_db, dst_db):  # FIXME
         t_movies.pop('collection_id')
 
         if dst_db.add_movie(t_movies):  # FIXME
-            print t_movies
+            print(t_movies)
 
         if movie.image is not None:
             dest_file = os.path.join(self.locations['posters'], movie.image + '.jpg')
@@ -214,7 +216,7 @@ def restore(self, merge=False):
         tmp_db = None
         tmp_dir = mkdtemp()
         os.mkdir(os.path.join(tmp_dir, 'posters'))
-        print filename
+        print(filename)
         if filename.lower().endswith('.zip'):
             try:
                 zip_file = zipfile.ZipFile(filename, 'r')

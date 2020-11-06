@@ -23,7 +23,9 @@ __revision__ = '$Id: edit.py 1619 2012-01-29 19:11:45Z mikej06 $'
 
 import logging
 
-import gtk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 
 import db
 import delete
@@ -59,7 +61,7 @@ def change_poster_select_file(self, number, handler = update_image):
                                    folder=self.locations['desktop'],
                                    picture=True)
     if filename and filename[0]:
-        filename = filename[0].decode('UTF-8')
+        filename = filename[0]
         if handler:
             return handler(self, number, filename)
     return False
@@ -72,7 +74,7 @@ def update_image_from_memory(self, number, data):
         loader.close()
         self.widgets['movie']['picture'].set_from_pixbuf(\
                 loader.get_pixbuf().scale_simple(100, 140, gtk.gdk.INTERP_BILINEAR))
-    except Exception, e:
+    except Exception as e:
         log.error(str(e))
         gutils.error(_("Image is not valid."), self.widgets['window'])
         return False
@@ -96,7 +98,7 @@ def update_image_from_memory(self, number, data):
     session.add(movie)
     try:
         session.commit()
-    except Exception, e:
+    except Exception as e:
         session.rollback()
         log.error("cannot add poster to database: %s" % e)
         return False
@@ -129,7 +131,7 @@ def delete_poster(self, movie_id = None):
         session.add(movie)
         try:
             session.commit()
-        except Exception, e:
+        except Exception as e:
             session.rollback()
             log.error("cannot delete poster: %s" % e)
             return False

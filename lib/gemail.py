@@ -57,7 +57,7 @@ def mailto(self, tls, port, server, auth, user, password, sender, to, subject, m
         return
     except:
         gutils.error(_("Error sending e-mail: %s")%"", self.widgets['window'])
-        
+
     session.quit()
 
 def send_email(self):
@@ -74,8 +74,8 @@ def send_email(self):
                 self.config.get('password', '', section='mail'), \
                 self.config.get('email', 'griffith', section='mail'), self.person_email, \
                 _("Movie loan reminder"), _("Hi, %s!\n\nJust to remind you that I'm really needing the following movie I have loaned to you recently:\n\n%s (%s)\n\nLoaned on %s") \
-                %(self.person_name, self.widgets['movie']['o_title'].get_text().decode('utf-8'), \
-                self.widgets['movie']['title'].get_text().decode('utf-8'), self.loan_date[:10]))
+                %(self.person_name, self.widgets['movie']['o_title'].get_text(), \
+                self.widgets['movie']['title'].get_text(), self.loan_date[:10]))
         except:
             gutils.error(_("Mail could not be sent. Please check e-mail preferences."), self.widgets['window'])
     else:

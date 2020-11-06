@@ -69,7 +69,7 @@ def delete_poster(self, md5sum, commit=False):
         if commit:
             try:
                 session.commit()
-            except Exception, e:
+            except Exception as e:
                 log.warn("cannot delete poster from db: %s", e)
                 session.rollback()
                 return False

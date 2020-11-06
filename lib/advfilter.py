@@ -1,5 +1,4 @@
 # -*- coding: UTF-8 -*-
-# vim: fdm=marker et ts=4 sw=4
 __revision__ = '$Id: advfilter.py 1478 2010-11-23 20:25:16Z mikej06 $'
 
 # Copyright (c) 2008 Vasco Nunes, Piotr Ożarowski
@@ -24,7 +23,9 @@ __revision__ = '$Id: advfilter.py 1478 2010-11-23 20:25:16Z mikej06 $'
 import logging
 from copy import deepcopy
 
-import gtk
+import gi
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk
 from sqlalchemy import select
 
 import db
@@ -339,7 +340,7 @@ def get_conditions(widgets): #{{{
     for hbox in widgets["dynamic_vbox"]:
         hbox_items = hbox.get_children()
 
-        entry = hbox_items[2].get_text().strip().decode('utf-8')
+        entry = hbox_items[2].get_text().strip()
         if not entry: # ignore if it's empty
             continue
 
@@ -364,7 +365,7 @@ def save(gsql, widgets):
     """saves search conditions from current filter window"""
 
     cond = get_conditions(widgets)
-    name = widgets['cb_name'].get_active_text().decode('utf-8')
+    name = widgets['cb_name'].get_active_text()
     if not name:
         log.debug("search rule name is empty")
         info(_("Name is empty"), widgets['window'])
@@ -381,7 +382,7 @@ def save(gsql, widgets):
     session.add(filter_)
     try:
         session.commit()
-    except Exception, e:
+    except Exception as e:
         session.rollback()
         log.warn(e)
         warning(_("Cannot save search conditions"), widgets['window'])
@@ -393,7 +394,7 @@ def save(gsql, widgets):
 
 
 def load(gsql, widgets, field_names):
-    name = widgets['cb_name'].get_active_text().decode('utf-8')
+    name = widgets['cb_name'].get_active_text()
     if not name:
         log.debug("search rule name is empty")
         return False
@@ -408,7 +409,7 @@ def delete(gsql, widgets):
     """deletes the current selected filter"""
 
     #hier muss was anderes her! nicht den text prüfen, da bei manchem anwender ein leereintrag existiert
-    name = widgets['cb_name'].get_active_text().decode('utf-8')
+    name = widgets['cb_name'].get_active_text()
     if not name:
         log.debug("search rule name is empty")
         info(_("Name is empty"), widgets['window'])
