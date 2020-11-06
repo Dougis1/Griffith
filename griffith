@@ -1387,7 +1387,7 @@ class Griffith(object):
             if pthinfo is not None:
                 path, col, cellx, celly = pthinfo
                 self.widgets['treeview'].grab_focus()
-                self.widgets['popups']['main'].popup( None, None, None, event.button, time)
+                self.widgets['popups']['main'].popup(None, None, None, event.button, time)
             return 1
         elif event.type == Gtk.gdk._2BUTTON_PRESS:
             self.edit_movie()
@@ -1399,6 +1399,7 @@ class Griffith(object):
         self.widgets['add']['b_get_from_web'].set_sensitive(True)
         if self._resultswin_window_closed_signal:
             self._resultswin_window_closed_signal(*args)
+
         self._resultswin_window_closed_signal = None
         self._resultswin_button_pressed_signal = self.on_add_movie_results_button_press_event
         self._resultswin_process = self.populate_dialog_with_results
