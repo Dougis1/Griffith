@@ -145,7 +145,6 @@ class Griffith(object):
         gconsole.check_args_with_db(self)
 
 ##        Gtk.window_set_auto_startup_notification()
-        #self.Image = Gtk.Image()
         self.filter_l = False
         initialize.gui(self)
         initialize.toolbar(self)
@@ -962,7 +961,7 @@ class Griffith(object):
         if active > 0:
             vcodec_id = self.vcodecs_ids[active]
             vcodec = session.query(db.VCodec).filter_by(vcodec_id=vcodec_id).first()
-            if vcodec and len(vcodec.movies)==0:
+            if vcodec and len(vcodec.movies) == 0:
                 session.delete(vcodec)
                 try:
                     session.commit()
@@ -1202,7 +1201,7 @@ class Griffith(object):
         # on other systems the window manager should manage the windows
         # but it is possible to active it for other platforms via config file
         if self.config.get('savelayout', self.windows, section='window'):
-            if hasattr(self, 'mainwindow_state') and not self.mainwindow_state is None:
+            if hasattr(self, 'mainwindow_state') and self.mainwindow_state is not None:
                 self.config.set('width',  self.mainwindow_state['width'],  section='window')
                 self.config.set('height', self.mainwindow_state['height'], section='window')
                 self.config.set('left',   self.mainwindow_state['left'],   section='window')
@@ -1226,7 +1225,7 @@ class Griffith(object):
         # save sorting
         columnsorting = self.treemodel.get_sort_column_id()
         self.config.set('columnsortid', columnsorting[0], section='mainlist')
-        if columnsorting[1] == None:
+        if columnsorting[1] is None:
             self.config.set('columnsortorder', 0, section='mainlist')
         else:
             self.config.set('columnsortorder', int(columnsorting[1]), section='mainlist')
@@ -1240,16 +1239,16 @@ class Griffith(object):
             # offset of 30 points (height of the title bar) every time the
             # application is started. The window would move right-down.
             self.widgets['window'].set_gravity(Gtk.gdk.GRAVITY_STATIC)
-        if self.config.get("left", None, section='window') == None:
+        if self.config.get("left", None, section='window') is None:
             pass
         else:
             state = self.config.get('state', '0', section='window')
             if state == str(int(Gtk.gdk.WINDOW_STATE_MAXIMIZED)):
                 self.widgets['window'].maximize()
             else:
-                self.widgets['window'].move(int(self.config.get('left', section='window')), \
+                self.widgets['window'].move(int(self.config.get('left', section='window')),
                     int(self.config.get('top', section='window')))
-                self.widgets['window'].resize(int(self.config.get('width', section='window')), \
+                self.widgets['window'].resize(int(self.config.get('width', section='window')),
                     int(self.config.get('height', section='window')))
         self.widgets['window'].show()
 
@@ -1298,11 +1297,13 @@ class Griffith(object):
             gutils.run_browser(self._trailer_url)
 
     def on_goto_homepage_activate(site, *args):
-        gutils.run_browser('http://www.griffith.cc/')
+        gutils.run_browser('')
+
     def on_goto_forum_activate(site, *args):
-        gutils.run_browser('http://forum.griffith.cc/')
+        gutils.run_browser('')
+
     def on_goto_report_bug_activate(site, *args):
-        gutils.run_browser('http://bugs.griffith.cc/')
+        gutils.run_browser('')
 
     # toolbar -------------------------------------------------------------
     def toggle_toolbar(self, *args):
@@ -1316,7 +1317,7 @@ class Griffith(object):
 
     def toggle_ext_toolbar(self, *args):
         state = self.widgets['menu']['ext_toolbar'].get_active()
-        if state == False:
+        if state is False:
             self.widgets['extensions']['toolbar_hb'].hide()
         else:
             self.widgets['extensions']['toolbar_hb'].show()
