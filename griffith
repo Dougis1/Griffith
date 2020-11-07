@@ -74,6 +74,7 @@ missing = []
 for i in required:
     if i['version'] is False or (i['version'] is not True and i['version'][0] == '-'):
         missing.append(i)
+
 if len(missing) > 0:
     log.error('Error: missing modules:')
     for i in missing:
@@ -82,8 +83,11 @@ if len(missing) > 0:
             log.error("\t:: required version: %(module_req)s" % i)
             if i['version'] is not False and i['version'][0] == '-':
                 log.error("\t:: detected: %s" % i['version'][1:])
+
         log.error("\n")
+
     sys.exit(1)
+
 del missing
 
 # other imports
@@ -196,6 +200,7 @@ class Griffith(object):
             log.debug('reloading %s', plugin_name)
             import sys
             importlib.reload(sys.modules[plugin_name])
+
         plugin = module.ExportPlugin(self.db, self.locations, self.widgets['window'], self._search_conditions, self.config)
         if plugin.initialize():
             try:
@@ -217,9 +222,10 @@ class Griffith(object):
     def on_configure(self, widget, data=None):
         # size should only be saved on microsoft windows systems
         # on other systems the window manager should manage the windows
-        if self.windows and not data is None:
+        if not data is None:
             if not hasattr(self, 'mainwindow_state') or self.mainwindow_state is None:
                 self.mainwindow_state = {}
+
             self.mainwindow_state['left'] = data.x
             self.mainwindow_state['top'] = data.y
             self.mainwindow_state['height'] = data.height
@@ -229,10 +235,11 @@ class Griffith(object):
         # size should only be saved on microsoft windows systems
         # on other systems the window manager should manage the windows
         # here: save the window state
-        if self.windows and not windowstate is None:
+        if not windowstate is None:
             if not hasattr(self, 'mainwindow_state') or self.mainwindow_state is None:
                 self.mainwindow_state = {}
-            self.mainwindow_state['state'] = int(windowstate.new_window_state & Gtk.gdk.WINDOW_STATE_MAXIMIZED)
+
+            self.mainwindow_state['state'] = int(windowstate.new_window_state & Gdk.WindowState.MAXIMIZED)
 
     def toggle_fullscreen(self, widget):
         if widget is True or widget.get_active():
@@ -401,8 +408,10 @@ class Griffith(object):
         if self.widgets['poster_window'].flags() & Gtk.VISIBLE == Gtk.VISIBLE:
             self.widgets['poster_window'].hide()
             return
+
         if len(self.selected) > 1:
             return
+
         poster_md5 = self.db.session.query(db.Movie.poster_md5).filter_by(number=int(self.selected[0])).first()[0]
         if poster_md5:
             filename = gutils.get_image_fname(poster_md5, self.db)
@@ -431,12 +440,14 @@ class Griffith(object):
         for this_iter in self.selected_iter:
             val = self.treemodel.get_value(this_iter,6)
             self.treemodel.set_value(this_iter, 6, not val)
+
         self.treeview_clicked()
         self.count_statusbar()
 
     def sugest_movie(self, *args):
         if not self.widgets['menu']['not_seen_movies'].get_active():
             self.widgets['menu']['not_seen_movies'].set_active(True)
+
         subtotal = len(self.widgets['treeview'].get_model())
         self.count_statusbar()
         if subtotal > 0:
@@ -452,6 +463,7 @@ class Griffith(object):
     def on_am_collection_combo_changed(self,widget):
         if widget.get_active() != -1:
             self._selected_collection = self.collection_combo_ids[widget.get_active()]
+
     def on_am_volume_combo_changed(self,widget):
         if widget.get_active() != -1:
             self._selected_volume = self.volume_combo_ids[widget.get_active()]
@@ -556,7 +568,7 @@ class Griffith(object):
                 path, col, cellx, celly = pthinfo
                 self.widgets['add']['lang_treeview'].grab_focus()
                 self.widgets['add']['lang_treeview'].set_cursor( path, col, 0)
-            self.widgets['add']['lang_menu'].popup(None, None, None, event.button, time)
+            self.widgets['add']['lang_menu'].open_submenu("popup")     #popup(None, None, None, event.button, time)
 
     def create_language_row(self, lang=None):
         if len(self.languages_ids) == 1:
@@ -653,6 +665,7 @@ class Griffith(object):
             lang_id = self.languages_ids[self.lang_name_active]
         except:
             return False
+
         session = self.db.Session()
         lang = session.query(db.Lang).filter_by(lang_id=lang_id).first()
         if lang:
@@ -711,6 +724,7 @@ class Griffith(object):
             active = self.tag_name_active
         except:
             return False
+
         session = self.db.Session()
         tag_id = self.tags_ids[active]
         tag = session.query(db.Tag).filter_by(tag_id=tag_id).first()
@@ -770,6 +784,7 @@ class Griffith(object):
             acodec_id = self.acodecs_ids[self.acodec_name_active]
         except:
             return False
+
         session = self.db.Session()
         acodec = session.query(db.ACodec).filter_by(acodec_id=acodec_id).first()
         if acodec:
@@ -827,6 +842,7 @@ class Griffith(object):
             achannel_id = self.achannels_ids[self.achannel_name_active]
         except:
             return False
+
         session = self.db.Session()
         achannel = session.query(db.AChannel).filter_by(achannel_id=achannel_id).first()
         if achannel is not None:
@@ -884,6 +900,7 @@ class Griffith(object):
             subformat_id = self.subformats_ids[self.subformat_name_active]
         except:
             return False
+
         session = self.db.Session()
         subformat = session.query(db.SubFormat).filter_by(subformat_id=subformat_id).first()
         if subformat is not None:
@@ -932,6 +949,7 @@ class Griffith(object):
             medium_id = self.media_ids[self.medium_name_active]
         except:
             return False
+
         session = self.db.Session()
         medium = session.query(db.Medium).filter_by(medium_id=medium_id).first()
         if medium:
@@ -1116,6 +1134,7 @@ class Griffith(object):
         if allmovies > 0:
             loaned = self.db.session.query(db.Movie).filter_by(loaned=True).count()
             not_seen = self.db.session.query(db.Movie).filter_by(seen=False).count()
+
         self.update_statusbar(_("%s movie(s) in collection. %s movie(s) are shown by the filter. %s movie(s) loaned. You haven't seen %s movie(s)") % (allmovies, self.total, loaned, not_seen))
 
     def update_statusbar(self, text):
@@ -1138,6 +1157,7 @@ class Griffith(object):
         from advfilter import create_select_query, hide_window
         # remove the simple filter conditions because adv filter takes effect
         self.clear_filter()
+
         # now filtering in advanced
         movies = create_select_query(self, None, None, None).execute().fetchall()
         main_treeview.populate(self, movies, qf=False)
@@ -1387,9 +1407,9 @@ class Griffith(object):
             if pthinfo is not None:
                 path, col, cellx, celly = pthinfo
                 self.widgets['treeview'].grab_focus()
-                self.widgets['popups']['main'].popup(None, None, None, event.button, time)
+                self.widgets['popups']['main'].popup(None, None, None, None, event.button, Gtk.get_current_event_time())
             return 1
-        elif event.type == Gtk.gdk._2BUTTON_PRESS:
+        elif event.type == Gdk._2BUTTON_PRESS:
             self.edit_movie()
 
     # -=[ results window ]=------------------------------------------------
