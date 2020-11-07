@@ -329,7 +329,7 @@ def popup_message(message):
     def wrap(f):
 
         def wrapped_f(*args, **kwargs):
-            if gtk:
+            if Gtk:
                 window = Gtk.Window()
                 window.set_title('Griffith info')
                 window.set_position(Gtk.WIN_POS_CENTER)
@@ -348,7 +348,7 @@ def popup_message(message):
             else:
                 print(message, end=' ')
             res = f(*args, **kwargs)
-            if gtk:
+            if Gtk:
                 window.destroy()
             else:
                 print(' [done]')

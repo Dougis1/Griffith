@@ -27,10 +27,9 @@ __revision__ = '$Id: loan.py 1522 2011-02-05 19:59:38Z iznogoud $'
 
 import logging
 
-import gtkimport gi
+import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
-
 
 import db
 import gutils
