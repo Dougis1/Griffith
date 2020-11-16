@@ -212,7 +212,7 @@ class Progress:
 
     def __init__(self, window, title='', message=''):
         self.status = False
-        self.dialog = Gtk.Dialog(title, window, Gtk.DIALOG_MODAL, ())
+        self.dialog = Gtk.Dialog(title, window, Gtk.DialogFlags.MODAL, ())
         self.dialog.set_urgency_hint(False)
         self.dialog.set_position(Gtk.WIN_POS_CENTER)
         self.dialog.stick()

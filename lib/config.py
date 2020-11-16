@@ -51,10 +51,13 @@ class Config(object):
     def set(self, option, value, section='main'):
         if not isinstance(option, str):
             option = str(option)
+
         if not isinstance(value, str):
             value = str(value)
+
         if not self._cfg.has_section(section):
             self._cfg.add_section(section)
+
         value = value.replace('%', '%%')
         self._cfg.set(section, option, value)
 
@@ -88,6 +91,7 @@ class Config(object):
     def save(self, file = None):
         if not file:
             file = self._file
+
         if not os.path.exists(os.path.split(file)[0]):
             os.makedirs(os.path.split(file)[0])
         self._cfg.write(open(file, 'w'))
@@ -200,8 +204,10 @@ class Config(object):
             self._cfg.set('main', 'pdf_reader', '')
         else:
             self._cfg.set('main', 'pdf_reader', 'xpdf')
+
         self._cfg.set('main', 'posters', 'posters')
         self._cfg.set('main', 'rating_image', '0')  # 0 = meter; 1 = stars
+        self._cfg.set('main', 'backup_dir', os.path.expanduser('~'))
         self._cfg.set('mainlist', 'director', 'True')
         self._cfg.set('mainlist', 'image', 'True')
         self._cfg.set('mainlist', 'limit', '0')  # limit search results to x items (0 -> no limits)

@@ -181,10 +181,10 @@ def upgrade_database(self, version, config):
             if poster_file_name in updated:
                 continue
             if os.path.isfile(poster_file_name):
-                poster_md5 = gutils.md5sum(file(poster_file_name, 'rb'))
+                poster_md5 = gutils.md5sum(open(poster_file_name, 'rb'))
                 poster = self.session.query(db.Poster).filter_by(md5sum=poster_md5).first()
                 if not poster:
-                    poster = db.Poster(md5sum=poster_md5, data=file(poster_file_name, 'rb').read())
+                    poster = db.Poster(md5sum=poster_md5, data=open(poster_file_name, 'rb').read())
                     self.session.add(poster)
 
                 update_query = movies_table.update(movies_table.c.image == movie.image, {'poster_md5': poster_md5, 'image': None}, bind=b)

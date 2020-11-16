@@ -319,7 +319,7 @@ class PluginTester:
         # test all plugins ?
         test_all = True
         dialog = Gtk.MessageDialog(None,
-            Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+            Gtk.DialogFlags.MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
             Gtk.MESSAGE_QUESTION, Gtk.BUTTONS_NONE, 'Test all plugins ?')
         dialog.add_buttons(Gtk.STOCK_YES, Gtk.RESPONSE_YES,
             Gtk.STOCK_NO, Gtk.RESPONSE_NO)
@@ -334,7 +334,7 @@ class PluginTester:
             if domsgbox and test_all == False:
                 # ask for test of that specific plugin
                 dialog = Gtk.MessageDialog(None,
-                    Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+                    Gtk.DialogFlags.MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
                     Gtk.MESSAGE_QUESTION, Gtk.BUTTONS_NONE, 'Test plugin %s ?' %i)
                 dialog.add_buttons(Gtk.STOCK_YES, Gtk.RESPONSE_YES,
                     Gtk.STOCK_NO, Gtk.RESPONSE_NO)

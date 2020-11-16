@@ -61,14 +61,15 @@ def create(self):
 
     default_name = "%s_backup_%s.zip" % (self.config.get('name', 'griffith', section='database'),\
                     datetime.date.isoformat(datetime.datetime.now()))
-    filename = gutils.file_chooser(_("Save Griffith backup"), \
-        action=Gtk.FILE_CHOOSER_ACTION_SAVE, name=default_name, \
-        buttons=(Gtk.STOCK_CANCEL, Gtk.RESPONSE_CANCEL, Gtk.STOCK_SAVE, Gtk.RESPONSE_OK))
+    filename = gutils.file_chooser(self, _("Save Griffith backup"), \
+        action=Gtk.FileChooserAction.SAVE, name=default_name, \
+        buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
 
     if filename and filename[0]:
         proceed = True
-#        zipfilename = filename[0]
+        zipfilename = filename[0]
         log.debug('Backup filename: %s', zipfilename)
+        print('Backup filename: %s', zipfilename)
         if os.path.isfile(zipfilename):
             if not gutils.question(_("File exists. Do you want to overwrite it?"), window=self.widgets['window']):
                 proceed = False
@@ -84,6 +85,7 @@ def create(self):
             except:
                 gutils.error(_("Error creating backup"), self.widgets['window'])
                 return False
+
             log.debug('Preparing data and saving it to the zip archive')
             if self.db.session.bind.engine.name == 'sqlite':
                 mzip.write(os.path.join(self.locations['home'], 'griffith.cfg').encode('utf-8'), arcname='griffith.cfg')
@@ -124,6 +126,7 @@ def create(self):
                     # disposing the temporary db connection before rmtree and in finally block to avoid locked db file
                     if tmp_engine:
                         tmp_engine.dispose()
+
                     rmtree(tmp_dir)
             gutils.info(_("Backup has been created"), self.widgets['window'])
 

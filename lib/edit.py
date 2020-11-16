@@ -29,7 +29,7 @@ import logging
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk
+from gi.repository import Gtk, GdkPixbuf
 
 import db
 import delete
@@ -51,7 +51,7 @@ def change_poster(self):
     return change_poster_select_file(self, number)
 
 def update_image(self, number, filename):
-    imagedata = file(filename, 'rb').read()
+    imagedata = open(filename, 'rb').read()
     return update_image_from_memory(self, number, imagedata)
 
 def change_poster_select_file(self, number, handler = update_image):
@@ -68,6 +68,7 @@ def change_poster_select_file(self, number, handler = update_image):
         filename = filename[0]
         if handler:
             return handler(self, number, filename)
+
     return False
 
 def update_image_from_memory(self, number, data):
@@ -77,7 +78,7 @@ def update_image_from_memory(self, number, data):
         loader.write(data, len(data))
         loader.close()
         self.widgets['movie']['picture'].set_from_pixbuf(\
-                loader.get_pixbuf().scale_simple(100, 140, Gtk.Gdk.INTERP_BILINEAR))
+                loader.get_pixbuf().scale_simple(100, 140, GdkPixbuf.InterpType.BILINEAR))
     except Exception as e:
         log.error(str(e))
         gutils.error(_("Image is not valid."), self.widgets['window'])
@@ -147,12 +148,12 @@ def delete_poster(self, movie_id = None):
             gutils.garbage(handler)
             self.widgets['add']['delete_poster'].set_sensitive(False)
             self.widgets['movie']['picture_button'].set_sensitive(False)
+
         # always refresh the treeview entry
         update_tree_thumbnail(self, gutils.get_defaultthumbnail_fname(self))
-
         self.update_statusbar(_("Image has been updated"))
-
         return True
+
     return False
 
 def update_tree_thumbnail(self, t_image_path):

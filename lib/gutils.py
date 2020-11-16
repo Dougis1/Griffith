@@ -39,7 +39,7 @@ import platform
 try:
     import gi
     gi.require_version('Gtk', '3.0')
-    from gi.repository import Gtk, Gdk
+    from gi.repository import Gtk, Gdk, GdkPixbuf
     import db
 except:
     Gtk = None
@@ -105,22 +105,26 @@ def trim(text, key1, key2):
         return ''
     else:
         p1 = p1 + len(key1)
+
     p2 = string.find(text[p1:], key2)
     if p2 == -1:
         return ""
     else:
         p2 = p1 + p2
+
     return text[p1:p2]
 
 def rtrim(text, key1, key2):
     p1 = string.rfind(text, key2)
     if p1 == -1:
         return ''
+
     p2 = string.rfind(text[:p1], key1)
     if p2 == -1:
         return ""
     else:
         p2 = p2 + len(key1)
+
     return text[p2:p1]
 
 def regextrim(text, key1, key2):
@@ -129,11 +133,13 @@ def regextrim(text, key1, key2):
         return ''
     else:
         p1 = obj.end()
+
     obj = re.search(key2, text[p1:])
     if obj is None:
         return ''
     else:
         p2 = p1 + obj.start()
+
     return text[p1:p2]
 
 
@@ -161,16 +167,17 @@ def progress(blocks, size_block, size):
         transfered = size
     elif size < 0:
         size = "?"
+
     print(transfered, '/', size, 'bytes')
 
 # functions to handle comboboxentry stuff
-
 
 def set_model_from_list(cb, items):
     """Setup a ComboBox or ComboBoxEntry based on a list of strings."""
     model = Gtk.ListStore(str)
     for i in items:
         model.append([i])
+
     cb.set_model(model)
     if type(cb) == Gtk.ComboBoxEntry:
         cb.set_text_column(0)
@@ -187,6 +194,7 @@ def on_combo_box_entry_changed(widget):
         value = model.get_value(m_iter, 0)
         if type(value) is str:
             value = value
+
         return value
     else:
         return 0
@@ -220,6 +228,7 @@ def convert_entities(text):
             if code[0] == 'x':
                 code = code[1:]
                 base = 16
+
             return chr(int(code, base))
         else:
             return
@@ -235,6 +244,7 @@ def convert_entities(text):
 def strip_tags(text):
     if text is None:
         return ''
+
     finished = 0
     while not finished:
         finished = 1
@@ -247,6 +257,7 @@ def strip_tags(text):
                 # if it does, strip it, and continue loop
                 text = text[:start] + text[start + stop + 1:]
                 finished = 0
+
     return text
 
 
@@ -259,17 +270,15 @@ def clean(text):
 
 
 def gdecode(txt, encode):
-    try:
-        return txt
-    except:
-        return txt
+    return txt
+
 
 # Messages
 
 
 def error(msg, parent=None):
     dialog = Gtk.MessageDialog(parent,
-            Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+            Gtk.DialogFlags.MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
             Gtk.MESSAGE_ERROR, Gtk.BUTTONS_OK, msg)
     dialog.set_skip_taskbar_hint(False)
     dialog.run()
@@ -278,7 +287,7 @@ def error(msg, parent=None):
 
 def urllib_error(msg, parent=None):
     dialog = Gtk.MessageDialog(parent,
-            Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+            Gtk.DialogFlags.MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
             Gtk.MESSAGE_ERROR, Gtk.BUTTONS_OK, msg)
     dialog.set_skip_taskbar_hint(False)
     dialog.run()
@@ -290,38 +299,38 @@ def warning(msg, parent=None):
         macutils.createAlert(msg)
     else:
         dialog = Gtk.MessageDialog(parent,
-            Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+            Gtk.DialogFlags.MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
             Gtk.MESSAGE_WARNING, Gtk.BUTTONS_OK, msg)
         dialog.set_skip_taskbar_hint(False)
         dialog.run()
         dialog.destroy()
 
+
 def info(msg, parent=None):
     if mac:
         macutils.createAlert(msg)
     else:
-        dialog = Gtk.MessageDialog(parent,
-                Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
-                Gtk.MESSAGE_INFO, Gtk.BUTTONS_OK, msg)
+        dialog = Gtk.MessageDialog(parent, Gtk.DIALOG_DESTROY_WITH_PARENT,
+            Gtk.MESSAGE_INFO, Gtk.BUTTONS_OK, msg)
         dialog.set_skip_taskbar_hint(False)
         dialog.run()
         dialog.destroy()
+
 
 def question(msg, window=None):
     if mac:
         response = macutils.question(msg)
         return response
     else:
-        dialog = Gtk.MessageDialog(window,
-            Gtk.DIALOG_MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
+        dialog = Gtk.MessageDialog(window, Gtk.DIALOG_DESTROY_WITH_PARENT,
             Gtk.MESSAGE_QUESTION, Gtk.BUTTONS_NONE, msg)
-        dialog.add_buttons(Gtk.STOCK_YES, Gtk.RESPONSE_YES,
-            Gtk.STOCK_NO, Gtk.RESPONSE_NO)
+        dialog.add_buttons(Gtk.STOCK_YES, Gtk.RESPONSE_YES, Gtk.STOCK_NO, Gtk.RESPONSE_NO)
         dialog.set_default_response(Gtk.RESPONSE_NO)
         dialog.set_skip_taskbar_hint(False)
         response = dialog.run()
         dialog.destroy()
         return response in (Gtk.RESPONSE_OK, Gtk.RESPONSE_YES)
+
 
 def popup_message(message):
     """shows popup message while executing decorated function"""
@@ -357,7 +366,13 @@ def popup_message(message):
     return wrap
 
 
-def file_chooser(title, action=None, buttons=None, name='', folder=os.path.expanduser('~'), picture=False, backup=False):
+def file_chooser(self, title, action=None, buttons=None, name='', folder='', picture=False, backup=False):
+    if not folder or folder == '':
+        if config.get('main', 'backup_dir') and not config.get('main', 'backup_dir') == '':
+            folder = config.get('main', 'backup_dir')
+        else:
+            folder = os.path.expanduser('~')
+
     if mac:
         if "SAVE" in str(action):
             if backup:
@@ -366,6 +381,7 @@ def file_chooser(title, action=None, buttons=None, name='', folder=os.path.expan
                 status, filename, path = macutils.saveDialog()
         else:
             status, filename, path = macutils.openDialog(['zip'])
+
         if status:
             if filename.lower().endswith('.zip'):
                 pass
@@ -376,11 +392,13 @@ def file_chooser(title, action=None, buttons=None, name='', folder=os.path.expan
             return False
     else:
         dialog = Gtk.FileChooserDialog(title=title, action=action, buttons=buttons)
-        dialog.set_default_response(Gtk.RESPONSE_OK)
+        dialog.set_default_response(Gtk.ResponseType.OK)
         if name:
             dialog.set_current_name(name)
+
         if folder:
             dialog.set_current_folder(folder)
+
         mfilter = Gtk.FileFilter()
         if picture:
             preview = Gtk.Image()
@@ -402,20 +420,23 @@ def file_chooser(title, action=None, buttons=None, name='', folder=os.path.expan
             mfilter.add_pattern('*.[gG][rR][iI]')
             mfilter.add_pattern('*.[dD][bB]')
             dialog.add_filter(mfilter)
+
         mfilter = Gtk.FileFilter()
         mfilter.set_name(_("All files"))
         mfilter.add_pattern("*")
         dialog.add_filter(mfilter)
 
-
         response = dialog.run()
-        if response == Gtk.RESPONSE_OK:
+        if response == Gtk.ResponseType.OK:
             filename = dialog.get_filename()
+            config.set(folder, 'backup_dir', 'main')
         elif response == Gtk.RESPONSE_CANCEL:
             filename = None
         else:
             return False
+
         path = dialog.get_current_folder()
+        self.widgets['preferences']['backup_dir'] = path
         dialog.destroy()
         return filename, path
 
@@ -467,7 +488,7 @@ def clean_posters_dir(self):
                 # it's safe to remove all thumbs, they'll be regenerated later
                 os.unlink(filepath)
             else:
-                poster_md5 = md5sum(file(filepath, 'rb'))
+                poster_md5 = md5sum(open(filepath, 'rb'))
                 # lets check if this poster is orphan
                 used = self.db.session.query(db.Poster).filter(db.Poster.md5sum == poster_md5).count()
                 if not used:
@@ -541,6 +562,7 @@ def get_dependencies():
             version = sqlalchemy.__version__
     except:
         version = False
+
     depend.append({'module': 'sqlalchemy',
         'version': version,
         'module_req': '0.5rc3',
@@ -733,6 +755,7 @@ def md5sum(fobj):
             m.update(d)
     else:
         m.update(fobj)
+
     return str(m.hexdigest())
 
 
@@ -741,6 +764,7 @@ def create_image_cache(md5sum, gsql):
     if not poster:
         log.warn("poster not available: %s", md5sum)
         return False
+
     if not poster.data:
         log.warn("poster data not available: %s", md5sum)
         return False
@@ -750,7 +774,7 @@ def create_image_cache(md5sum, gsql):
     fn_small = os.path.join(gsql.data_dir, 'posters', md5sum + '_s.jpg')
 
     if not os.path.isfile(fn_big):
-        f = file(fn_big, 'wb')
+        f = open(fn_big, 'wb')
         f.write(poster.data)
         f.close()
 
@@ -759,13 +783,12 @@ def create_image_cache(md5sum, gsql):
 
     if not os.path.isfile(fn_medium):
         pixbuf = image.get_pixbuf()
-        pixbuf = pixbuf.scale_simple(100, 140, 'bilinear')
-        pixbuf.save(fn_medium, 'jpeg', {'quality': '70'})
-
+        pixbuf = pixbuf.scale_simple(100, 140, GdkPixbuf.InterpType.BILINEAR)
+        pixbuf.savev(fn_medium, 'jpeg', ['quality'], ['70'])
     if not os.path.isfile(fn_small):
         pixbuf = image.get_pixbuf()
-        pixbuf = pixbuf.scale_simple(30, 40, 'bilinear')
-        pixbuf.save(fn_small, 'jpeg', {'quality': '70'})
+        pixbuf = pixbuf.scale_simple(30, 40, GdkPixbuf.InterpType.BILINEAR)
+        pixbuf.savev(fn_small, 'jpeg', ['quality'], ['70'])
 
     return True
 
@@ -775,6 +798,7 @@ def create_imagefile(destdir, md5sum, gsql, destfilename=None):
     if not poster:
         log.warn("poster not available: %s", md5sum)
         return False
+
     if not poster.data:
         log.warn("poster data not available: %s", md5sum)
         return False
@@ -784,7 +808,7 @@ def create_imagefile(destdir, md5sum, gsql, destfilename=None):
     else:
         fulldestpath = os.path.join(destdir, md5sum + '.jpg')
 
-    f = file(fulldestpath, 'wb')
+    f = open(fulldestpath, 'wb')
     try:
         f.write(poster.data)
     finally:
@@ -810,6 +834,7 @@ def get_image_fname(md5sum, gsql, size=None):
     if not os.path.isfile(file_name) and not create_image_cache(md5sum, gsql):
         log.warn("Can't create image file %s for md5sum %s" % (file_name, md5sum))
         return False
+
     return file_name
 
 
@@ -819,6 +844,7 @@ def get_defaultimage_fname(self):
 
 def get_defaultthumbnail_fname(self):
     return os.path.join(self.locations['images'], 'default_thumbnail.png')
+
 
 def get_filesystem_pagesize(path):
     pagesize = 1024
@@ -835,12 +861,8 @@ def get_filesystem_pagesize(path):
             bytesPerSector = ctypes.c_ulonglong(0)
             rootPathName = ctypes.c_wchar_p(str(drive[0]))
 
-            ctypes.windll.kernel32.GetDiskFreeSpaceW(rootPathName,
-                ctypes.pointer(sectorsPerCluster),
-                ctypes.pointer(bytesPerSector),
-                None,
-                None,
-            )
+            ctypes.windll.kernel32.GetDiskFreeSpaceW(rootPathName, ctypes.pointer(sectorsPerCluster),
+                ctypes.pointer(bytesPerSector), None, None)
             pagesize = sectorsPerCluster.value * bytesPerSector.value
         else:
             # I could not try it out on non-windows platforms
@@ -854,6 +876,7 @@ def get_filesystem_pagesize(path):
     # adjust page size
     if pagesize > 32768:
         pagesize = 32768
+
     if pagesize < 1024:
         pagesize = 1024
 

@@ -101,7 +101,7 @@ def update_movie(self):
                 new_poster_md5 = gutils.md5sum(file(new_image_path, 'rb'))
                 if session.query(db.Poster).filter_by(md5sum=new_poster_md5).count() == 0:
                     try:
-                        data = file(new_image_path, 'rb').read()
+                        data = open(new_image_path, 'rb').read()
                     except Exception as e:
                         log.warning("cannot read poster data")
                         old_poster_md5 = new_poster_md5
@@ -739,7 +739,7 @@ def add_movie_db(self, close):
         if not os.path.isfile(tmp_image_path):
             tmp_image_path = os.path.join(self.locations['temp'], "poster_%s.jpg" % details['image'])
         if os.path.isfile(tmp_image_path):
-            file_object = file(tmp_image_path, 'rb')
+            file_object = open(tmp_image_path, 'rb')
             try:
                 new_poster_md5 = gutils.md5sum(file_object)
 

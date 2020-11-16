@@ -109,7 +109,7 @@ class GriffithDebug:
 #
 class DebugWindow:
     def __init__(self, window):
-        self.dialog = Gtk.Dialog('Debug Window', window, Gtk.DIALOG_MODAL, ())
+        self.dialog = Gtk.Dialog('Debug Window', window, Gtk.DialogFlags.MODAL, ())
         self.dialog.set_destroy_with_parent(True)
         self.dialog.set_transient_for(window)
         self.dialog.set_modal(False)

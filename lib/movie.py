@@ -367,7 +367,7 @@ class SearchMovie(object):
                     # don't care about the content
                     return True
                 if retriever.html:
-                    ifile = file(retriever.html[0], 'rb')
+                    ifile = open(retriever.html[0], 'rb')
                     try:
                         self.page = ifile.read()
                     finally:
@@ -477,7 +477,7 @@ def urlretrieve2(url, filename=None, reporthook=None, data=None):
         _tempfilecleanup._tempfiles.append(filename)
         tfp = os.fdopen(fd, 'wb')
     else:
-        tfp = file(filename, 'wb')
+        tfp = open(filename, 'wb')
 
     while 1:
         block = response.read(4096)
@@ -530,7 +530,7 @@ class Progress:
 
     def __init__(self, window, title='', message=''):
         self.status = False
-        self.dialog = Gtk.Dialog(title, window, Gtk.DIALOG_MODAL, ())
+        self.dialog = Gtk.Dialog(title, window, Gtk.DialogFlags.MODAL, ())
         self.dialog.set_urgency_hint(False)
         self.label = Gtk.Label()
         self.label.set_markup(message)
