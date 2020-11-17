@@ -1,9 +1,9 @@
-<?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
-<!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.36.0 -->
+<!--*- mode: xml -*-->
+<interface>
 
-<glade-interface>
-
-<widget class="GtkDialog" id="d_import">
+<object class="GtkDialog" id="d_import">
   <property name="visible">True</property>
   <property name="title" translatable="yes">CSV Import</property>
   <property name="type">GTK_WINDOW_TOPLEVEL</property>
@@ -23,16 +23,16 @@
   <property name="has_separator">True</property>
 
   <child internal-child="vbox">
-    <widget class="GtkVBox" id="dialog-vbox1">
+    <object class="GtkBox" id="dialog-vbox1">
       <property name="visible">True</property>
       <property name="homogeneous">False</property>
       <property name="spacing">0</property>
-
+        <property name="orientation">vertical</property>
       <child internal-child="action_area">
-	<widget class="GtkHButtonBox" id="dialog-action_area1">
+	<object class="GtkButtonBox" id="dialog-action_area1">
 	  <property name="height_request">1</property>
 	  <property name="layout_style">GTK_BUTTONBOX_END</property>
-	</widget>
+	</object>
 	<packing>
 	  <property name="padding">0</property>
 	  <property name="expand">False</property>
@@ -42,13 +42,13 @@
       </child>
 
       <child>
-	<widget class="GtkVBox" id="vbox7">
+	<object class="GtkBox" id="vbox7">
 	  <property name="visible">True</property>
 	  <property name="homogeneous">False</property>
 	  <property name="spacing">0</property>
-
+        <property name="orientation">vertical</property>
 	  <child>
-	    <widget class="GtkNotebook" id="nb_pages">
+	    <object class="GtkNotebook" id="nb_pages">
 	      <property name="border_width">2</property>
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
@@ -59,7 +59,7 @@
 	      <property name="enable_popup">False</property>
 
 	      <child>
-		<widget class="GtkTable" id="table2">
+		<object class="GtkTable" id="table2">
 		  <property name="border_width">8</property>
 		  <property name="height_request">350</property>
 		  <property name="visible">True</property>
@@ -70,7 +70,7 @@
 		  <property name="column_spacing">8</property>
 
 		  <child>
-		    <widget class="GtkLabel" id="label12">
+		    <object class="GtkLabel" id="label12">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">Encoding</property>
 		      <property name="use_underline">False</property>
@@ -86,7 +86,7 @@
 		      <property name="width_chars">-1</property>
 		      <property name="single_line_mode">False</property>
 		      <property name="angle">0</property>
-		    </widget>
+		    </object>
 		    <packing>
 		      <property name="left_attach">0</property>
 		      <property name="right_attach">1</property>
@@ -98,7 +98,7 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkLabel" id="label13">
+		    <object class="GtkLabel" id="label13">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">From Row</property>
 		      <property name="use_underline">False</property>
@@ -114,7 +114,7 @@
 		      <property name="width_chars">-1</property>
 		      <property name="single_line_mode">False</property>
 		      <property name="angle">0</property>
-		    </widget>
+		    </object>
 		    <packing>
 		      <property name="left_attach">0</property>
 		      <property name="right_attach">1</property>
@@ -126,7 +126,7 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkEntry" id="e_delimiter">
+		    <object class="GtkEntry" id="e_delimiter">
 		      <property name="visible">True</property>
 		      <property name="can_focus">True</property>
 		      <property name="editable">True</property>
@@ -136,7 +136,7 @@
 		      <property name="has_frame">True</property>
 		      <property name="invisible_char">●</property>
 		      <property name="activates_default">False</property>
-		    </widget>
+		    </object>
 		    <packing>
 		      <property name="left_attach">1</property>
 		      <property name="right_attach">2</property>
@@ -147,7 +147,7 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkLabel" id="label14">
+		    <object class="GtkLabel" id="label14">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">Delimiter</property>
 		      <property name="use_underline">False</property>
@@ -163,7 +163,7 @@
 		      <property name="width_chars">-1</property>
 		      <property name="single_line_mode">False</property>
 		      <property name="angle">0</property>
-		    </widget>
+		    </object>
 		    <packing>
 		      <property name="left_attach">0</property>
 		      <property name="right_attach">1</property>
@@ -175,7 +175,7 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkLabel" id="label15">
+		    <object class="GtkLabel" id="label15">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">Quotechar</property>
 		      <property name="use_underline">False</property>
@@ -191,7 +191,7 @@
 		      <property name="width_chars">-1</property>
 		      <property name="single_line_mode">False</property>
 		      <property name="angle">0</property>
-		    </widget>
+		    </object>
 		    <packing>
 		      <property name="left_attach">0</property>
 		      <property name="right_attach">1</property>
@@ -203,7 +203,7 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkLabel" id="label23">
+		    <object class="GtkLabel" id="label23">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">Line terminator</property>
 		      <property name="use_underline">False</property>
@@ -219,7 +219,7 @@
 		      <property name="width_chars">-1</property>
 		      <property name="single_line_mode">False</property>
 		      <property name="angle">0</property>
-		    </widget>
+		    </object>
 		    <packing>
 		      <property name="left_attach">0</property>
 		      <property name="right_attach">1</property>
@@ -231,7 +231,7 @@
 		  </child>
 
 		  <child>
-		    <widget class="GtkLabel" id="label24">
+		    <object class="GtkLabel" id="label24">
 		      <property name="visible">True</property>
 		      <property name="label" translatable="yes">&lt;b&gt;Some Hints&lt;/b&gt;:
 
@@ -251,7 +251,7 @@ Your cast-list should be comma-seperated to break it apart in multiple lines.</p
 		      <property name="width_chars">-1</property>
 		      <property name="single_line_mode">False</property>
 		      <property name="angle">0</property>
-		    </widget>
+		    </object>
 		    <packing>
 		      <property name="left_attach">1</property>
 		      <property name="right_attach">2</property>
@@ -263,7 +263,7 @@ Your cast-list should be comma-seperated to break it apart in multiple lines.</p
 		  </child>
 
 		  <child>
-		    <widget class="GtkSpinButton" id="e_startrow">
+		    <object class="GtkSpinButton" id="e_startrow">
 		      <property name="visible">True</property>
 		      <property name="tooltip" translatable="yes">If your file has no column headers then you should import from row 0.</property>
 		      <property name="can_focus">True</property>
@@ -274,7 +274,7 @@ Your cast-list should be comma-seperated to break it apart in multiple lines.</p
 		      <property name="snap_to_ticks">False</property>
 		      <property name="wrap">False</property>
 		      <property name="adjustment">1 0 1000000000 1 10 10</property>
-		    </widget>
+		    </object>
 		    <packing>
 		      <property name="left_attach">1</property>
 		      <property name="right_attach">2</property>
@@ -285,7 +285,7 @@ Your cast-list should be comma-seperated to break it apart in multiple lines.</p
 		  </child>
 
 		  <child>
-		    <widget class="GtkEntry" id="e_quotechar">
+		    <object class="GtkEntry" id="e_quotechar">
 		      <property name="visible">True</property>
 		      <property name="can_focus">True</property>
 		      <property name="editable">True</property>
@@ -295,7 +295,7 @@ Your cast-list should be comma-seperated to break it apart in multiple lines.</p
 		      <property name="has_frame">True</property>
 		      <property name="invisible_char">*</property>
 		      <property name="activates_default">False</property>
-		    </widget>
+		    </object>
 		    <packing>
 		      <property name="left_attach">1</property>
 		      <property name="right_attach">2</property>
@@ -306,14 +306,14 @@ Your cast-list should be comma-seperated to break it apart in multiple lines.</p
 		  </child>
 
 		  <child>
-		    <widget class="GtkComboBox" id="e_lineterminator">
+		    <object class="GtkComboBox" id="e_lineterminator">
 		      <property name="visible">True</property>
 		      <property name="items">Linux
 Windows/Dos
 </property>
 		      <property name="add_tearoffs">False</property>
 		      <property name="focus_on_click">True</property>
-		    </widget>
+		    </object>
 		    <packing>
 		      <property name="left_attach">1</property>
 		      <property name="right_attach">2</property>
@@ -325,7 +325,7 @@ Windows/Dos
 		  </child>
 
 		  <child>
-		    <widget class="GtkComboBox" id="e_encoding">
+		    <object class="GtkComboBox" id="e_encoding">
 		      <property name="visible">True</property>
 		      <property name="items" translatable="yes">ascii (English)
 big5 (Traditional Chinese)
@@ -414,7 +414,7 @@ utf_7 (all languages)
 utf_8 (all languages)</property>
 		      <property name="add_tearoffs">False</property>
 		      <property name="focus_on_click">True</property>
-		    </widget>
+		    </object>
 		    <packing>
 		      <property name="left_attach">1</property>
 		      <property name="right_attach">2</property>
@@ -424,7 +424,7 @@ utf_8 (all languages)</property>
 		      <property name="y_options">fill</property>
 		    </packing>
 		  </child>
-		</widget>
+		</object>
 		<packing>
 		  <property name="tab_expand">False</property>
 		  <property name="tab_fill">True</property>
@@ -432,7 +432,7 @@ utf_8 (all languages)</property>
 	      </child>
 
 	      <child>
-		<widget class="GtkLabel" id="label16">
+		<object class="GtkLabel" id="label16">
 		  <property name="visible">True</property>
 		  <property name="label" translatable="yes">File-Options</property>
 		  <property name="use_underline">False</property>
@@ -448,33 +448,33 @@ utf_8 (all languages)</property>
 		  <property name="width_chars">-1</property>
 		  <property name="single_line_mode">False</property>
 		  <property name="angle">0</property>
-		</widget>
+		</object>
 		<packing>
 		  <property name="type">tab</property>
 		</packing>
 	      </child>
 
 	      <child>
-		<widget class="GtkVBox" id="vbox8">
+		<object class="GtkBox" id="vbox8">
 		  <property name="visible">True</property>
 		  <property name="homogeneous">False</property>
 		  <property name="spacing">0</property>
-
+        <property name="orientation">vertical</property>
 		  <child>
-		    <widget class="GtkHBox" id="hbox2">
+		    <object class="GtkBox" id="hbox2">
 		      <property name="border_width">8</property>
 		      <property name="visible">True</property>
 		      <property name="homogeneous">True</property>
 		      <property name="spacing">20</property>
 
 		      <child>
-			<widget class="GtkVBox" id="vbox9">
+			<object class="GtkBox" id="vbox9">
 			  <property name="visible">True</property>
 			  <property name="homogeneous">False</property>
 			  <property name="spacing">4</property>
-
+        <property name="orientation">vertical</property>
 			  <child>
-			    <widget class="GtkLabel" id="label17">
+			    <object class="GtkLabel" id="label17">
 			      <property name="visible">True</property>
 			      <property name="label" translatable="yes">CSV Fields</property>
 			      <property name="use_underline">False</property>
@@ -490,7 +490,7 @@ utf_8 (all languages)</property>
 			      <property name="width_chars">-1</property>
 			      <property name="single_line_mode">False</property>
 			      <property name="angle">0</property>
-			    </widget>
+			    </object>
 			    <packing>
 			      <property name="padding">0</property>
 			      <property name="expand">False</property>
@@ -499,7 +499,7 @@ utf_8 (all languages)</property>
 			  </child>
 
 			  <child>
-			    <widget class="GtkScrolledWindow" id="scrolledwindow4">
+			    <object class="GtkScrolledWindow" id="scrolledwindow4">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
 			      <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
@@ -508,7 +508,7 @@ utf_8 (all languages)</property>
 			      <property name="window_placement">GTK_CORNER_TOP_LEFT</property>
 
 			      <child>
-				<widget class="GtkTreeView" id="tv_csv">
+				<object class="GtkTreeView" id="tv_csv">
 				  <property name="height_request">300</property>
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
@@ -519,16 +519,16 @@ utf_8 (all languages)</property>
 				  <property name="fixed_height_mode">False</property>
 				  <property name="hover_selection">False</property>
 				  <property name="hover_expand">False</property>
-				</widget>
+				</object>
 			      </child>
-			    </widget>
+			    </object>
 			    <packing>
 			      <property name="padding">0</property>
 			      <property name="expand">True</property>
 			      <property name="fill">True</property>
 			    </packing>
 			  </child>
-			</widget>
+			</object>
 			<packing>
 			  <property name="padding">0</property>
 			  <property name="expand">True</property>
@@ -537,13 +537,13 @@ utf_8 (all languages)</property>
 		      </child>
 
 		      <child>
-			<widget class="GtkVBox" id="vbox10">
+			<object class="GtkBox" id="vbox10">
 			  <property name="visible">True</property>
 			  <property name="homogeneous">False</property>
 			  <property name="spacing">4</property>
-
+        <property name="orientation">vertical</property>
 			  <child>
-			    <widget class="GtkLabel" id="label18">
+			    <object class="GtkLabel" id="label18">
 			      <property name="visible">True</property>
 			      <property name="label" translatable="yes">Griffith Fields</property>
 			      <property name="use_underline">False</property>
@@ -559,7 +559,7 @@ utf_8 (all languages)</property>
 			      <property name="width_chars">-1</property>
 			      <property name="single_line_mode">False</property>
 			      <property name="angle">0</property>
-			    </widget>
+			    </object>
 			    <packing>
 			      <property name="padding">0</property>
 			      <property name="expand">False</property>
@@ -568,7 +568,7 @@ utf_8 (all languages)</property>
 			  </child>
 
 			  <child>
-			    <widget class="GtkScrolledWindow" id="scrolledwindow5">
+			    <object class="GtkScrolledWindow" id="scrolledwindow5">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
 			      <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
@@ -577,7 +577,7 @@ utf_8 (all languages)</property>
 			      <property name="window_placement">GTK_CORNER_TOP_LEFT</property>
 
 			      <child>
-				<widget class="GtkTreeView" id="tv_griffith">
+				<object class="GtkTreeView" id="tv_griffith">
 				  <property name="height_request">300</property>
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
@@ -588,16 +588,16 @@ utf_8 (all languages)</property>
 				  <property name="fixed_height_mode">False</property>
 				  <property name="hover_selection">False</property>
 				  <property name="hover_expand">False</property>
-				</widget>
+				</object>
 			      </child>
-			    </widget>
+			    </object>
 			    <packing>
 			      <property name="padding">0</property>
 			      <property name="expand">True</property>
 			      <property name="fill">True</property>
 			    </packing>
 			  </child>
-			</widget>
+			</object>
 			<packing>
 			  <property name="padding">0</property>
 			  <property name="expand">True</property>
@@ -606,13 +606,13 @@ utf_8 (all languages)</property>
 		      </child>
 
 		      <child>
-			<widget class="GtkVBox" id="vbox11">
+			<object class="GtkBox" id="vbox11">
 			  <property name="visible">True</property>
 			  <property name="homogeneous">False</property>
 			  <property name="spacing">4</property>
-
+        <property name="orientation">vertical</property>
 			  <child>
-			    <widget class="GtkLabel" id="label19">
+			    <object class="GtkLabel" id="label19">
 			      <property name="visible">True</property>
 			      <property name="label" translatable="yes">Assigned Fields (CSV &gt; Griffith)</property>
 			      <property name="use_underline">False</property>
@@ -628,7 +628,7 @@ utf_8 (all languages)</property>
 			      <property name="width_chars">-1</property>
 			      <property name="single_line_mode">False</property>
 			      <property name="angle">0</property>
-			    </widget>
+			    </object>
 			    <packing>
 			      <property name="padding">0</property>
 			      <property name="expand">False</property>
@@ -637,7 +637,7 @@ utf_8 (all languages)</property>
 			  </child>
 
 			  <child>
-			    <widget class="GtkScrolledWindow" id="scrolledwindow6">
+			    <object class="GtkScrolledWindow" id="scrolledwindow6">
 			      <property name="visible">True</property>
 			      <property name="can_focus">True</property>
 			      <property name="hscrollbar_policy">GTK_POLICY_AUTOMATIC</property>
@@ -646,7 +646,7 @@ utf_8 (all languages)</property>
 			      <property name="window_placement">GTK_CORNER_TOP_LEFT</property>
 
 			      <child>
-				<widget class="GtkTreeView" id="tv_assigned">
+				<object class="GtkTreeView" id="tv_assigned">
 				  <property name="height_request">300</property>
 				  <property name="visible">True</property>
 				  <property name="can_focus">True</property>
@@ -657,23 +657,23 @@ utf_8 (all languages)</property>
 				  <property name="fixed_height_mode">False</property>
 				  <property name="hover_selection">False</property>
 				  <property name="hover_expand">False</property>
-				</widget>
+				</object>
 			      </child>
-			    </widget>
+			    </object>
 			    <packing>
 			      <property name="padding">0</property>
 			      <property name="expand">True</property>
 			      <property name="fill">True</property>
 			    </packing>
 			  </child>
-			</widget>
+			</object>
 			<packing>
 			  <property name="padding">0</property>
 			  <property name="expand">True</property>
 			  <property name="fill">True</property>
 			</packing>
 		      </child>
-		    </widget>
+		    </object>
 		    <packing>
 		      <property name="padding">0</property>
 		      <property name="expand">True</property>
@@ -682,13 +682,13 @@ utf_8 (all languages)</property>
 		  </child>
 
 		  <child>
-		    <widget class="GtkHButtonBox" id="hbuttonbox3">
+		    <object class="GtkButtonBox" id="hbuttonbox3">
 		      <property name="visible">True</property>
 		      <property name="layout_style">GTK_BUTTONBOX_END</property>
 		      <property name="spacing">2</property>
 
 		      <child>
-			<widget class="GtkButton" id="b_add">
+			<object class="GtkButton" id="b_add">
 			  <property name="visible">True</property>
 			  <property name="sensitive">False</property>
 			  <property name="can_default">True</property>
@@ -698,11 +698,11 @@ utf_8 (all languages)</property>
 			  <property name="relief">GTK_RELIEF_NORMAL</property>
 			  <property name="focus_on_click">True</property>
 			  <accelerator key="A" modifiers="GDK_MOD1_MASK" signal="clicked"/>
-			</widget>
+			</object>
 		      </child>
 
 		      <child>
-			<widget class="GtkButton" id="b_del">
+			<object class="GtkButton" id="b_del">
 			  <property name="visible">True</property>
 			  <property name="sensitive">False</property>
 			  <property name="can_default">True</property>
@@ -712,16 +712,16 @@ utf_8 (all languages)</property>
 			  <property name="relief">GTK_RELIEF_NORMAL</property>
 			  <property name="focus_on_click">True</property>
 			  <accelerator key="R" modifiers="GDK_MOD1_MASK" signal="clicked"/>
-			</widget>
+			</object>
 		      </child>
-		    </widget>
+		    </object>
 		    <packing>
 		      <property name="padding">0</property>
 		      <property name="expand">False</property>
 		      <property name="fill">False</property>
 		    </packing>
 		  </child>
-		</widget>
+		</object>
 		<packing>
 		  <property name="tab_expand">False</property>
 		  <property name="tab_fill">True</property>
@@ -729,7 +729,7 @@ utf_8 (all languages)</property>
 	      </child>
 
 	      <child>
-		<widget class="GtkLabel" id="label20">
+		<object class="GtkLabel" id="label20">
 		  <property name="label" translatable="yes">Fields</property>
 		  <property name="use_underline">False</property>
 		  <property name="use_markup">False</property>
@@ -744,19 +744,19 @@ utf_8 (all languages)</property>
 		  <property name="width_chars">-1</property>
 		  <property name="single_line_mode">False</property>
 		  <property name="angle">0</property>
-		</widget>
+		</object>
 		<packing>
 		  <property name="type">tab</property>
 		</packing>
 	      </child>
-	    </widget>
+	    </object>
 	    <packing>
 	      <property name="padding">0</property>
 	      <property name="expand">True</property>
 	      <property name="fill">True</property>
 	    </packing>
 	  </child>
-	</widget>
+	</object>
 	<packing>
 	  <property name="padding">0</property>
 	  <property name="expand">True</property>
@@ -765,7 +765,7 @@ utf_8 (all languages)</property>
       </child>
 
       <child>
-	<widget class="GtkHButtonBox" id="hbuttonbox5">
+	<object class="GtkButtonBox" id="hbuttonbox5">
 	  <property name="border_width">5</property>
 	  <property name="height_request">37</property>
 	  <property name="visible">True</property>
@@ -773,7 +773,7 @@ utf_8 (all languages)</property>
 	  <property name="spacing">2</property>
 
 	  <child>
-	    <widget class="GtkButton" id="b_cancel">
+	    <object class="GtkButton" id="b_cancel">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
 	      <property name="can_focus">True</property>
@@ -781,11 +781,11 @@ utf_8 (all languages)</property>
 	      <property name="use_stock">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
-	    </widget>
+	    </object>
 	  </child>
 
 	  <child>
-	    <widget class="GtkButton" id="b_back">
+	    <object class="GtkButton" id="b_back">
 	      <property name="visible">True</property>
 	      <property name="sensitive">False</property>
 	      <property name="can_default">True</property>
@@ -794,11 +794,11 @@ utf_8 (all languages)</property>
 	      <property name="use_stock">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
-	    </widget>
+	    </object>
 	  </child>
 
 	  <child>
-	    <widget class="GtkButton" id="b_next">
+	    <object class="GtkButton" id="b_next">
 	      <property name="visible">True</property>
 	      <property name="can_default">True</property>
 	      <property name="can_focus">True</property>
@@ -806,17 +806,17 @@ utf_8 (all languages)</property>
 	      <property name="use_stock">True</property>
 	      <property name="relief">GTK_RELIEF_NORMAL</property>
 	      <property name="focus_on_click">True</property>
-	    </widget>
+	    </object>
 	  </child>
-	</widget>
+	</object>
 	<packing>
 	  <property name="padding">0</property>
 	  <property name="expand">False</property>
 	  <property name="fill">False</property>
 	</packing>
       </child>
-    </widget>
+    </object>
   </child>
-</widget>
+</object>
 
-</glade-interface>
+</interface>
