@@ -245,9 +245,11 @@ def populate_with_results(self):
 
 def show_websearch_results(self):
     total = self.founded_results_id = 0
+    print("len %d %s" % (len(self.search_movie.ids), self.search_movie.ids[0]))
     for g in self.search_movie.ids:
         if (str(g) != ''):
             total += 1
+
     if total > 1:
         self.widgets['results']['window'].show()
         self.widgets['results']['window'].set_keep_above(True)
@@ -260,14 +262,18 @@ def show_websearch_results(self):
                     title = self.search_movie.titles[key]
                 else:
                     title = str(self.search_movie.titles[key])  ##.decode(self.search_movie.encode)
+
                 movieslist.append((row, title))
+
             key += 1
+
         movieslist = sorted(movieslist, key=lambda titel: titel[1])
         self.treemodel_results.clear()
         for entry in movieslist:
             myiter = self.treemodel_results.insert_before(None, None)
             self.treemodel_results.set_value(myiter, 0, str(entry[0]))
             self.treemodel_results.set_value(myiter, 1, entry[1])
+
         self.widgets['results']['treeview'].show()
     elif total == 1:
         self.widgets['results']['treeview'].set_cursor(total-1)
@@ -294,6 +300,7 @@ def get_from_web(self):
             log.debug('reloading %s', plugin_name)
             import sys
             importlib.reload(sys.modules[plugin_name])
+
         self.search_movie = plugin.SearchPlugin()
         self.search_movie.config = self.config
         self.search_movie.locations = self.locations
@@ -309,19 +316,23 @@ def get_from_web(self):
                 self.search_movie.title = gutils.remove_accents(title, 'utf-8')
             else:
                 self.search_movie.title = str(title, 'utf-8')
+
         # check if internet connection is available
         try:
-            urllib.request.urlopen("http://www.google.com")
+#            urllib.request.urlopen("http://www.google.com")
             if self.search_movie.search_movies(self.widgets['add']['window']):
                 self.search_movie.get_searches()
+            print("3 %d" % len(self.search_movie.ids))
             if len(self.search_movie.ids) == 1 and o_title and title:
                 self.search_movie.url = self.search_movie.translated_url_search
                 if self.search_movie.remove_accents:
                     self.search_movie.title = gutils.remove_accents(title, 'utf-8')
                 else:
                     self.search_movie.title = str(title, 'utf-8')
+
                 if self.search_movie.search_movies(self.widgets['add']['window']):
                     self.search_movie.get_searches()
+
             self.show_search_results(self.search_movie)
         except:
             log.exception('')
@@ -565,7 +576,7 @@ def set_details(self, item=None):#{{{
     else:
         w['region'].set_active(gutils.digits_only(self.config.get('region', 0, section='defaults'), 11))
 
-    if 'cond' in item and item['cond'] >= 0:
+    if 'cond' in item and item['cond'] and item['cond'] >= 0:
         w['condition'].set_active(gutils.digits_only(item['cond'], 5))
     else:
         w['condition'].set_active(gutils.digits_only(self.config.get('condition', 0, section='defaults'), 5))

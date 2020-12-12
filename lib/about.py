@@ -27,7 +27,7 @@ __revision__ = '$Id: about.py 1519 2011-02-05 15:32:36Z iznogoud $'
 
 import gi
 gi.require_version('Gtk', '3.0')
-from gi.repository import Gtk, Gdk, GdkPixbuf
+from gi.repository import Gtk
 import version
 import os
 import sys
@@ -41,7 +41,7 @@ class AboutDialog:
         def _open_url(dialog, link):
             import gutils
             gutils.run_browser(link)
-##        Gtk.about_dialog_set_url_hook(_open_url)   no longer valid
+        Gtk.about_dialog_set_url_hook(_open_url)
 
         dialog = Gtk.AboutDialog()
         dialog.set_name(version.pname)
@@ -52,7 +52,6 @@ class AboutDialog:
             _("Main Authors") + ':',
             version.pauthor.replace(', ', '\n') + "\n",
             _("Programmers") + ':',
-            'Doug Lindquist <doug.lindquist@protonmail.com>',
             'Jessica Katharina Parth <Jessica.K.P@women-at-work.org>',
             'Michael Jahn <mikej06@hotmail.com>',
             'Ivo Nunes <netherblood@gmail.com>\n',
@@ -89,9 +88,12 @@ class AboutDialog:
             translator_credits = _("See TRANSLATORS file")
         dialog.set_translator_credits(translator_credits)
         logo_file = os.path.abspath(os.path.join(IMAGES_DIR, 'griffith.png'))
-        logo = GdkPixbuf.Pixbuf.new_from_file(logo_file)
+        logo = Gtk.Gdk.pixbuf_new_from_file(logo_file)
         dialog.set_logo(logo)
-        dialog.set_license(_("This program is released under the GNU" + \
+        if os.path.isfile('/usr/share/common-licenses/GPL-2'):
+            dialog.set_license(open('/usr/share/common-licenses/GPL-2').read())
+        else:
+            dialog.set_license(_("This program is released under the GNU" + \
                 "General Public License.\n" + \
                 "Please visit http://www.gnu.org/copyleft/gpl.html for details."))
         dialog.set_comments(version.pdescription)

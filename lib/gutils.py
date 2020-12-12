@@ -58,17 +58,18 @@ ENTITY = re.compile(r'\&.\w*?\;')
 
 
 def remove_accents(txt, encoding='iso-8859-1'):
-    d = {192: u'A', 193: u'A', 194: u'A', 195: u'A', 196: u'A', 197: u'A',
-         199: u'C', 200: u'E', 201: u'E', 202: u'E', 203: u'E', 204: u'I',
-         205: u'I', 206: u'I', 207: u'I', 209: u'N', 210: u'O', 211: u'O',
-         212: u'O', 213: u'O', 214: u'O', 216: u'O', 217: u'U', 218: u'U',
-         219: u'U', 220: u'U', 221: u'Y', 224: u'a', 225: u'a', 226: u'a',
-         227: u'a', 228: u'a', 229: u'a', 231: u'c', 232: u'e', 233: u'e',
-         234: u'e', 235: u'e', 236: u'i', 237: u'i', 238: u'i', 239: u'i',
-         241: u'n', 242: u'o', 243: u'o', 244: u'o', 245: u'o', 246: u'o',
-         248: u'o', 249: u'u', 250: u'u', 251: u'u', 252: u'u', 253: u'y',
-         255: u'y'}
-    return unicode(txt, encoding).translate(d)
+#    d = {192: u'A', 193: u'A', 194: u'A', 195: u'A', 196: u'A', 197: u'A',
+#         199: u'C', 200: u'E', 201: u'E', 202: u'E', 203: u'E', 204: u'I',
+#         205: u'I', 206: u'I', 207: u'I', 209: u'N', 210: u'O', 211: u'O',
+#         212: u'O', 213: u'O', 214: u'O', 216: u'O', 217: u'U', 218: u'U',
+#         219: u'U', 220: u'U', 221: u'Y', 224: u'a', 225: u'a', 226: u'a',
+#         227: u'a', 228: u'a', 229: u'a', 231: u'c', 232: u'e', 233: u'e',
+#         234: u'e', 235: u'e', 236: u'i', 237: u'i', 238: u'i', 239: u'i',
+#         241: u'n', 242: u'o', 243: u'o', 244: u'o', 245: u'o', 246: u'o',
+#         248: u'o', 249: u'u', 250: u'u', 251: u'u', 252: u'u', 253: u'y',
+#         255: u'y'}
+#    return unicode(txt, encoding).translate(d)
+        return txt
 
 
 def is_number(x):
@@ -278,8 +279,8 @@ def gdecode(txt, encode):
 
 def error(msg, parent=None):
     dialog = Gtk.MessageDialog(parent,
-            Gtk.DialogFlags.MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
-            Gtk.MESSAGE_ERROR, Gtk.BUTTONS_OK, msg)
+            Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+            Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, msg)
     dialog.set_skip_taskbar_hint(False)
     dialog.run()
     dialog.destroy()
@@ -287,8 +288,8 @@ def error(msg, parent=None):
 
 def urllib_error(msg, parent=None):
     dialog = Gtk.MessageDialog(parent,
-            Gtk.DialogFlags.MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
-            Gtk.MESSAGE_ERROR, Gtk.BUTTONS_OK, msg)
+            Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+            Gtk.MessageType.ERROR, Gtk.ButtonsType.OK, msg)
     dialog.set_skip_taskbar_hint(False)
     dialog.run()
     dialog.destroy()
@@ -299,8 +300,8 @@ def warning(msg, parent=None):
         macutils.createAlert(msg)
     else:
         dialog = Gtk.MessageDialog(parent,
-            Gtk.DialogFlags.MODAL | Gtk.DIALOG_DESTROY_WITH_PARENT,
-            Gtk.MESSAGE_WARNING, Gtk.BUTTONS_OK, msg)
+            Gtk.DialogFlags.MODAL | Gtk.DialogFlags.DESTROY_WITH_PARENT,
+            Gtk.MessageType.WARNING, Gtk.ButtonsType.OK, msg)
         dialog.set_skip_taskbar_hint(False)
         dialog.run()
         dialog.destroy()
@@ -310,8 +311,8 @@ def info(msg, parent=None):
     if mac:
         macutils.createAlert(msg)
     else:
-        dialog = Gtk.MessageDialog(parent, Gtk.DIALOG_DESTROY_WITH_PARENT,
-            Gtk.MESSAGE_INFO, Gtk.BUTTONS_OK, msg)
+        dialog = Gtk.MessageDialog(parent, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+            Gtk.MessageType.INFO, Gtk.ButtonsType.OK, msg)
         dialog.set_skip_taskbar_hint(False)
         dialog.run()
         dialog.destroy()
@@ -322,8 +323,8 @@ def question(msg, window=None):
         response = macutils.question(msg)
         return response
     else:
-        dialog = Gtk.MessageDialog(window, Gtk.DIALOG_DESTROY_WITH_PARENT,
-            Gtk.MESSAGE_QUESTION, Gtk.BUTTONS_NONE, msg)
+        dialog = Gtk.MessageDialog(window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
+            Gtk.MessageType.QUESTION, Gtk.BUTTONS_NONE, msg)
         dialog.add_buttons(Gtk.STOCK_YES, Gtk.RESPONSE_YES, Gtk.STOCK_NO, Gtk.RESPONSE_NO)
         dialog.set_default_response(Gtk.RESPONSE_NO)
         dialog.set_skip_taskbar_hint(False)
@@ -350,7 +351,7 @@ def popup_message(message):
 %s</big>""" % message)
                 window.add(label)
                 window.set_modal(True)
-                window.set_type_hint(Gtk.Gdk.WINDOW_TYPE_HINT_DIALOG)
+                window.set_type_hint(Gdk.WINDOW_TYPE_HINT_DIALOG)
                 window.show_all()
                 while Gtk.events_pending():    # give GTK some time for updates
                     Gtk.main_iteration()
@@ -361,6 +362,7 @@ def popup_message(message):
                 window.destroy()
             else:
                 print(' [done]')
+
             return res
         return wrapped_f
     return wrap
@@ -516,31 +518,20 @@ def get_dependencies():
     depend = []
 
     # Python version
-    if sys.version_info[:2] < (3, 3):
+    if sys.version_info[:2] < (3, 9):
         depend.append({'module': 'python',
             'version': '-' + '.'.join(map(str, sys.version_info)),
-            'module_req': '3.3',
-            'url': 'http://www.python.org/',
-            'debian': 'python',
-            'debian_req': '3.3',
-            'fedora, centos, rhel': 'python',
-            'fedora/centos/rhel_req': '3.3'})
+            'module_req': '3.9',
+            'url': 'http://www.python.org/'})
             # TODO: 'suse', etc.
 
-#    try:
-#        import gtk
-#        version = '.'.join([str(i) for i in Gtk.pygtk_version])
-#        if Gtk.pygtk_version <= (2, 6, 0):
-#            version = '-%s' % version
-#    except:
-#        version = False
-#    depend.append({'module': 'gtk',
-#        'version': version,
-#        'module_req': '2.6',
-#        'url': 'http://www.pyGtk.org/',
-#        'debian': 'python-gtk2',
-#        'debian_req': '2.8.6-1'})
-#        # TODO: 'fedora', 'suse', etc.
+    if Gtk is None:
+        version = False
+        depend.append({'module': 'gtk',
+            'version': version,
+            'module_req': '3.0',
+            'url': 'http://www.pyGtk.org/'})
+            # TODO: 'fedora', 'suse', etc.
 
 #    try:
 #        import Gtk.glade
@@ -556,7 +547,7 @@ def get_dependencies():
 
     try:
         import sqlalchemy
-        if list(map(int, sqlalchemy.__version__[:3].split('.'))) < [0, 5]:
+        if list(map(int, sqlalchemy.__version__[:3].split('.'))) < [1, 3]:
             version = "-%s" % sqlalchemy.__version__
         else:
             version = sqlalchemy.__version__
@@ -565,10 +556,8 @@ def get_dependencies():
 
     depend.append({'module': 'sqlalchemy',
         'version': version,
-        'module_req': '0.5rc3',
-        'url': 'http://www.sqlalchemy.org/',
-        'debian': 'python-sqlalchemy',
-        'debian_req': '0.5~rc3'})
+        'module_req': '1.3',
+        'url': 'http://www.sqlalchemy.org/'})
 
     try:
         import sqlite3
@@ -576,24 +565,9 @@ def get_dependencies():
         sqliteversion = sqlite3.sqlite_version
     except ImportError:
         version = False
-    if version is False:
-        try:
-            import pysqlite2.dbapi2
-            version = pysqlite2.dbapi2.version
-            sqliteversion = pysqlite2.dbapi2.sqlite_version
-        except:
-            version = False
-        depend.append({'module': 'pysqlite2',
-            'version': version + ' (sqlite-lib ' + sqliteversion + ')',
-            'url': 'http://pypi.python.org/pypi/pysqlite/',
-            'debian': 'python-pysqlite2',
-            'debian_req': '2.3.0-1'})
-    else:
         depend.append({'module': 'sqlite3',
             'version': version + ' (sqlite-lib ' + sqliteversion + ')',
-            'url': 'http://www.python.org',
-            'debian': 'python',
-            'debian_req': '2.5'})
+            'url': 'http://www.python.org'})
 
     try:
         import reportlab
@@ -602,9 +576,7 @@ def get_dependencies():
         version = False
     depend.append({'module': 'reportlab',
         'version': version,
-        'url': 'http://www.reportlab.org/',
-        'debian': 'python-reportlab',
-        'debian_req': '1.20debian-6'})
+        'url': 'http://www.reportlab.org/'})
 
     try:
         import PIL
@@ -613,9 +585,8 @@ def get_dependencies():
         version = False
     depend.append({'module': 'PIL',
         'version': version,
-        'url': 'http://www.pythonware.com/products/pil/',
-        'debian': 'python-imaging',
-        'debian_req': '1.1.5-6'})
+        'url': 'http://www.pythonware.com/products/pil/'})
+
     # extra dependencies:
     optional = []
 
@@ -626,9 +597,7 @@ def get_dependencies():
         version = False
     optional.append({'module': 'psycopg2',
         'version': version,
-        'url': 'http://initd.org/psycopg/',
-        'debian': 'python-psycopg2',
-        'debian_req': '1.1.21-6'})
+        'url': 'http://initd.org/psycopg/'})
 
     try:
         import MySQLdb
@@ -637,9 +606,7 @@ def get_dependencies():
         version = False
     optional.append({'module': 'MySQLdb',
         'version': version,
-        'url': 'http://sourceforge.net/projects/mysql-python',
-        'debian': 'python-mysqldb',
-        'debian_req': '1.2.1-p2-2'})
+        'url': 'http://sourceforge.net/projects/mysql-python'})
 
     try:
         import chardet
@@ -648,8 +615,7 @@ def get_dependencies():
         version = False
     optional.append({'module': 'chardet',
         'version': version,
-        'url': 'http://chardet.feedparser.org/',
-        'debian': 'python-chardet'})
+        'url': 'http://chardet.feedparser.org/'})
 
     try:
         import sqlite
@@ -658,8 +624,7 @@ def get_dependencies():
         version = False
     optional.append({'module': 'sqlite',
         'version': version,
-        'url': 'http://initd.org/tracker/pysqlite',
-        'debian': 'python-sqlite'})
+        'url': 'http://initd.org/tracker/pysqlite'})
 
     try:
         import lxml
@@ -668,8 +633,7 @@ def get_dependencies():
         version = False
     optional.append({'module': 'lxml',
         'version': version,
-        'url': 'http://lxml.de/',
-        'debian': 'python-lxml'})
+        'url': 'http://lxml.de/'})
 
     return depend, optional
 
@@ -784,11 +748,12 @@ def create_image_cache(md5sum, gsql):
     if not os.path.isfile(fn_medium):
         pixbuf = image.get_pixbuf()
         pixbuf = pixbuf.scale_simple(100, 140, GdkPixbuf.InterpType.BILINEAR)
-        pixbuf.savev(fn_medium, 'jpeg', ['quality'], ['70'])
+        pixbuf.savev(fn_medium, 'jpeg', {'quality': '70'})
+
     if not os.path.isfile(fn_small):
         pixbuf = image.get_pixbuf()
         pixbuf = pixbuf.scale_simple(30, 40, GdkPixbuf.InterpType.BILINEAR)
-        pixbuf.savev(fn_small, 'jpeg', ['quality'], ['70'])
+        pixbuf.savev(fn_small, 'jpeg', {'quality': '70'})
 
     return True
 
@@ -881,3 +846,13 @@ def get_filesystem_pagesize(path):
         pagesize = 1024
 
     return pagesize
+
+
+# Python program to convert a list to string
+def listToString(s, joiner=' '):
+    # traverse in the string
+    try:
+        listToStr = joiner.join([str(elem) for elem in s])
+        return listToStr
+    except:
+        return ''
