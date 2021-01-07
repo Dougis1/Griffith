@@ -35,6 +35,7 @@ import sys
 import webbrowser
 from io import StringIO
 import platform
+import config
 
 try:
     import gi
@@ -264,10 +265,10 @@ def strip_tags(text):
 
 def clean(text):
     t = strip_tags(text)
-    t = string.replace(t, '&nbsp;', ' ')
-    t = string.replace(t, '&#34;', '')
-    t = string.replace(t, '&#160;', ' ')
-    return string.strip(t)
+    t.replace('&nbsp;', ' ')
+    t.replace('&#34;', '')
+    t.replace('&#160;', ' ')
+    return t.strip()
 
 
 def gdecode(txt, encode):
@@ -371,7 +372,7 @@ def popup_message(message):
 def file_chooser(self, title, action=None, buttons=None, name='', folder='', picture=False, backup=False):
     if not folder or folder == '':
         if config.get('main', 'backup_dir') and not config.get('main', 'backup_dir') == '':
-            folder = config.get('main', 'backup_dir')
+            folder = self.config.get('main', 'backup_dir')
         else:
             folder = os.path.expanduser('~')
 

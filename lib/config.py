@@ -200,6 +200,7 @@ class Config(object):
         self._cfg.set('main', 'default_movie_plugin', 'IMDB')
         self._cfg.set('main', 'font', '')
         self._cfg.set('main', 'font_size', '18')
+        self._cfg.set('main', 'backup_dir', os.path.expanduser('~'))
         if os.name == 'nt' or os.name.startswith('win'):  # win32, win64
             self._cfg.set('main', 'pdf_reader', '')
         else:

@@ -163,6 +163,7 @@ def populate_with_results(self):
         (tmp_model, tmp_iter) = treeselection.get_selected()
         if tmp_iter is None:
             return False
+
         m_id = tmp_model.get_value(tmp_iter, 0)
 
     self.treemodel_results.clear()
@@ -174,47 +175,59 @@ def populate_with_results(self):
     self.movie.locations = self.locations
     self.movie.config = self.config
 
-    fields_to_fetch = ['o_title', 'title', 'director', 'plot', 'cast', 'country', 'genre',
-                'classification', 'studio', 'o_site', 'site', 'trailer', 'year',
-                'notes', 'runtime', 'image', 'rating', 'screenplay', 'cameraman',
-                'resolution', 'barcode']
+    fields_to_fetch = ['barcode', 'cameraman', 'cast', 'classification', 'country', 'director', 'genre',
+                'image', 'notes', 'o_site', 'o_title', 'plot', 'rating', 'resolution', 'runtime',
+                'screenplay', 'site', 'studio', 'title', 'trailer', 'year']
+
     # remove fields that user doesn't want to fetch: (see preferences window)
     fields_to_fetch = [i for i in fields_to_fetch if self.config.get("s_%s" % i, True, section='add')]
 
     if w['cb_only_empty'].get_active(): # only empty fields
         details = get_details(self)
         fields_to_fetch = [i for i in fields_to_fetch if details[i] is None or details[i] == 0.0]
+
     self.movie.fields_to_fetch = fields_to_fetch
 
     if not self.movie.get_movie(w['window']):
         return None
+
     self.movie.parse_movie()
 
-    if 'year' in fields_to_fetch:
-        w['year'].set_value(int(self.movie.year))
-        fields_to_fetch.pop(fields_to_fetch.index('year'))
-    if 'runtime' in fields_to_fetch:
-        w['runtime'].set_value(int(self.movie.runtime))
-        fields_to_fetch.pop(fields_to_fetch.index('runtime'))
     if 'cast' in fields_to_fetch:
-        cast_buffer = w['cast'].get_buffer()
-        cast_buffer.set_text(gutils.convert_entities(self.movie.cast))
+        if self.movie.cast is not None:
+            cast_buffer = w['cast'].get_buffer()
+            a = gutils.convert_entities(self.movie.cast)
+            cast_buffer.set_text(a, len(a))
         fields_to_fetch.pop(fields_to_fetch.index('cast'))
-    if 'plot' in fields_to_fetch:
-        plot_buffer = w['plot'].get_buffer()
-        plot_buffer.set_text(gutils.convert_entities(self.movie.plot))
-        fields_to_fetch.pop(fields_to_fetch.index('plot'))
-    if 'notes' in fields_to_fetch:
-        notes_buffer = w['notes'].get_buffer()
-        notes_buffer.set_text(gutils.convert_entities(self.movie.notes))
-        fields_to_fetch.pop(fields_to_fetch.index('notes'))
-    if 'rating' in fields_to_fetch:
-        if self.movie.rating:
-            w['rating_slider'].set_value(float(self.movie.rating))
-        fields_to_fetch.pop(fields_to_fetch.index('rating'))
-    if 'resolution' in fields_to_fetch:
-        w['resolution'].get_child().set_text(gutils.convert_entities(self.movie.resolution))
-        fields_to_fetch.pop(fields_to_fetch.index('resolution'))
+
+    if 'color' in fields_to_fetch:
+        if self.movie.color is not None:
+            color_buffer = w['color'].get_buffer()
+            a = self.movie.color
+            color_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('color'))
+
+    if 'country' in fields_to_fetch:
+        if self.movie.country is not None:
+            country_buffer = w['country'].get_buffer()
+            a = self.movie.country
+            country_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('country'))
+
+    if 'director' in fields_to_fetch:
+        if self.movie.director is not None:
+            director_buffer = w['director'].get_buffer()
+            a = self.movie.director
+            director_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('director'))
+
+    if 'genre' in fields_to_fetch:
+        if self.movie.genre is not None:
+            genre_buffer = w['genre'].get_buffer()
+            a = self.movie.genre
+            genre_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('genre'))
+
     # poster
     if 'image' in fields_to_fetch:
         w['image'].set_text('')
@@ -237,15 +250,115 @@ def populate_with_results(self):
             Pixbuf = self.Image.get_pixbuf()
             w['picture'].set_from_pixbuf(Pixbuf)
             w['aremove_poster'].set_sensitive(False)
+
         fields_to_fetch.pop(fields_to_fetch.index('image'))
+
+    if 'language' in fields_to_fetch:
+        if self.movie.language is not None:
+            language_buffer = w['language'].get_buffer()
+            a = self.movie.language
+            language_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('language'))
+
+    if 'notes' in fields_to_fetch:
+        if self.movie.notes is not None:
+            notes_buffer = w['notes'].get_buffer()
+            a = gutils.convert_entities(self.movie.notes)
+            notes_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('notes'))
+
+    if 'o_site' in fields_to_fetch:
+        if self.movie.o_site is not None:
+            o_site_buffer = w['o_site'].get_buffer()
+            a = self.movie.o_site
+            o_site_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('o_site'))
+
+    if 'o_title' in fields_to_fetch:
+        if self.movie.o_title is not None:
+            o_title_buffer = w['o_title'].get_buffer()
+            a = self.movie.o_title
+            o_title_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('o_title'))
+
+    if 'plot' in fields_to_fetch:
+        if self.movie.plot is not None:
+            plot_buffer = w['plot'].get_buffer()
+            a = gutils.convert_entities(self.movie.plot)
+            plot_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('plot'))
+
+    if 'rating' in fields_to_fetch:
+        if self.movie.rating is not None:
+            w['rating_slider'].set_value(float(self.movie.rating))
+        fields_to_fetch.pop(fields_to_fetch.index('rating'))
+
+    if 'resolution' in fields_to_fetch:
+        if self.movie.resolution is not None:
+            revolution_buffer = w['resolution']
+            a = gutils.convert_entities(self.movie.resolution)
+            resolution_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('resolution'))
+
+    if 'runtime' in fields_to_fetch:
+        if self.movie.runtime is not None:
+            w['runtime'].set_value(int(self.movie.runtime))
+        fields_to_fetch.pop(fields_to_fetch.index('runtime'))
+
+    if 'screenplay' in fields_to_fetch:
+        if self.movie.screenplay  is not None:
+            screenplay_buffer = w['screenplay'].get_buffer()
+            a = self.movie.screenplay
+            screenplay_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('screenplay'))
+
+    if 'site' in fields_to_fetch:
+        if self.movie.site is not None:
+            site_buffer = w['site'].get_buffer()
+            a = self.movie.site
+            site_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('site'))
+
+    if 'sound' in fields_to_fetch:
+        if self.movie.sound is not None:
+            sound_buffer = w['sound'].get_buffer()
+            a = self.movie.sound
+            sound_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('sound'))
+
+    if 'studio' in fields_to_fetch:
+        if self.movie.studio is not None:
+            studio_buffer = w['studio'].get_buffer()
+            a = self.movie.studio
+            studio_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('studio'))
+
+    if 'tagline' in fields_to_fetch:
+        if self.movie.tagline is not None:
+            tagline_buffer = w['tagline'].get_buffer()
+            a = gutils.convert_entities(self.movie.tagline)
+            tagline_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('tagline'))
+
+    if 'trailer' in fields_to_fetch:
+        if self.movie.trailer is not None:
+            trailer_buffer = w['trailer'].get_buffer()
+            a = self.movie.trailer
+            trailer_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('trailer'))
+
+    if 'year' in fields_to_fetch:
+        if self.movie.year is not None:
+            w['year'].set_value(int(self.movie.year))
+        fields_to_fetch.pop(fields_to_fetch.index('year'))
+
     # other fields
-    for i in fields_to_fetch:
-        w[i].set_text(gutils.convert_entities(self.movie[i]))
+#    for i in fields_to_fetch:
+#        w[i].set_text(gutils.convert_entities(self.movie[i]))
 
 
 def show_websearch_results(self):
     total = self.founded_results_id = 0
-    print("len %d %s" % (len(self.search_movie.ids), self.search_movie.ids[0]))
     for g in self.search_movie.ids:
         if (str(g) != ''):
             total += 1
@@ -267,12 +380,10 @@ def show_websearch_results(self):
 
             key += 1
 
-        movieslist = sorted(movieslist, key=lambda titel: titel[1])
+#        movieslist = sorted(movieslist, key=lambda titel: titel[1])
         self.treemodel_results.clear()
         for entry in movieslist:
-            myiter = self.treemodel_results.insert_before(None, None)
-            self.treemodel_results.set_value(myiter, 0, str(entry[0]))
-            self.treemodel_results.set_value(myiter, 1, entry[1])
+            self.treemodel_results.append(None, entry)
 
         self.widgets['results']['treeview'].show()
     elif total == 1:
@@ -290,7 +401,6 @@ def get_from_web(self):
 
     title = self.widgets['add']['title'].get_text()
     o_title = self.widgets['add']['o_title'].get_text()
-
     if o_title or title:
         option = gutils.on_combo_box_entry_changed_name(self.widgets['add']['source'])
         self.active_plugin = option
@@ -307,13 +417,13 @@ def get_from_web(self):
         if o_title:
             self.search_movie.url = self.search_movie.original_url_search
             if self.search_movie.remove_accents:
-                self.search_movie.title = gutils.remove_accents(o_title, 'utf-8')
+                self.search_movie.title = o_title   #gutils.remove_accents(o_title, 'utf-8')
             else:
                 self.search_movie.title = str(o_title, 'utf-8')
         elif title:
             self.search_movie.url = self.search_movie.translated_url_search
             if self.search_movie.remove_accents:
-                self.search_movie.title = gutils.remove_accents(title, 'utf-8')
+                self.search_movie.title = title   #gutils.remove_accents(title, 'utf-8')
             else:
                 self.search_movie.title = str(title, 'utf-8')
 
@@ -322,21 +432,23 @@ def get_from_web(self):
 #            urllib.request.urlopen("http://www.google.com")
             if self.search_movie.search_movies(self.widgets['add']['window']):
                 self.search_movie.get_searches()
-            print("3 %d" % len(self.search_movie.ids))
+
             if len(self.search_movie.ids) == 1 and o_title and title:
                 self.search_movie.url = self.search_movie.translated_url_search
                 if self.search_movie.remove_accents:
-                    self.search_movie.title = gutils.remove_accents(title, 'utf-8')
+                    self.search_movie.title = title   # gutils.remove_accents(title, 'utf-8')
                 else:
                     self.search_movie.title = str(title, 'utf-8')
 
                 if self.search_movie.search_movies(self.widgets['add']['window']):
                     self.search_movie.get_searches()
 
-            self.show_search_results(self.search_movie)
-        except:
+            show_websearch_results(self)
+#            self.show_search_results(self.search_movie)
+        except Exception as e:
             log.exception('')
-            gutils.error(_("Connection failed."))
+            gutils.error(_(e))
+#            gutils.error(_("Connection failed."))
     else:
         gutils.error(_("You should fill the original title\nor the movie title."))
 
