@@ -8416,6 +8416,7 @@
       <object class="GtkBox" id="dialog-vbox6">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
         <child internal-child="action_area">
           <object class="GtkButtonBox" id="dialog-action_area6">
             <property name="visible">True</property>
@@ -8465,13 +8466,15 @@
           <object class="GtkScrolledWindow" id="scrolledwindow4">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
+            <property name="double-buffered">False</property>
             <property name="border-width">8</property>
+            <property name="window-placement-set">False</property>
             <property name="shadow-type">in</property>
             <child>
               <object class="GtkTreeView" id="results_treeview">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
-                <property name="rules-hint">True</property>
+                <property name="double-buffered">False</property>
                 <property name="enable-search">False</property>
                 <child internal-child="selection">
                   <object class="GtkTreeSelection"/>
@@ -8659,6 +8662,7 @@
       <object class="GtkBox" id="dialog-vbox11">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
+        <property name="orientation">vertical</property>
         <property name="spacing">4</property>
         <child internal-child="action_area">
           <object class="GtkButtonBox" id="dialog-action_area11">
@@ -8807,6 +8811,8 @@
           <object class="GtkScrolledWindow" id="scrolledwindow1">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
+            <property name="window-placement-set">False</property>
+            <property name="shadow-type">etched-in</property>
             <child>
               <object class="GtkViewport" id="viewport1">
                 <property name="visible">True</property>
