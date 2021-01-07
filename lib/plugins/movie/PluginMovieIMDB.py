@@ -1,5 +1,7 @@
 # -*- coding: UTF-8 -*-
 
+__revision__ = '$Id: PluginMovieIMDB.py 1660 2014-03-13 20:48:05Z mikej06 $'
+
 __revision__ = '$Id: PluginMovieIMDB.py 1660 2020-12-13 dougl $'
 #               Updated to Gtk 3 2020 by Doug Lindquist
 
@@ -26,6 +28,11 @@ __revision__ = '$Id: PluginMovieIMDB.py 1660 2020-12-13 dougl $'
 
 import gutils, movie
 import string, re, math
+import urllib3
+from bs4 import BeautifulSoup
+from imdb import IMDb
+import locale
+import pycountry
 
 plugin_name         = 'IMDb'
 plugin_description  = 'Internet Movie Database'
@@ -35,94 +42,119 @@ plugin_author       = 'Doug Lindquist'
 plugin_author_email = 'doug.lindquist@protonmail.com'
 plugin_version      = '1.20'
 
+ia = IMDb()
+ul3 = urllib3.PoolManager()
+
 class Plugin(movie.Movie):
-    from imdb import IMDb
-    ia = None
-    movie = None
+    mvie = None
+    company = None
 
     def __init__(self, id):
         self.encode   = 'utf-8'
         self.movie_id = id
         self.url      = "http://imdb.com/title/tt%s" % self.movie_id
-        if not ia:
-            ia = IMDb()
 
     def initialize(self):
-        movie = ia.get_movie(self.movie_id)
+#        self.get_window().set_cursor(self.watch_cursor)
+#        self.cast_page = self.open_page(url=self.url + '/fullcredits')
+#        self.plot_page = self.open_page(url=self.url + '/plotsummary')
+#        self.comp_page = self.open_page(url=self.url + '/companycredits')
+#        self.tagl_page = self.open_page(url=self.url + '/taglines')
+#        self.cert_page = self.open_page(url=self.url + '/parentalguide')
+#        self.release_page = self.open_page(url=self.url + '/releaseinfo')
+        self.mvie = ia.get_movie(self.movie_id)
         company = ia.get_company(self.movie_id)
+#        self.get_window().set_cursor(None)
+
+    def get_cameraman(self):
+        self.cameraman = self.mvie['cinematographers']
+
+    def get_cast(self):
+        self.cast = ''
+        actors = self.mvie['cast']
+        for actor in actors:
+            role = actor.currentRole
+            if role == '':
+                line = actor + '\n'
+            else:
+                line = ("%s as %s\n" % (actor, role))
+
+            self.cast += line
+
+#DWL
+#    def get_classification(self):
+#        loc = locale.getlocale()[0][3:]
+#        cntry = pycountry.countries.get(alpha_2=loc)
+#        cert = ''
+#        for a in self.mvie['certificates']:
+#            if a.startswith(cntry):
+#                cert = a
+#                break
+
+#        self.classification = cert
+
+    def get_color(self):
+        self.color = gutils.listToString(self.mvie['color'], joiner=', ')
+
+    def get_country(self):
+        self.country = gutils.listToString(self.mvie['countries'], joiner=', ')
+
+    def get_director(self):
+        self.director = gutils.listToString(self.mvie['directors'], joiner=', ')
+
+    def get_genre(self):
+        self.genre = gutils.listToString(self.mvie['genre'], joiner=' | ')
 
     def get_image(self):
         try:
-            self.image_url = movie['cover url']
+            self.image_url = self.mvie['cover url']
             if not self.image_url:
-                self.image_url = movie['full-size cover url']
+                self.image_url = self.mvie['full-size cover url']
         except:
             self.image_url = ''
 
-    def get_o_title(self):
-        self.title = movie['original title']
+    def get_language(self):
+        languages = self.mvie['languages']
+        self.language = ''
+        f = False
+        for l in languages:
+            if f:
+                self.language += ', ' + l
+            else:
+                self.language += l
+                f = True
 
-    def get_title(self):
-        self.title = self.movie['title']
+    def get_notes(self):
+        self.notes = ''
+        self.get_color()
+        self.get_sound()
+        self.get_language()
+        self.get_tagline()
 
-    def get_director(self):
-        self.director = gutils.listToString(movie['directors'], joiner=', ')
+        if self.language and len(self.language) > 0:
+            self.notes = "%s: %s\n" %(_('Language'), self.language)
 
-    def get_plot(self):
-        self.plot = movie['plot']
-        self.plot.replace('\\', '')
-        self.plot = self.plot.split('::')[0]
+        if self.sound and len(self.sound) > 0:
+            self.notes += "%s: %s\n" %(gutils.strip_tags(_('<b>Audio</b>')), self.sound)
 
-    def get_year(self):
-        self.year = movie['year']
+        if self.color and len(self.color) > 0:
+            self.notes += "%s: %s\n" %(_('Color'), self.color)
 
-    def get_runtime(self):
-        self.runtime = movie['runtimes']
-
-    def get_genre(self):
-        self.genre = gutils.listToString(movie['genre'], joiner=' | ')
-
-    def get_cast(self):
-        self.cast = gutils.listToString(movie['cast'], joiner='\n')
-
-    def get_classification(self):
-        # until we can find a way to locate the user, we have to use the US-classification
-        self.classification = gutils.trim(self.page, '<meta itemprop="contentRating" content="', '"')
-        if not self.classification:
-            classificationList = gutils.regextrim(self.cert_page,'id="certifications-list"','<\/ul>')
-            if classificationList:
-                self.classification = gutils.regextrim(classificationList,'>United States:','<')
-            else: # the old way
-                self.classification = gutils.trim(self.cert_page, '>Certification:<', '</div>')
-                self.classification = gutils.trim(self.classification, '>USA:', '<')
-
-    def get_studio(self):
-        self.studio = ''
-        tmp = gutils.regextrim(self.comp_page, 'name="production"', '</ul>')
-        tmp = string.split(tmp, 'href="')
-        if len(tmp)>1:
-            for entry in tmp[1:]:
-                entry = string.strip(string.replace(gutils.trim(entry, '>', '<'), '\n', ''))
-                if entry:
-                    self.studio = self.studio + entry + ', '
-
-            if self.studio:
-                self.studio = self.studio[:-2]
+        if self.tagline and len(self.tagline) > 0:
+            self.notes += "%s: %s\n" %(_('Tagline'), self.tagline)
 
     def get_o_site(self):
         self.o_site = ''
 
-    def get_site(self):
-        self.site = "http://www.imdb.com/title/tt%s" % self.movie_id
+    def get_o_title(self):
+        self.o_title = self.mvie['original title']
 
-    def get_trailer(self):
-        self.trailer = "http://www.imdb.com/title/tt%s/trailers" % self.movie_id
-
-    def get_country(self):
-        self.country = gutils.listToString(movie['countries'], joiner=', ')
+    def get_plot(self):
+        self.plot = self.mvie['plot'][0]
+        self.plot.split('::')
 
     def get_rating(self):
-        self.rating = movie['rating']
+        self.rating = self.mvie['rating']
         if self.rating:
             try:
                 self.rating = math.trunc(float(self.rating) + 0.5)
@@ -131,47 +163,35 @@ class Plugin(movie.Movie):
         else:
             self.rating = 0
 
-    def get_notes(self):
-        self.notes = ''
-        language = get_language()
-        color = movie['color']
-        sound = movie['sound mix']
+#    def get_resolution(self):
+#        self.resolution = mvie
 
-#        tagline = gutils.regextrim(self.tagl_page, '>Taglines', '>See also')
-#        taglines = re.split('<div[^>]+class="soda[^>]*>', tagline)
-#        tagline = ''
-#        if len(taglines)>1:
-#            for entry in taglines[1:]:
-#                entry = gutils.clean(gutils.before(entry, '</div>'))
-#                if entry:
-#                    tagline = tagline + entry + '\n'
-
-        if len(language) > 0:
-            self.notes = "%s: %s\n" %(_('Language'), language)
-
-        if len(sound) > 0:
-            self.notes += "%s: %s\n" %(gutils.strip_tags(_('<b>Audio</b>')), sound)
-
-        if len(color) > 0:
-            self.notes += "%s: %s\n" %(_('Color'), color)
-
-#        if len(tagline) > 0:
-#            self.notes += "%s: %s\n" %('Tagline', tagline)
+    def get_runtime(self):
+        self.runtime = gutils.listToString(self.mvie['runtimes'], joiner=', ')
 
     def get_screenplay(self):
-        self.screenplay = movie['writer']
+        self.screenplay = gutils.listToString(self.mvie['writer'], joiner=', ')
 
-    def get_cameraman(self):
-        self.cameraman = ''
-        tmp = gutils.regextrim(self.cast_page, '>Cinematography by', '</table>')
-        tmp = string.split(tmp, 'href="')
-        if len(tmp) > 1:
-            for entry in tmp[1:]:
-                entry = string.strip(string.replace(gutils.trim(entry, '>', '<'), '\n', ''))
-                if entry:
-                    self.cameraman = self.cameraman + entry + ', '
-            if self.cameraman:
-                self.cameraman = self.cameraman[:-2]
+    def get_site(self):
+        self.site = "http://www.imdb.com/title/tt%s" % self.movie_id
+
+    def get_sound(self):
+        self.sound = gutils.listToString(self.mvie['sound mix'], ', ')
+
+    def get_studio(self):
+        self.studio = self.mvie.get('studio')
+
+    def get_tagline(self):
+        self.tagline = self.mvie.get('taglines')
+
+    def get_title(self):
+        self.title = self.mvie['title']
+
+    def get_trailer(self):
+        self.trailer = "http://www.imdb.com/title/tt%s/trailers" % self.movie_id
+
+    def get_year(self):
+        self.year = str(self.mvie['year'])
 
     def __before_more(self, data):
         for element in ['>See more<', '>more<', '>Full summary<', '>Full synopsis<']:
@@ -180,10 +200,12 @@ class Plugin(movie.Movie):
                 data = data[:tmp] + '>'
         return data
 
+#https://www.imdb.com/find?s=tt&q=matrix
+#https://www.imdb.com/find?q=matrix&s=tt&exact=true&ref_=fn_tt_ex
+#https://www.imdb.com/find?q=matrix&s=tt&ref_=fn_tt_pop
 class SearchPlugin(movie.SearchMovie):
-    PATTERN = re.compile(r"""<a href=['"]/title/tt([0-9]+)/[^>]+[>](.*?)</td>""")
-    PATTERN_DIRECT = re.compile(r"""value="/title/tt([0-9]+)""")
-    movies = [""]
+#    PATTERN = re.compile(r"""<a href=['"]/title/tt([0-9]+)/[^>]+[>](.*?)</td>""")
+#    PATTERN_DIRECT = re.compile(r"""value="/title/tt([0-9]+)""")
 
     def __init__(self):
         # http://www.imdb.com/List?words=
@@ -197,32 +219,25 @@ class SearchPlugin(movie.SearchMovie):
         self.translated_url_search = 'http://www.imdb.com/find?s=tt&q='
         self.encode                = 'utf8'
 
-    def search(self,parent_window):
-        if not self.open_search(parent_window):
+    def search(self, parent_window):
+        url = self.original_url_search + self.title
+        try:
+            r = ul3.request('GET', url)
+            self.page = r.data
+            return True
+        except:
+            print("search failed for %s" % url)
+            self.page = ''
             return None
 
-        movies = ia.search_movie(self.title)
-        print("2 %d" % len(movies))
-        return len(movies)
-
     def get_searches(self):
-        print("1 %s" % self.title)
-        movies = ia.search_movie(self.title)
-        print("5 %d" % len(movies))
-        for m in movies:
-            ids.append(m.movieID)
-            titles.append(m['title'])
-        print("6 %d" % len(ids))
-
-        if len(ids) < 2:
-            # try to find a direct result
-            match = self.PATTERN_DIRECT.findall(self.page)
-            if len(match) > 0:
-                ids.append(match[0])
-            else:
-                # try to look for IMDb id directly
-                if len(self.title) == 7 and re.match('[0-9]+', self.title):
-                    ids.append(self.title)
+        soup = BeautifulSoup(self.page, 'html.parser')
+        for i in soup.find_all('td', class_='result_text'):
+            link = i.find('a')['href']
+            link1 = link.split('/')[2][2:]
+            name = i.text
+            self.ids.append(link1)
+            self.titles.append(name)
 
 #
 # Plugin Test
