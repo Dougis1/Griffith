@@ -208,7 +208,7 @@ class Griffith(object):
             try:
                 plugin.run()
             except Exception as e:
-                log.exception('')
+                log.exception(e)
             plugin.cleanup()
 
     def on_import_activate(self, *args):
@@ -385,7 +385,7 @@ class Griffith(object):
         add.clone_movie(self)
 
     def on_m_seen_icon_button_press_event(self, widget, event):
-        if event.button == 1 and event.type == Gtk.gdk._2BUTTON_PRESS:
+        if event.button == 1 and event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
             self.toggle_seen()
 
     # poster --------------------------------------------------------------
@@ -1397,7 +1397,7 @@ class Griffith(object):
 
     def on_p_tree_button_press_event(self, widget, event):
         """add a double click event to people tree"""
-        if event.type == Gtk.gdk._2BUTTON_PRESS:
+        if event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
             from people import edit_person
             edit_person(self)
 
@@ -1413,7 +1413,7 @@ class Griffith(object):
                 self.widgets['treeview'].grab_focus()
                 self.widgets['popups']['main'].popup(None, None, None, None, event.button, Gtk.get_current_event_time())
             return 1
-        elif event.type == Gdk._2BUTTON_PRESS:
+        elif event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
             self.edit_movie()
 
     # -=[ results window ]=------------------------------------------------
@@ -1430,8 +1430,9 @@ class Griffith(object):
         return True
 
     def on_results_button_press_event(self, widget, event):
-        if event.type == Gtk.gdk._2BUTTON_PRESS:
+        if event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
             return self.on_results_select_press_event(widget)
+
         return self._resultswin_button_pressed_signal(widget, event)
 
     def on_results_select_press_event(self, button):
@@ -1439,10 +1440,12 @@ class Griffith(object):
         if not treeselection:
             log.debug('no treeselection')
             return False
+
         tmp_model, tmp_iter = treeselection.get_selected()
         if tmp_iter is None:
             log.debug('no selected iter found')
             return False
+
         selected_key = tmp_model.get_value(tmp_iter, 0)
         self.widgets['results']['window'].hide()
         return self._resultswin_process(selected_key)
@@ -1450,7 +1453,7 @@ class Griffith(object):
     def on_add_movie_results_button_press_event(self, widget, event):
         """add a double click event to add movie results"""
         # TODO: use on_results_select_press_event and its selected_key
-        if event.type == Gtk.gdk._2BUTTON_PRESS:
+        if event.type == Gdk.EventType.DOUBLE_BUTTON_PRESS:
             add.populate_with_results(self)
 
     # -=[ treeview ]=------------------------------------------------------
@@ -1821,8 +1824,6 @@ if __name__ == "__main__":
     home_dir, config_name = gconsole.check_args()
     if not (config_name.find('/') >= 0 or config_name.find('\\') >= 0):
         config_name = os.path.join(home_dir, config_name)
-    log.debug("config file used: %s", config_name)
-    log.debug("home dir is: %s", home_dir)
     config = config.Config(file=config_name)
 
     if ('~' in version.pversion or '-' in version.pversion) and \
