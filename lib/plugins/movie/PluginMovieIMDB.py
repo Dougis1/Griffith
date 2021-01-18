@@ -42,7 +42,6 @@ plugin_author       = 'Doug Lindquist'
 plugin_author_email = 'doug.lindquist@protonmail.com'
 plugin_version      = '1.20'
 
-ia = IMDb()
 ul3 = urllib3.PoolManager()
 
 class Plugin(movie.Movie):
@@ -62,45 +61,84 @@ class Plugin(movie.Movie):
 #        self.tagl_page = self.open_page(url=self.url + '/taglines')
 #        self.cert_page = self.open_page(url=self.url + '/parentalguide')
 #        self.release_page = self.open_page(url=self.url + '/releaseinfo')
+        ia = IMDb()
         self.mvie = ia.get_movie(self.movie_id)
-        company = ia.get_company(self.movie_id)
+#        company = ia.get_company(self.movie_id)
 #        self.get_window().set_cursor(None)
 
+    def get_barcode(self):
+        try:
+            self.barcode = self.mvie.get('barcode')
+        except:
+            self.barcode = ''
+
     def get_cameraman(self):
-        self.cameraman = self.mvie['cinematographers']
+        try:
+            if self.mvie['cinematographers']:
+                self.cameraman = gutils.listToString(self.mvie['cinematographers'], joiner=', ')
+        except:
+            self.cameraman = ''
 
     def get_cast(self):
         self.cast = ''
-        actors = self.mvie['cast']
-        for actor in actors:
-            role = actor.currentRole
-            if role == '':
-                line = actor + '\n'
+        try:
+            actors = self.mvie['cast']
+            for actor in actors:
+                role = actor.currentRole
+                if role == '':
+                    line = actor + '\n'
+                else:
+                    line = ("%s as %s\n" % (actor, role))
+
+                self.cast += line
+        except:
+            self.cast = ''
+
+    def get_classification(self):
+        try:
+            self.classification = self.mvie['rating']
+            loc = locale.getlocale()[0][3:]
+            res = pycountry.countries.search_fuzzy(loc)
+            cntry = res[0].name
+            cert = ''
+            c = self.mvie['certificates']
+            if c is not None:
+                for a in c:
+                    if a.startswith(cntry):
+                        a,b = a.split(':')
+                        cert = b
+                        break
             else:
-                line = ("%s as %s\n" % (actor, role))
+                cert = ''
+        except:
+            cert = ''
 
-            self.cast += line
-
-#DWL
-#    def get_classification(self):
-#        loc = locale.getlocale()[0][3:]
-#        cntry = pycountry.countries.get(alpha_2=loc)
-#        cert = ''
-#        for a in self.mvie['certificates']:
-#            if a.startswith(cntry):
-#                cert = a
-#                break
-
-#        self.classification = cert
+        self.classification = cert
 
     def get_color(self):
-        self.color = gutils.listToString(self.mvie['color'], joiner=', ')
+        try:
+            c = self.mvie['color info']
+            self.color = ''
+            if not c:
+                self.color = gutils.listToString(c, joiner=', ')
+        except:
+            self.color = ''
 
     def get_country(self):
-        self.country = gutils.listToString(self.mvie['countries'], joiner=', ')
+        try:
+            if self.mvie['countries']:
+                self.country = gutils.listToString(self.mvie['countries'], joiner=', ')
+        except:
+            self.country = ''
 
     def get_director(self):
-        self.director = gutils.listToString(self.mvie['directors'], joiner=', ')
+        try:
+            if self.mvie['directors']:
+                self.director = gutils.listToString(self.mvie['directors'], joiner=', ')
+            else:
+                self.director = ''
+        except:
+            self.director = ''
 
     def get_genre(self):
         self.genre = gutils.listToString(self.mvie['genre'], joiner=' | ')
@@ -114,15 +152,18 @@ class Plugin(movie.Movie):
             self.image_url = ''
 
     def get_language(self):
-        languages = self.mvie['languages']
-        self.language = ''
-        f = False
-        for l in languages:
-            if f:
-                self.language += ', ' + l
-            else:
-                self.language += l
-                f = True
+        try:
+            languages = self.mvie['languages']
+            self.language = ''
+            f = False
+            for l in languages:
+                if f:
+                    self.language += ', ' + l
+                else:
+                    self.language += l
+                    f = True
+        except:
+            self.language = ''
 
     def get_notes(self):
         self.notes = ''
@@ -147,58 +188,88 @@ class Plugin(movie.Movie):
         self.o_site = ''
 
     def get_o_title(self):
-        self.o_title = self.mvie['original title']
+        try:
+            self.o_title = self.mvie['original title']
+        except:
+            self.o_title = ''
 
     def get_plot(self):
-        self.plot = self.mvie['plot'][0]
-        self.plot.split('::')
+        try:
+            if self.mvie['plot']:
+                self.plot = self.mvie['plot'][0]
+                self.plot.split('::')
+            else:
+                self.plot = ''
+        except:
+            self.plot = ''
 
     def get_rating(self):
-        self.rating = self.mvie['rating']
-        if self.rating:
-            try:
-                self.rating = math.trunc(float(self.rating) + 0.5)
-            except Exception as e:
+        try:
+            self.rating = self.mvie['rating']
+            if self.rating:
+                try:
+                    self.rating = math.trunc(float(self.rating) + 0.5)
+                except Exception as e:
+                    self.rating = 0
+            else:
                 self.rating = 0
-        else:
+        except:
             self.rating = 0
 
 #    def get_resolution(self):
 #        self.resolution = mvie
 
     def get_runtime(self):
-        self.runtime = gutils.listToString(self.mvie['runtimes'], joiner=', ')
+        try:
+            r = self.mvie['runtime']
+            self.runtime = gutils.listToString(r, joiner=', ')
+        except:
+            self.runtime = '0'
 
     def get_screenplay(self):
-        self.screenplay = gutils.listToString(self.mvie['writer'], joiner=', ')
+        try:
+            w = self.mvie['writer']
+            self.screenplay = gutils.listToString(w, joiner=', ')
+        except:
+            self.screenplay = ''
 
     def get_site(self):
         self.site = "http://www.imdb.com/title/tt%s" % self.movie_id
 
     def get_sound(self):
-        self.sound = gutils.listToString(self.mvie['sound mix'], ', ')
+        try:
+            sm = self.mvie['sound mix']
+            self.sound = gutils.listToString(sm, ', ')
+        except:
+            self.sound = ''
 
     def get_studio(self):
-        self.studio = self.mvie.get('studio')
+        try:
+            self.studio = self.mvie.get('studio')
+        except:
+            self.studio = ''
 
     def get_tagline(self):
-        self.tagline = self.mvie.get('taglines')
+        try:
+            self.tagline = self.mvie.get('taglines')
+        except:
+            self.tagline = ''
 
     def get_title(self):
-        self.title = self.mvie['title']
+        try:
+            self.title = self.mvie['title']
+        except:
+            self.title = ''
 
     def get_trailer(self):
         self.trailer = "http://www.imdb.com/title/tt%s/trailers" % self.movie_id
 
     def get_year(self):
-        self.year = str(self.mvie['year'])
+        try:
+            self.year = str(self.mvie['year'])
+        except:
+            self.year = '1900'
 
-    def __before_more(self, data):
-        for element in ['>See more<', '>more<', '>Full summary<', '>Full synopsis<']:
-            tmp = string.find(data, element)
-            if tmp>0:
-                data = data[:tmp] + '>'
-        return data
 
 #https://www.imdb.com/find?s=tt&q=matrix
 #https://www.imdb.com/find?q=matrix&s=tt&exact=true&ref_=fn_tt_ex
@@ -231,6 +302,8 @@ class SearchPlugin(movie.SearchMovie):
             return None
 
     def get_searches(self):
+        self.ids.clear()
+        self.titles.clear()
         soup = BeautifulSoup(self.page, 'html.parser')
         for i in soup.find_all('td', class_='result_text'):
             link = i.find('a')['href']
