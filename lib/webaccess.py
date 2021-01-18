@@ -218,13 +218,13 @@ class Progress:
         self.dialog.stick()
         self.label = Gtk.Label()
         self.label.set_markup(message)
-        self.dialog.vbox.pack_start(self.label)
+        self.dialog.vbox.pack_start(self.label, True, True, 0)
         self.progress = Gtk.ProgressBar()
         self.progress.set_pulse_step(0.01)
-        self.dialog.vbox.pack_start(self.progress, False, False)
+        self.dialog.vbox.pack_start(self.progress, False, False, 0)
         self.button = Gtk.Button(_("Cancel"), Gtk.STOCK_CANCEL)
         self.button.connect("clicked", self.callback)
-        self.dialog.vbox.pack_start(self.button, False, False)
+        self.dialog.vbox.pack_start(self.button, False, False, 0)
 
     def callback(self, widget):
         #self.hide()

@@ -223,21 +223,10 @@ class Movie(object):
             dest = "%s.jpg" % tmp_dest
             try:
                 r = ul3.request('GET', self.image_url)
-                self.page = r.data
+                tfp = open(dest, 'wb')
+                tfp.write(r.data)
+                tfp.close()
                 r.release_conn()
-
-#                self.progress.set_data(self.parent_window, _("Fetching poster"), _("Wait a moment"), False)
-#                retriever = Retriever(self.image_url, self.parent_window, self.progress, dest, useurllib3=self.useurllib3)
-#                retriever.start()
-#                while threading.active_count():
-#                    self.progress.pulse()
-#                    if self.progress.status:
-#                        retriever.join()
-
-#                    while Gtk.events_pending():
-#                        Gtk.main_iteration()
-
-#                urlcleanup()
             except:
                 log.exception('Unable to fetch picture')
                 print('Unable to fetch picture')
@@ -252,84 +241,121 @@ class Movie(object):
     def parse_movie(self):
         try:
             fields = list(self.fields_to_fetch)  # make a copy
-
             self.initialize()
+
+            if 'barcode' in fields:
+                self.get_barcode()
+                fields.pop(fields.index('barcode'))
+
+            if 'cameraman' in fields:
+                self.get_cameraman()
+                fields.pop(fields.index('cameraman'))
 
             if 'cast' in fields:
                 self.get_cast()
                 self.cast = gutils.clean(self.cast)
                 fields.pop(fields.index('cast'))
+
             if 'color' in fields:
                 self.get_color()
                 fields.pop(fields.index('color'))
+
+            if 'classification' in fields:
+                self.get_classification()
+                fields.pop(fields.index('classification'))
+
             if 'country' in fields:
                 self.get_country()
                 fields.pop(fields.index('country'))
+
             if 'director' in fields:
                 self.get_director()
                 fields.pop(fields.index('director'))
+
             if 'genre' in fields:
                 self.get_genre()
                 fields.pop(fields.index('genre'))
+
             if 'image' in fields:
                 self.get_image()
                 self.fetch_picture()
                 fields.pop(fields.index('image'))
+
             if 'language' in fields:
                 self.get_language()
                 fields.pop(fields.index('language'))
+
             if 'notes' in fields:
                 self.get_notes()
                 self.notes = gutils.clean(self.notes)
                 fields.pop(fields.index('notes'))
+
             if 'o_site' in fields:
                 self.get_o_site()
                 fields.pop(fields.index('o_site'))
-            if 'o_title' in self.fields_to_fetch and self.o_title is not None:
-                if self.o_title[:4] == u'The ':
-                    self.o_title = self.o_title[4:] + u', The'
+
+            if 'o_title' in self.fields_to_fetch:
+                self.get_o_title()
+                if self.o_title is not None:
+                    if self.o_title[:4] == u'The ':
+                        self.o_title = self.o_title[4:] + u', The'
+
             if 'plot' in fields:
                 self.get_plot()
                 self.plot = gutils.clean(self.plot)
 #                if not isinstance(self.plot, unicode):
 #                    self.plot = gutils.gdecode(self.plot, self.encode)
                 fields.pop(fields.index('plot'))
+
             if 'rating' in fields:
                 self.get_rating()
                 self.rating = gutils.digits_only(self.rating, 10)
                 fields.pop(fields.index('rating'))
+
             if 'resolution' in fields:
                 self.get_resolution()
                 fields.pop(fields.index('resolution'))
+
             if 'runtime' in fields:
                 self.get_runtime()
                 self.runtime = gutils.digits_only(self.runtime)
                 fields.pop(fields.index('runtime'))
+
             if 'screenplay' in fields:
                 self.get_screenplay()
                 fields.pop(fields.index('screenplay'))
+
             if 'site' in fields:
                 self.get_site()
                 fields.pop(fields.index('site'))
+
             if 'sound' in fields:
                 self.get_sound()
                 fields.pop(fields.index('sound'))
+
             if 'studio' in fields:
                 self.get_studio()
                 fields.pop(fields.index('studio'))
+
             if 'tagline' in fields:
                 self.get_tagline()
                 fields.pop(fields.index('tagline'))
-            if 'title' in self.fields_to_fetch and self.title is not None:
-                if self.title[:4] == u'The ':
-                    self.title = self.title[4:] + u', The'
+
+            if 'title' in self.fields_to_fetch:
+                self.get_title()
+                if self.title is not None:
+                    if self.title[:4] == u'The ':
+                        self.title = self.title[4:] + u', The'
+
             if 'trailer' in fields:
                 self.get_trailer()
                 fields.pop(fields.index('trailer'))
+
             if 'year' in fields:
                 self.get_year()
                 self.year = gutils.digits_only(self.year, 2100)
                 fields.pop(fields.index('year'))
+
 #            for i in fields:
 #                getattr(self, "get_%s" % i)()
 #                self[i] = gutils.clean(self[i])

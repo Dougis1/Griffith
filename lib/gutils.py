@@ -185,7 +185,7 @@ def set_model_from_list(cb, items):
         cb.set_text_column(0)
     elif type(cb) == Gtk.ComboBox:
         cell = Gtk.CellRendererText()
-        cb.pack_start(cell, True)
+        cb.pack_start(cell, True, True, 0)
         cb.add_attribute(cell, 'text', 0)
 
 
@@ -325,13 +325,13 @@ def question(msg, window=None):
         return response
     else:
         dialog = Gtk.MessageDialog(window, Gtk.DialogFlags.DESTROY_WITH_PARENT,
-            Gtk.MessageType.QUESTION, Gtk.BUTTONS_NONE, msg)
-        dialog.add_buttons(Gtk.STOCK_YES, Gtk.RESPONSE_YES, Gtk.STOCK_NO, Gtk.RESPONSE_NO)
-        dialog.set_default_response(Gtk.RESPONSE_NO)
+            Gtk.MessageType.QUESTION, Gtk.ButtonsType.NONE, msg)
+        dialog.add_buttons(Gtk.STOCK_YES, Gtk.ResponseType.YES, Gtk.STOCK_NO, Gtk.ResponseType.NO)
+        dialog.set_default_response(Gtk.ResponseType.NO)
         dialog.set_skip_taskbar_hint(False)
         response = dialog.run()
         dialog.destroy()
-        return response in (Gtk.RESPONSE_OK, Gtk.RESPONSE_YES)
+        return response in (Gtk.ResponseType.OK, Gtk.ResponseType.YES)
 
 
 def popup_message(message):
@@ -370,12 +370,6 @@ def popup_message(message):
 
 
 def file_chooser(self, title, action=None, buttons=None, name='', folder='', picture=False, backup=False):
-    if not folder or folder == '':
-        if config.get('main', 'backup_dir') and not config.get('main', 'backup_dir') == '':
-            folder = self.config.get('main', 'backup_dir')
-        else:
-            folder = os.path.expanduser('~')
-
     if mac:
         if "SAVE" in str(action):
             if backup:
@@ -432,8 +426,7 @@ def file_chooser(self, title, action=None, buttons=None, name='', folder='', pic
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
             filename = dialog.get_filename()
-            config.set(folder, 'backup_dir', 'main')
-        elif response == Gtk.RESPONSE_CANCEL:
+        elif response == Gtk.ResponseType.CANCEL:
             filename = None
         else:
             return False
@@ -749,12 +742,12 @@ def create_image_cache(md5sum, gsql):
     if not os.path.isfile(fn_medium):
         pixbuf = image.get_pixbuf()
         pixbuf = pixbuf.scale_simple(100, 140, GdkPixbuf.InterpType.BILINEAR)
-        pixbuf.savev(fn_medium, 'jpeg', {'quality': '70'})
+        pixbuf.savev(fn_medium, 'jpeg', ['quality'], ['70'])
 
     if not os.path.isfile(fn_small):
         pixbuf = image.get_pixbuf()
         pixbuf = pixbuf.scale_simple(30, 40, GdkPixbuf.InterpType.BILINEAR)
-        pixbuf.savev(fn_small, 'jpeg', {'quality': '70'})
+        pixbuf.savev(fn_small, 'jpeg', ['quality'], ['70'])
 
     return True
 

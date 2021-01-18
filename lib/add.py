@@ -95,10 +95,11 @@ def update_movie(self):
             new_image_path = details['image']
             if not os.path.isfile(new_image_path):
                 new_image_path = os.path.join(self.locations['temp'], "poster_%s.jpg" % details['image'])
+
             if not os.path.isfile(new_image_path):
                 log.warn("cannot read temporary file: %s", new_image_path)
             else:
-                new_poster_md5 = gutils.md5sum(file(new_image_path, 'rb'))
+                new_poster_md5 = gutils.md5sum(open(new_image_path, 'rb'))
                 if session.query(db.Poster).filter_by(md5sum=new_poster_md5).count() == 0:
                     try:
                         data = open(new_image_path, 'rb').read()
@@ -340,6 +341,13 @@ def populate_with_results(self):
             tagline_buffer.set_text(a, len(a))
         fields_to_fetch.pop(fields_to_fetch.index('tagline'))
 
+    if 'title' in fields_to_fetch:
+        if self.movie.title is not None:
+            title_buffer = w['title'].get_buffer()
+            a = self.movie.title
+            title_buffer.set_text(a, len(a))
+        fields_to_fetch.pop(fields_to_fetch.index('title'))
+
     if 'trailer' in fields_to_fetch:
         if self.movie.trailer is not None:
             trailer_buffer = w['trailer'].get_buffer()
@@ -353,9 +361,9 @@ def populate_with_results(self):
         fields_to_fetch.pop(fields_to_fetch.index('year'))
 
     # other fields
-#    for i in fields_to_fetch:
-#        w[i].set_text(gutils.convert_entities(self.movie[i]))
-
+    for i in fields_to_fetch:
+        if self.movie[i] is not None:
+            w[i].set_text(str(self.movie[i]))
 
 def show_websearch_results(self):
     total = self.founded_results_id = 0
@@ -435,18 +443,21 @@ def get_from_web(self):
 
             if len(self.search_movie.ids) == 1 and o_title and title:
                 self.search_movie.url = self.search_movie.translated_url_search
-                if self.search_movie.remove_accents:
-                    self.search_movie.title = title   # gutils.remove_accents(title, 'utf-8')
-                else:
-                    self.search_movie.title = str(title, 'utf-8')
+#                if self.search_movie.remove_accents:
+#                    self.search_movie.title = title   # gutils.remove_accents(title, 'utf-8')
+#                else:
+#                    self.search_movie.title = str(title, 'utf-8')
 
+#                watch_cursor = Gdk.Cursor.new(Gdk.CursorType.WATCH)
+#                self.window.get_root_window().set_cursor(watch_cursor)
                 if self.search_movie.search_movies(self.widgets['add']['window']):
                     self.search_movie.get_searches()
 
             show_websearch_results(self)
+#            self.window.get_root_window().set_cursor(None)
 #            self.show_search_results(self.search_movie)
         except Exception as e:
-            log.exception('')
+            log.exception(_(e))
             gutils.error(_(e))
 #            gutils.error(_("Connection failed."))
     else:
@@ -503,9 +514,9 @@ def get_details(self): #{{{
         'medium_id': w['media'].get_active(),
         'volume_id': w['volume'].get_active(),
         'vcodec_id': w['vcodec'].get_active(),
-        'cast': cast_buffer.get_text(cast_buffer.get_start_iter(), cast_buffer.get_end_iter()),
-        'notes': notes_buffer.get_text(notes_buffer.get_start_iter(), notes_buffer.get_end_iter()),
-        'plot': plot_buffer.get_text(plot_buffer.get_start_iter(), plot_buffer.get_end_iter()),
+        'cast': cast_buffer.get_text(cast_buffer.get_start_iter(), cast_buffer.get_end_iter(), False),
+        'notes': notes_buffer.get_text(notes_buffer.get_start_iter(), notes_buffer.get_end_iter(), False),
+        'plot': plot_buffer.get_text(plot_buffer.get_start_iter(), plot_buffer.get_end_iter(), False),
         'created': None,
         'updated': None
     }
@@ -546,7 +557,7 @@ def get_details(self): #{{{
     # languages
     t_movies['languages'] = set()
      # isn't the best but it works. without it the current selection of a language field is lost
-    w['lang_treeview'].child_focus(Gtk.DIR_TAB_FORWARD)
+    w['lang_treeview'].child_focus(Gtk.DirectionType.TAB_FORWARD)
     for row in self.lang['model']:
         lang_id = get_id(self.lang['lang'], row[0])
         lang_type = get_id(self.lang['type'], row[1])
@@ -594,9 +605,6 @@ def set_details(self, item=None):#{{{
         w['number'].set_value(int(item['number']))
     else:
         w['number'].set_value(int(gutils.find_next_available(self.db)))
-
-    if 'title' in item and item['title']:
-        w['title'].set_text(item['title'])
 
     if 'year' in item and item['year']:
         w['year'].set_value(gutils.digits_only(item['year'], 2100))

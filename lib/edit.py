@@ -56,11 +56,11 @@ def update_image(self, number, filename):
 
 def change_poster_select_file(self, number, handler = update_image):
     filename = gutils.file_chooser(_("Select image"),
-                                   action=Gtk.FILE_CHOOSER_ACTION_OPEN,
+                                   action=Gtk.FileChooserAction.OPEN,
                                    buttons=(Gtk.STOCK_CANCEL,
-                                            Gtk.RESPONSE_CANCEL,
+                                            Gtk.ResponseType.CANCEL,
                                             Gtk.STOCK_OPEN,
-                                            Gtk.RESPONSE_OK),
+                                            Gtk.ResponseType.OK),
                                    name='',
                                    folder=self.locations['desktop'],
                                    picture=True)

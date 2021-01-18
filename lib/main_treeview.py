@@ -410,7 +410,7 @@ def set_details(self, item=None):  # {{{
                     tmp = "%s - %s" % (i.language.name, i.subformat.name)
                 else:
                     tmp = "%s" % i.language.name
-                w['subtitle_vbox'].pack_start(Gtk.Label(tmp))
+                w['subtitle_vbox'].pack_start(Gtk.Label(tmp), True, True, 0)
             else:
                 language = i.language.name
                 if i.type is not None and len(self._lang_types[i.type]) > 0:
@@ -429,7 +429,7 @@ def set_details(self, item=None):  # {{{
                     tmp = language
                 widget = Gtk.Label(tmp)
                 widget.set_use_markup(True)
-                w['audio_vbox'].pack_start(widget)
+                w['audio_vbox'].pack_start(widget, True, True, 0)
 
     w['audio_vbox'].show_all()
     w['subtitle_vbox'].show_all()

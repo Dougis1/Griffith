@@ -61,15 +61,18 @@ def create(self):
 
     default_name = "%s_backup_%s.zip" % (self.config.get('name', 'griffith', section='database'),\
                     datetime.date.isoformat(datetime.datetime.now()))
-    filename = gutils.file_chooser(self, _("Save Griffith backup"), \
-        action=Gtk.FileChooserAction.SAVE, name=default_name, \
-        buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
+    backup_dir = self.config.get('backup_dir', '', 'main')
+    filename,path = gutils.file_chooser(self, _("Save Griffith backup"), \
+               action=Gtk.FileChooserAction.SAVE, name=default_name, folder=backup_dir, \
+               buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_SAVE, Gtk.ResponseType.OK))
 
-    if filename and filename[0]:
+    if not backup_dir == path:
+        self.config.set('backup_dir', path, 'main')
+
+    if filename:
         proceed = True
-        zipfilename = filename[0]
+        zipfilename = filename
         log.debug('Backup filename: %s', zipfilename)
-        print('Backup filename: %s', zipfilename)
         if os.path.isfile(zipfilename):
             if not gutils.question(_("File exists. Do you want to overwrite it?"), window=self.widgets['window']):
                 proceed = False
@@ -212,9 +215,10 @@ def restore(self, merge=False):
     * SQLite3 *.db file
     """
     # let user select a backup file
-    filename, path = gutils.file_chooser(_("Restore Griffith backup"), \
-                action=Gtk.FILE_CHOOSER_ACTION_OPEN, backup=True, \
-                buttons=(Gtk.STOCK_CANCEL, Gtk.RESPONSE_CANCEL, Gtk.STOCK_OPEN, Gtk.RESPONSE_OK))
+    backup_dir = self.config.get('main', 'backup_dir', default='')
+    filename, path = gutils.file_chooser(_("Restore Griffith backup"), folder=backup_dir, \
+                action=Gtk.FileChooserAction.OPEN, backup=True, \
+                buttons=(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK))
     if not filename:
         log.debug('no file selected')
         return False

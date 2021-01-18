@@ -123,21 +123,21 @@ def _fill_container(container, items, options, id_name):
 
         label_id = Gtk.Label()
         label_id.set_text(str(getattr(item, id_name)))
-        hbox.pack_start(label_id, expand=False)
+        hbox.pack_start(label_id, expand=False, fill=True, padding=0)
 
         widget = Gtk.RadioButton(label=options[0]) # first widget
-        hbox.pack_start(widget, expand=False, padding=4)
+        hbox.pack_start(widget, expand=False, fill=True, padding=4)
         for option in options[1:]: # create rest of the widgets, use first one as a group
             next_widget = Gtk.RadioButton(widget, label=option)
-            hbox.pack_start(next_widget, expand=False, padding=4)
+            hbox.pack_start(next_widget, expand=False, fill=True, padding=4)
 
         label = Gtk.Label()
         label.set_text(item.name)
-        hbox.pack_start(label, padding=16, expand=False)
+        hbox.pack_start(label, padding=16, expand=False, fill=True)
 
         hbox.show_all()
         label_id.hide()
-        container.pack_start(hbox)
+        container.pack_start(hbox, True, True, 0)
 
 
 def initialize(widgets, gsql, field_names):
@@ -209,13 +209,13 @@ def add_query_widget(container, field_names, sel_qf='title', sel_comm='contains'
     button = Gtk.Button(stock=Gtk.STOCK_DELETE)
     button.connect("clicked", lambda w: hbox.destroy())
 
-    hbox.pack_start(cb, expand=False)
-    hbox.pack_start(action_cb, expand=False)
-    hbox.pack_start(entry, expand=True, padding=8)
-    hbox.pack_start(button, expand=False, fill=False)
+    hbox.pack_start(cb, expand=False, fill=True, padding=0)
+    hbox.pack_start(action_cb, expand=False, fill=True, padding=0)
+    hbox.pack_start(entry, expand=True, fill=True, padding=8)
+    hbox.pack_start(button, expand=False, fill=False, padding=0)
     hbox.show_all()
 
-    container.pack_start(hbox)
+    container.pack_start(hbox, True, True, 0)
 
 
 def set_conditions(widgets, cond, field_names): #{{{
