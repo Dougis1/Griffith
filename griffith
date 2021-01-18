@@ -232,6 +232,7 @@ class Griffith(object):
             self.mainwindow_state['top'] = data.y
             self.mainwindow_state['height'] = data.height
             self.mainwindow_state['width'] = data.width
+            config.save()
 
     def on_window_state(self, widget, windowstate=None):
         # size should only be saved on microsoft windows systems
@@ -284,7 +285,10 @@ class Griffith(object):
         add.show_websearch_results(self)
 
     def populate_dialog_with_results(self, *args):
+#        watch_cursor = Gdk.Cursor(Gdk.CursorType.WATCH)
+#        self.widgets['window'].set_cursor(watch_cursor)
         add.populate_with_results(self)
+#        self.widgets['window'].set_cursor(watch_cursor)
 
     def source_changed(self, *args):
         add.source_changed(self)
@@ -1219,9 +1223,6 @@ class Griffith(object):
 
     def save_state(self):
         """Saves main window state"""
-        # size should only be saved on microsoft windows systems
-        # on other systems the window manager should manage the windows
-        # but it is possible to active it for other platforms via config file
         if self.config.get('savelayout', self.windows, section='window'):
             if hasattr(self, 'mainwindow_state') and self.mainwindow_state is not None:
                 self.config.set('width',  self.mainwindow_state['width'],  section='window')
@@ -1260,18 +1261,22 @@ class Griffith(object):
             # left offset of 4 points (Windows XP border size) and a top
             # offset of 30 points (height of the title bar) every time the
             # application is started. The window would move right-down.
-            self.widgets['window'].set_gravity(Gtk.gdk.GRAVITY_STATIC)
+            self.widgets['window'].set_gravity(Gdk.Gravity.STATIC)
+
         if self.config.get("left", None, section='window') is None:
             pass
         else:
             state = self.config.get('state', '0', section='window')
-            if state == str(int(Gtk.gdk.WINDOW_STATE_MAXIMIZED)):
+            if state == str(int(Gdk.WindowState.MAXIMIZED)):
                 self.widgets['window'].maximize()
             else:
-                self.widgets['window'].move(int(self.config.get('left', section='window')),
-                    int(self.config.get('top', section='window')))
-                self.widgets['window'].resize(int(self.config.get('width', section='window')),
-                    int(self.config.get('height', section='window')))
+                left = int(self.config.get('left', section='window'))
+                top = int(self.config.get('top', section='window'))
+                width = int(self.config.get('width', section='window'))
+                height = int(self.config.get('height', section='window'))
+                self.widgets['window'].move(left, top)
+                self.widgets['window'].resize(width, height)
+
         self.widgets['window'].show()
 
     def on_delete_event_poster(self, *args):
@@ -1824,6 +1829,7 @@ if __name__ == "__main__":
     home_dir, config_name = gconsole.check_args()
     if not (config_name.find('/') >= 0 or config_name.find('\\') >= 0):
         config_name = os.path.join(home_dir, config_name)
+
     config = config.Config(file=config_name)
 
     if ('~' in version.pversion or '-' in version.pversion) and \
