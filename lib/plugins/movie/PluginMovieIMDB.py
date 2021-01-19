@@ -85,7 +85,7 @@ class Plugin(movie.Movie):
             actors = self.mvie['cast']
             for actor in actors:
                 role = actor.currentRole
-                if role == '':
+                if role and len(role) > 0:
                     line = actor + '\n'
                 else:
                     line = ("%s as %s\n" % (actor, role))
@@ -195,11 +195,9 @@ class Plugin(movie.Movie):
 
     def get_plot(self):
         try:
-            if self.mvie['plot']:
-                self.plot = self.mvie['plot'][0]
-                self.plot.split('::')
-            else:
-                self.plot = ''
+            a = self.mvie['plot']
+            b = a[0]
+            self.plot = b[0]
         except:
             self.plot = ''
 
