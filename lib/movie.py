@@ -47,32 +47,32 @@ ul3 = urllib3.PoolManager()
 
 
 class Movie(object):
+    barcode = None
+    cameraman = None
     cast = None
     classification = None
+    color = None
     country = None
     director = None
     genre = None
     image = None
+    languages = None
     notes = None
     number = None
     o_site = None
     o_title = None
     plot = None
     rating = None
+    resolution = None
     runtime = None
+    screenplay = None
     site = None
+    sound = None
     studio = None
+    tagline = None
     title = None
     trailer = None
     year = None
-    screenplay = None
-    cameraman = None
-    resolution = None
-    barcode = None
-    tagline = None
-    languages = None
-    sound = None
-    color = None
 
     movie_id = None
     debug = False

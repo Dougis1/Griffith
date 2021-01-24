@@ -218,7 +218,7 @@ def convert_entities(text):
             except UnicodeDecodeError:
                 ents = str(ent_code, 'latin-1')
             except Exception as ex:
-                print(("error occurred while converting entity %s: %s" % (ents, ex)))
+                print(_("error occurred while converting entity %s: %s" % (ents, ex)))
 
             # check if it still needs conversion
             if not ENTITY.search(ents):
@@ -266,8 +266,8 @@ def strip_tags(text):
 def clean(text):
     t = strip_tags(text)
     t.replace('&nbsp;', ' ')
-    t.replace('&#34;', '')
-    t.replace('&#160;', ' ')
+    t.replace('&#34;', '')   # replace quotes
+    t.replace('&#160;', ' ') # replace nbsp
     return t.strip()
 
 
