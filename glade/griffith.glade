@@ -4479,6 +4479,24 @@
   </object>
   <object class="GtkMenu" id="lang_menu">
     <property name="can-focus">False</property>
+     <child>
+      <object class="GtkImageMenuItem" id="add_lang_row">
+        <property name="visible">True</property>
+        <property name="label">gtk-add</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
+        <signal name="activate" handler="on_am_lang_add_clicked"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkImageMenuItem" id="remove_lang_row">
+        <property name="visible">True</property>
+        <property name="label">gtk-remove</property>
+        <property name="use_underline">True</property>
+        <property name="use_stock">True</property>
+        <signal name="activate" handler="on_am_lang_remove_clicked"/>
+      </object>
+    </child>
   </object>
   <object class="GtkListStore" id="model1">
     <columns>
