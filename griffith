@@ -573,8 +573,8 @@ class Griffith(object):
             if pthinfo is not None:
                 path, col, cellx, celly = pthinfo
                 self.widgets['add']['lang_treeview'].grab_focus()
-                self.widgets['add']['lang_treeview'].set_cursor( path, col, 0)
-            self.widgets['add']['lang_menu'].open_submenu("popup")     #popup(None, None, None, event.button, time)
+                self.widgets['add']['lang_treeview'].set_cursor(path, col, 0)
+            self.widgets['add']['lang_menu'].popup(None, None, None, None, event.button, time)
 
     def create_language_row(self, lang=None):
         if len(self.languages_ids) == 1:
