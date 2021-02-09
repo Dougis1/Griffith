@@ -26,15 +26,17 @@ from sqlalchemy import and_, or_
 from sqlalchemy.orm import object_session
 from sqlalchemy.sql import select, update
 
-import tables
-from _objects import Loan, DBTable
+from . import tables
+from ._objects import Loan, DBTable
 
 log = logging.getLogger('Griffith')
 
-res_aliases = {(2560, 1600): ('QSXGA',),
+res_aliases = { (7680, 4320): ('8K UHD', ),
+                (3840, 2160): ('4K', 'Ultra HD', 'Ultra-High Definition', ),
+                (2560, 1600): ('QSXGA',),
                 (2048, 1536): ('QXGA',),
                 (1920, 1200): ('WUXGA',),
-                (1920, 1080): ('1080p', 'HD 1080', '1080'),
+                (1920, 1080): ('1080p', 'HD 1080', '1080', 'Full HD', 'FHD', 'HD', 'High Definition', ),
                 (1920, 540): ('1080i',),
                 (1680, 1050): ('WSXGA+',),
                 (1600, 1200): ('UXGA',),
@@ -59,7 +61,7 @@ res_aliases = {(2560, 1600): ('QSXGA',),
                 (1, 2): ('Widescreen',),
                 (1, 3): ('Anamorphic Widescreen',)}
 res_alias_res = {}
-for res, aliases in res_aliases.iteritems():
+for res, aliases in res_aliases.items():
     for alias in aliases:
         res_alias_res[alias.upper()] = res
 del aliases, alias, res
@@ -76,10 +78,10 @@ class Movie(DBTable):
         else:
             try:
                 if 'x' in res_string:
-                    self.width, self.height = map(int, res_string.lower().split('x'))
+                    self.width, self.height = list(map(int, res_string.lower().split('x')))
                 else:
-                    self.width, self.height = map(int, res_string.lower().split())
-            except Exception, e:
+                    self.width, self.height = list(map(int, res_string.lower().split()))
+            except Exception as e:
                 log.warning('wrong resolution name: %s', e)
                 raise ValueError('Use standard resolution name or \d+x\d+')
 
