@@ -1225,15 +1225,17 @@ class Griffith(object):
         """Saves main window state"""
         if self.config.get('savelayout', self.windows, section='window'):
             if hasattr(self, 'mainwindow_state') and self.mainwindow_state is not None:
-                self.config.set('width',  self.mainwindow_state['width'],  section='window')
+                self.config.set('width', self.mainwindow_state['width'], section='window')
                 self.config.set('height', self.mainwindow_state['height'], section='window')
-                self.config.set('left',   self.mainwindow_state['left'],   section='window')
-                self.config.set('top',    self.mainwindow_state['top'],    section='window')
+                self.config.set('left', self.mainwindow_state['left'], section='window')
+                self.config.set('top', self.mainwindow_state['top'], section='window')
                 if 'state' in self.mainwindow_state:
-                    self.config.set('state',  self.mainwindow_state['state'],  section='window')
+                    self.config.set('state', self.mainwindow_state['state'], section='window')
                 else:
-                    self.config.set('state',  0,  section='window')
+                    self.config.set('state', 0, section='window')
+
                 self.config.save()
+
         # save the order and size of the columns of the mainlist
         treeview_columns = self.widgets['treeview'].get_columns()
         columnorder = ''
@@ -1243,8 +1245,10 @@ class Griffith(object):
             columnorder = columnorder + delimiter + treeview_column.get_name()
             columnsizes = columnsizes + delimiter + str(treeview_column.get_width())
             delimiter = ','
+
         self.config.set('columnorder', columnorder, section='mainlist')
         self.config.set('columnsizes', columnsizes, section='mainlist')
+
         # save sorting
         columnsorting = self.treemodel.get_sort_column_id()
         self.config.set('columnsortid', columnsorting[0], section='mainlist')
@@ -1252,6 +1256,7 @@ class Griffith(object):
             self.config.set('columnsortorder', 0, section='mainlist')
         else:
             self.config.set('columnsortorder', int(columnsorting[1]), section='mainlist')
+
         self.config.save()
 
     def restore_state(self):
@@ -1514,313 +1519,25 @@ class Griffith(object):
 ############################################
 ## Missing functions
 ############################################
-    def on_b_print_cover_simple_clicked(self, event):
-        return
-
-    def on_cancel_print_cover_simple_clicked(self, event):
-        return
-
-    def on_b_print_cover_image_clicked(self, event):
-        return
+    def on_hpaned1_move_handle(self, event):
+        pass
 
     def on_view_image_clicked(self, event):
-        return
+        pass
 
     def on_cb_reverse_toggled(self, event):
-        return
-
-    def on_save_preferences(self, event):
-        return
-
-    def on_cancel_preferences_clicked(self, event):
-        return
-
-    def on_people_edit_clicked(self, event):
-        return
-
-    def on_people_delete_clicked(self, event):
-        return
-
-    def on_people_add_clicked(self, event):
-        return
-
-    def on_cancel_people_clicked(self, event):
-        return
-
-    def on_loan_ok_clicked(self, event):
-        return
-
-    def on_cancel_loan_clicked(self, event):
-        return
-
-    def on_update_person_clicked(self, event):
-        return
-
-    def on_edit_person_cancel_clicked(self, event):
-        return
-
-    def on_advfilter_delete(self, event):
-        return
-
-    def on_advfilter_save(self, event):
-        return
-
-    def on_advfilter_open(self, event):
-        return
-
-    def on_advfilter_close(self, event):
-        return
-
-    def on_advfilter_clear(self, event):
-        return
-
-    def on_advfilter_add(self, event):
-        return
-
-    def on_add_person_db_clicked(self, event):
-        return
-
-    def on_add_person_cancel(self, event):
-        return
+        pass
 
     def on_results_select_clicked(self, event):
-        return
-
-    def on_results_cancel_clicked(self, event):
-        return
-
-    def on_popup_email_activate(self, event):
-        return
-
-    def on_popup_return_activate(self, event):
-        return
-
-    def on_popup_loan_activate(self, event):
-        return
-
-    def on_popup_choose_image_activate(self, event):
-        return
-
-    def on_popup_simple_activate(self, event):
-        return
-
-    def on_seen_activate(self, event):
-        return
-
-    def on_popup_clone_activate(self, event):
-        return
-
-    def on_popup_delete_activate(self, event):
-        return
-
-    def on_edit_button_clicked(self, event):
-        return
-
-    def gtk_main_quit(self, event):
-        return
-
-    def on_email_reminder_clicked(self, event):
-        return
-
-    def on_return_button_clicked(self, event):
-        return
-
-    def on_loan_button_clicked(self, event):
-        return
-
-    def on_m_show_collection_button_clicked(self, event):
-        return
-
-    def on_m_show_volume_button_clicked(self, event):
-        return
-
-    def on_zoom_poster(self, event):
-        return
-
-    def on_main_treeview_row_activated(self, event):
-        return
-
-    def on_f_advfilter_changed(self, event):
-        return
-
-    def on_f_col_changed(self, event):
-        return
-
-    def on_clear_filter_clicked(self, event):
-        return
-
-    def on_filter_txt_changed(self, event):
-        return
-
-    def on_filter_txt_key_release(self, event):
-        return
-
-    def on_fetch_posters_from(self, event):
-        return
-
-    def on_open_advfilterwindow_clicked(self, event):
-        return
-
-    def on_delete_poster_clicked(self, event):
-        return
-
-    def on_open_poster_clickedon_go_trailer_clicked(self, event):
-        return
-
-    def on_go_site_clicked(self, event):
-        return
-
-    def on_go_o_site_clicked(self, event):
-        return
-
-    def on_delete_movie_clicked(self, event):
-        return
-
-    def on_toolbar_add_clicked(self, event):
-        return
-
-    def on_go_last_clicked(self, event):
-        return
-
-    def on_go_forward_clicked(self, event):
-        return
-
-    def on_go_back_clicked(self, event):
-        return
-
-    def on_go_first_clicked(self, event):
-        return
-
-    def on_about1_activate(self, event):
-        return
-
-    def on_people_activate(self, event):
-        return
-
-    def on_preferences1_activate(self, event):
-        return
-
-    def on_cover_choose_image_activate(self, event):
-        return
-
-    def on_cover_simple_activate(self, event):
-        return
-
-    def on_sugest_activate(self, event):
-        return
-
-    def on_all_movies_activate(self, event):
-        return
-
-    def on_list_loaned_movies_activate(self, event):
-        return
-
-    def on_seen_movies_activate(self, event):
-        return
-
-    def on_view_ext_toolbar_activate(self, event):
-        return
-
-    def on_view_toolbar_activate(self, event):
-        return
-
-    def on_fullscreen_activate(self, event):
-        return
-
-    def on_open_poster_clicked(self, event):
-        return
-
-    def on_select_all_activate(self, event):
-        return
-
-    def on_clone_activate(self, event):
-        return
-
-    def on_delete1_movie_activate(self, event):
-        return
-
-    def on_add1_activate(self, event):
-        return
-
-    def on_quit1_activate(self, event):
-        return
-
-    def select_db_activate(self, event):
-        return
-
-    def on_restore_activate(self, event):
-        pass
-
-    def on_backup_activate(self, event):
-        pass
-
-    def on_new_activate(self, event):
-        pass
-
-    def on_am_remove_collection_button_clicked(self, event):
-        pass
-
-    def on_am_add_collection_button_clicked(self, event):
-        pass
-
-    def on_am_remove_volume_button(self, event):
-        pass
-
-    def on_am_add_volume_button_clicked(self, event):
-        pass
-
-    def on_combo_source_changed(self, event):
-        pass
-
-    def on_a_delete_poster(self, event):
-        pass
-
-    def on_a_open_poster_clicked(self, event):
-        pass
-
-    def on_rating_scale_add_value_changed(self, event):
-        pass
-
-    def on_am_save_button_clicked(self, event):
-        pass
-
-    def on_add_clear_clicked(self, event):
-        pass
-
-    def on_add_movie_close_clicked(self, event):
-        pass
-
-    def on_add_movie_clicked(self, event):
-        pass
-
-    def on_cancel_add_movie_clicked(self, event):
-        apss
-
-    def on_save_preferences_clicked(self, event):
-        pass
-
-    def on_cancel_print_cover_image_clicked(self, event):
-        pass
-
-    def on_add_person_cancel_clicked(self, event):
-        pass
-
-    def on_zoom_poster_clicked(self, event):
-        pass
-
-    def on_go_trailer_clicked(self, event):
-        pass
-
-    def on_select_db_activate(self, event):
-        pass
-
-    def on_am_remove_volume_button_clicked(self, event):
         pass
 
     def on_a_delete_poster_clicked(self, event):
         pass
 
-    def on_hpaned1_move_handle(self, event):
+    def on_a_open_poster_clicked(self, event):
+        pass
+
+    def on_fetch_posters_from(self, event):
         pass
 
 
