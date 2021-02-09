@@ -55,7 +55,7 @@ def update_image(self, number, filename):
     return update_image_from_memory(self, number, imagedata)
 
 def change_poster_select_file(self, number, handler = update_image):
-    filename = gutils.file_chooser(_("Select image"),
+    filename = gutils.file_chooser(self, title=_("Select image"),
                                    action=Gtk.FileChooserAction.OPEN,
                                    buttons=(Gtk.STOCK_CANCEL,
                                             Gtk.ResponseType.CANCEL,

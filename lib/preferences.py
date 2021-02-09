@@ -202,6 +202,7 @@ def show_preferences(self, page=None):
         plugin_name = plugin_module.replace('PluginMovie','')
         if plugin_name == default_movie_plugin:
             w['default_plugin'].set_active(mcounter)
+
         mcounter = mcounter + 1
 
     # rating image
@@ -209,6 +210,7 @@ def show_preferences(self, page=None):
         rimage = int(self.config.get('rating_image', 0))
     except:
         rimage = 0
+
     w['rating_image'].set_active(rimage)
 
     # spellchecker
@@ -216,6 +218,7 @@ def show_preferences(self, page=None):
         w['spellchecker'].set_active(False)
     else:
         w['spellchecker'].set_active(True)
+
     self.on_cb_spellchecker_pref_toggled(w['spellchecker'])
 
     if self.config.get('notes', True, section='spell') == False:
@@ -232,6 +235,7 @@ def show_preferences(self, page=None):
 
     if page is not None:
         w['notebook'].set_current_page(page)
+
     w['window'].show()
 
 def save_preferences(self):

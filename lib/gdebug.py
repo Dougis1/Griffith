@@ -119,7 +119,7 @@ class DebugWindow:
         self.textview.set_scroll_adjustments(Gtk.Adjustment(1.0, 1.0, 100.0, 1.0, 10.0, 10.0), Gtk.Adjustment(1.0, 1.0, 100.0, 1.0, 10.0, 10.0))
         self.scrolledwindow = Gtk.ScrolledWindow(None, None)
         self.scrolledwindow.add(self.textview)
-        self.dialog.vbox.pack_start(self.scrolledwindow)
+        self.dialog.vbox.pack_start(self.scrolledwindow, True, True, 0)
         self.dialog.set_default_size(640, 480)
     def show(self):
         self.dialog.show_all()
