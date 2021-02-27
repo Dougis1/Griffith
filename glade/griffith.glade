@@ -1844,11 +1844,13 @@
   <object class="GtkImage" id="image4">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
+    <property name="tooltip-text" translatable="yes">Get movie poster</property>
     <property name="pixbuf">ge_remover.png</property>
   </object>
   <object class="GtkImage" id="image5">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
+    <property name="tooltip-text" translatable="yes">Get movie poster</property>
     <property name="pixbuf">ge_remover.png</property>
   </object>
   <object class="GtkWindow" id="main_window">
@@ -2770,9 +2772,8 @@
                       <object class="GtkToolButton" id="toolbutton8">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="tooltip-text" translatable="yes">Adds new movie</property>
+                        <property name="tooltip-text" translatable="yes">Get movie poster</property>
                         <property name="icon-widget">image3</property>
-                        <accelerator key="A" signal="clicked" modifiers="GDK_CONTROL_MASK"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -4482,6 +4483,7 @@
         <property name="label">gtk-add</property>
         <property name="visible">True</property>
         <property name="can-focus">False</property>
+        <property name="double-buffered">False</property>
         <property name="use-underline">True</property>
         <property name="use-stock">True</property>
         <signal name="activate" handler="on_am_lang_add_clicked" swapped="no"/>
@@ -4492,6 +4494,7 @@
         <property name="label">gtk-remove</property>
         <property name="visible">True</property>
         <property name="can-focus">False</property>
+        <property name="double-buffered">False</property>
         <property name="use-underline">True</property>
         <property name="use-stock">True</property>
         <signal name="activate" handler="on_am_lang_remove_clicked" swapped="no"/>
