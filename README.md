@@ -1,7 +1,7 @@
 Griffith 1.13.0 README
 ======================
 
-This document was last updated on Nov 5 2020.
+This document was last updated on Feb 27 2021.
 Please see the file COPYING for licensing and warranty information.
 
 
@@ -15,6 +15,13 @@ Table of Contents
 * TODO list
 * About the Authors
 
+Updates
+=======
+Finished IMDB plugin.
+Languages are now sorted before lising in Add mode.
+Imdb plugin now uses Imdb library instead of parsing web site.
+Added extra options in Technical tab of Add movie.
+Added extra languages and other options when creating a new database.
 
 Introduction
 ============
@@ -115,6 +122,15 @@ Installation
 ============
 
 See INSTALL file
+
+
+Reporting Bugs
+==============
+
+If you want to help or report any bugs founded please visit:
+  http://www.griffith.cc/
+or
+  https://bugs.launchpad.net/griffith/
 
 
 TODO
