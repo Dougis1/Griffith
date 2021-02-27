@@ -569,7 +569,7 @@ def get_details(self): #{{{
     # tags
     t_movies['tags'] = {}
     for i in self.tags_ids:
-        if self.am_tags[i].get_active() == True:
+        if self.am_tags[i].get_active() is True:
             t_movies['tags'][self.tags_ids[i]] = 1
 
     validate_details(t_movies)

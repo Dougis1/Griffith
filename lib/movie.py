@@ -32,18 +32,19 @@ import sys
 import tempfile
 import threading
 import time
-from urllib import *
+#from urllib import *
 import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk, Gdk
 import gutils
+import requests
 import urllib3
 from bs4 import BeautifulSoup
 #import certifi
 #from PIL import Image
 
 log = logging.getLogger("Griffith")
-ul3 = urllib3.PoolManager()
+ul3 = None
 
 
 class Movie(object):
@@ -85,11 +86,10 @@ class Movie(object):
     page = None
     url = None
     image_url = None
-    encode = 'iso-8859-1'
+    encode = 'utf-8'
     fields_to_fetch = []
     progress = None
     useurllib3 = False
-#    watch_cursor = Gdk.Cursor(Gdk.CursorType.WATCH)
 
     # functions that plugin should implement: {{{
     def initialize(self):
@@ -180,27 +180,32 @@ class Movie(object):
     def get_movie(self, parent_window=None):
 #        try:
             # check for internet connection
-#            urllib3.urlopen("http://www.google.com")
-            #
-            # initialize the progress dialog once for the following loading process
-            #
-#            if self.progress is None:
-#                self.progress = Progress(parent_window)
-
-#            self.progress.set_data(parent_window, _("Fetching data"), _("Wait a moment"), True)
-            #
-            # get the page
-            #
-            if not self.open_page(parent_window):
-                return None
-
-#            print("get_movie 183: %s" % self.page)
-            return True
+#            ul3.urlopen("http://www.google.com")
 #        except:
 #            gutils.error(_("Connection failed."))
 #            return False
 
+        try:
+            # initialize the progress dialog once for the following loading process
+            if self.progress is None:
+                self.progress = Progress(parent_window)
+
+            self.progress.set_data(parent_window, _("Fetching data"), _("Wait a moment"), True)
+
+            # get the page
+            if not self.open_page(parent_window):
+                return None
+
+            return True
+
+        except:
+            self.progress.hide()
+            gutils.error(_("Connection failed."))
+            return False
+
     def open_page(self, parent_window=None, url=None):
+        global ul3
+
         if url is None:
             url_to_fetch = self.url
         else:
@@ -209,11 +214,26 @@ class Movie(object):
         if parent_window is not None:
             self.parent_window = parent_window
 
-        ul3 = urllib3.PoolManager()
+#        if ul3 is None:
+#            ul3 = urllib3.PoolManager()
+
         data = None
-        r = ul3.request('GET', url_to_fetch)
-        self.page = BeautifulSoup(r.data)
-        r.release_conn()
+#        r = ul3.request('GET', url_to_fetch)
+#        self.page = BeautifulSoup(r.data)
+#        r.release_conn()
+        self.progress.set_data(parent_window, _("Fetching data"), _("Wait a moment"), False)
+        retriever = Retriever(url_to_fetch, self.parent_window, self.progress)
+        retriever.start()
+        while retriever.isAlive():
+            self.progress.pulse()
+            if self.progress.status:
+                retriever.join()
+
+            while Gtk.events_pending():
+                Gtk.main_iteration()
+
+#        data = None
+        self.progress.hide()
         return True
 
     def fetch_picture(self):
@@ -222,14 +242,19 @@ class Movie(object):
             self.image = tmp_dest.split('poster_', 1)[1]
             dest = "%s.jpg" % tmp_dest
             try:
-                r = ul3.request('GET', self.image_url)
-                tfp = open(dest, 'wb')
-                tfp.write(r.data)
-                tfp.close()
-                r.release_conn()
+                self.progress.set_data(self.parent_window, _("Fetching poster"), _("Wait a moment"), False)
+                retriever = Retriever(self.image_url, self.parent_window, self.progress, dest)
+                retriever.start()
+                while retriever.isAlive():
+                    self.progress.pulse()
+                    if self.progress.status:
+                        retriever.join()
+
+                    while Gtk.events_pending():
+                        Gtk.main_iteration()
+#                urlcleanup()
             except:
-                log.exception('Unable to fetch picture')
-                print('Unable to fetch picture')
+                log.exception('')
                 self.image = ""
                 try:
                     os.remove("%s.jpg" % tmp_dest)
@@ -364,7 +389,7 @@ class Movie(object):
         except:
             log.exception('')
             # close the progress dialog which was opened in get_movie
-#            self.progress.hide()
+            self.progress.hide()
 
 
 class SearchMovie(object):
@@ -406,24 +431,127 @@ class SearchMovie(object):
             self.url = self.url + self.title
             self.url.replace(' ', '%20')
 
-#        self.progress.set_data(parent_window, _("Searching"), _("Wait a moment"), True)
-#        retriever = Retriever(url, parent_window, self.progress, destination)
+        self.progress.set_data(parent_window, _("Searching"), _("Wait a moment"), True)
+        retriever = Retriever(url, parent_window, self.progress, destination)
 
-#        retriever.start()
-#        while threading.isAlive():
-#            self.progress.pulse()
-#            if self.progress.status:
-#        retriever.join()
+        retriever.start()
+        while threading.isAlive():
+            self.progress.pulse()
+            if self.progress.status:
+                retriever.join()
 
-#        while Gtk.events_pending():
-#            Gtk.main_iteration()
+        while Gtk.events_pending():
+            Gtk.main_iteration()
 
-        ul3 = urllib3.PoolManager()
-        url = self.url.decode('utf-8')
-        r = ul3.request('GET', url)
-        self.page = r.data
+        try:
+            if retriever.exception is None:
+                if destination:
+                    # caller gave an explicit destination file
+                    # don't care about the content
+                    return True
+                if retriever.html:
+                    ifile = file(retriever.html[0], 'rb')
+                    try:
+                        self.page = ifile.read()
+                    finally:
+                        ifile.close()
+                    # check for gzip compressed pages before decoding to unicode
+                    if len(self.page) > 2 and self.page[0:2] == '\037\213':
+                        self.page = gutils.decompress(self.page)
+                    self.page = self.page.decode(self.encode, 'replace')
+                else:
+                    return False
+            else:
+                self.progress.hide()
+                gutils.urllib_error(_("Connection error"), parent_window)
+                return False
+        except IOError:
+            log.exception('')
+#        finally:
+#            urlcleanup()
         return True
 
+
+class Retriever(threading.Thread):
+    is_alive=False
+
+    def __init__(self, URL, parent_window, progress, destination=None):
+        self.URL = URL
+        self.html = None
+        self.exception = None
+        self.destination = destination
+        self.progress = progress
+        self._stopevent = threading.Event()
+        self._sleepperiod = 1.0
+        threading.Thread.__init__(self, name="Retriever")
+
+    def isAlive(self):
+        global is_alive
+        return is_alive
+
+    def run(self):
+        global is_alive
+
+        is_alive = True
+        try:
+            self.html = urlretrieve2(self.URL, self.destination, self.hook)
+            if self.progress.status:
+                self.html = []
+        except Exception as e:
+            log.exception('')
+            self.exception = e
+
+        is_alive = False
+        self.progress.hide()
+
+    def hook(self, count, blockSize, totalSize):
+        if totalSize == -1:
+            pass
+        else:
+            try:
+                downloaded_percentage = min((count * blockSize * 100) / totalSize, 100)
+            except:
+                downloaded_percentage = 100
+
+            if count != 0:
+                downloaded_kbyte = int(count * blockSize / 1024.0)
+                filesize_kbyte = int(totalSize / 1024.0)
+
+#
+# use own derived URLopener class because we need to set a correct User-Agent
+# string for some web sites. The default is 'Python-urllib/<version>'
+# which not all sites accepting. (zelluloid.de for example)
+#
+_uaurlopener = None
+_tempfilecleanup = None
+
+
+def urlretrieve2(url, filename=None, reporthook=None, data=None):
+    global _tempfilecleanup
+    req = requests.get(url, stream=True)
+    if not filename:
+        import tempfile
+        (fd, filename) = tempfile.mkstemp()
+        if not _tempfilecleanup:
+            _tempfilecleanup = TempFileCleanup()
+
+        _tempfilecleanup._tempfiles.append(filename)
+        tfp = os.fdopen(fd, 'wb')
+    else:
+        tfp = open(filename, 'wb')
+
+    while 1:
+        try:
+            for chunk in req.iter_content(4096):
+                tfp.write(chunk)
+        except requests.exceptions.StreamConsumedError as e:
+            break
+        except requests.exceptions.Timeout as e:
+            gutils.urllib_error(_("Timeout error getting data"), parent_window)
+            break
+
+    tfp.close()
+    return filename
 
 class TempFileCleanup:
     _tempfiles = []

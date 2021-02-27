@@ -33,6 +33,7 @@ import re
 import sys
 from glob import glob
 from locale import getdefaultlocale
+from collections import OrderedDict
 
 import gi
 gi.require_version('Gtk', '3.0')
@@ -831,9 +832,11 @@ def dictionaries(self):
         'volume_id': _('Volume'),
         'year': _('Year')}
     self._conditions = (_('N/A'), _('Damaged'), _('Poor'), _('Fair'), _('Good'), _('Excellent'))
-    self._colors = (_('N/A'), _('Color'), _('Black and White'), _('Mixed'), _('Nachkoloriert'))
+    self._colors = (_('N/A'), _('Color'), _('Black and White'), _('Mixed'), _('Nachkoloriert'), _('BluRay'))
     self._lang_types = ('', _('lector'), _('dubbing'), _('subtitles'), _('commentary'))
-    self._layers = (_('N/A'), _('Single Side, Single Layer'), _('Single Side, Dual Layer'), _('Dual Side, Single Layer'), _('Dual Side, Dual Layer'))
+    self._layers = (_('N/A'), _('Single Side, Single Layer'), _('Single Side, Dual Layer'), _('Single Side, Triple Layer'),
+            _('Single Side, Quad Layer'), _('BluRay, Single Layer'), _('BluRay, Dual Layer'), _('BluRay, Triple Layer'),
+            _('BluRay, Quad Layer'))
     self._regions = (
         _('Region 0 (No Region Coding)'),
         _('Region 1 (United States of America, Canada)'),
@@ -1032,11 +1035,22 @@ def language_combos(self):
     self.languages_ids[0] = 0    # empty one
     self.lang['lang'].clear()
     self.widgets['preferences']['lang_name'].insert_text(0, '')
-    for i, lang in enumerate(self.db.session.query(db.Lang.lang_id, db.Lang.name).all()):
-        self.languages_ids[i + 1] = lang.lang_id
-        self.widgets['preferences']['lang_name'].insert_text(i + 1, lang.name)
+    langs = {}
+    for i in self.db.session.query(db.Lang.lang_id, db.Lang.name).all():
+        langs[i.name] = i.lang_id
+
+    self.sorted_langs = OrderedDict(sorted(langs.items()))
+    i = 0
+    for j in self.sorted_langs.keys():
+        print(j)
+        lang_name = j
+        lang_id = self.sorted_langs[j]
+        self.languages_ids[i] = lang_id
+        self.widgets['preferences']['lang_name'].insert_text(i, lang_name)
         # add movie languages treeview
-        self.lang['lang'].append([lang.lang_id, lang.name])
+        self.lang['lang'].append([lang_id, lang_name])
+        i += 1
+
     self.widgets['preferences']['lang_name'].show_all()
     self.widgets['preferences']['lang_name'].set_active(0)
 
