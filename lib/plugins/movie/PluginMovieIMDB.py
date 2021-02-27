@@ -54,7 +54,6 @@ class Plugin(movie.Movie):
         self.url      = "http://imdb.com/title/tt%s" % self.movie_id
 
     def initialize(self):
-#        self.get_window().set_cursor(self.watch_cursor)
 #        self.cast_page = self.open_page(url=self.url + '/fullcredits')
 #        self.plot_page = self.open_page(url=self.url + '/plotsummary')
 #        self.comp_page = self.open_page(url=self.url + '/companycredits')
@@ -64,107 +63,125 @@ class Plugin(movie.Movie):
         ia = IMDb()
         self.mvie = ia.get_movie(self.movie_id)
 #        company = ia.get_company(self.movie_id)
-#        self.get_window().set_cursor(None)
 
     def get_barcode(self):
         try:
-            self.barcode = self.mvie.get('barcode')
+            if 'barcode' in self.mvie:
+                self.barcode = self.mvie.get('barcode')
+            else:
+                self.barcode = str('')
         except:
             self.barcode = str('')
 
     def get_cameraman(self):
-        try:
-            if self.mvie['cinematographers']:
-                self.cameraman = gutils.listToString(self.mvie['cinematographers'], joiner=', ')
-        except:
+        if 'cinematographers' in self.mvie:
+            self.cameraman = gutils.listToString(self.mvie['cinematographers'], joiner=', ')
+        else:
             self.cameraman = str('')
 
     def get_cast(self):
-        self.cast = ''
-        actors = self.mvie['cast']
-        for actor in actors:
-            try:
+        if 'cast' in self.mvie:
+            self.cast = ''
+            actors = self.mvie['cast']
+            for actor in actors:
+#                try:
                 role = actor.currentRole
-                if role is not None and not role == '':
-                    line = ("%s as %s\n" % (actor, role))
+                if role is None or role == '' or len(role) == 0:
+                    line = actor['name'] + '\n'
                 else:
-                    line = actor + '\n'
+                    line = ("%s as %s\n" % (actor['name'], role))
 
-            except:
-                line = '\n'
+#                except:
+#                    line = '\n'
 
-            self.cast += line
+                self.cast += line
+        else:
+            self.cast = str('')
 
     def get_classification(self):
-        try:
-            self.classification = self.mvie['rating']
-            loc = locale.getlocale()[0][3:]
-            res = pycountry.countries.search_fuzzy(loc)
-            cntry = res[0].name
-            cert = ''
-            c = self.mvie['certificates']
-            if c is not None:
-                for a in c:
-                    if a.startswith(cntry):
-                        a,b = a.split(':')
-                        cert = b
-                        break
-            else:
+        if 'rating' in self.mvie:
+            try:
+                self.classification = self.mvie['rating']
+                loc = locale.getlocale()[0][3:]
+                res = pycountry.countries.search_fuzzy(loc)
+                cntry = res[0].name
+                cert = ''
+                c = self.mvie['certificates']
+                if c is not None:
+                    for a in c:
+                        if a.startswith(cntry):
+                            a,b = a.split(':')
+                            cert = b
+                            break
+                else:
+                    cert = str('')
+            except:
                 cert = str('')
-        except:
-            cert = str('')
 
-        self.classification = cert
+            self.classification = cert
+        else:
+            self.classification = str('')
 
     def get_color(self):
-        try:
-            c = self.mvie['color info']
-            self.color = ''
-            if not c:
-                self.color = gutils.listToString(c, joiner=', ')
-        except:
+        if 'color info' in self.mvie:
+            try:
+                c = self.mvie['color info']
+                self.color = ''
+                if not c:
+                    self.color = gutils.listToString(c, joiner=', ')
+            except:
+                self.color = str('')
+        else:
             self.color = str('')
 
     def get_country(self):
-        try:
-            if self.mvie['countries']:
-                self.country = gutils.listToString(self.mvie['countries'], joiner=', ')
-        except:
+        if 'countries' in self.mvie:
+            self.country = gutils.listToString(self.mvie['countries'], joiner=', ')
+        else:
             self.country = str('')
 
     def get_director(self):
-        try:
-            if self.mvie['directors']:
-                self.director = gutils.listToString(self.mvie['directors'], joiner=', ')
-            else:
+        if 'directors' in self.mvie:
+            try:
+                if self.mvie['directors']:
+                    self.director = gutils.listToString(self.mvie['directors'], joiner=', ')
+                else:
+                    self.director = str('')
+            except:
                 self.director = str('')
-        except:
+        else:
             self.director = str('')
 
     def get_genre(self):
-        self.genre = gutils.listToString(self.mvie['genre'], joiner=' | ')
+        if 'genres' in self.mvie:
+            self.genre = gutils.listToString(self.mvie['genres'], joiner=' | ')
+        else:
+            self.genre = str('')
 
     def get_image(self):
-        try:
+        if 'cover url' in self.mvie and self.mvie['cover url']:
             self.image_url = self.mvie['cover url']
-            if not self.image_url:
-                self.image_url = self.mvie['full-size cover url']
-        except:
+        elif 'full-size cover url' in self.mvie and self.mvie['full-size cover url']:
+            self.image_url = self.mvie['full-size cover url']
+        else:
             self.image_url = str('')
 
     def get_language(self):
-        try:
-            languages = self.mvie['languages']
-            self.language = ''
-            f = False
-            for l in languages:
-                if f:
-                    self.language += ', ' + l
-                else:
-                    self.language += l
-                    f = True
-        except:
-            self.language = ''
+        if 'languages' in self.mvie:
+            try:
+                languages = self.mvie['languages']
+                self.language = ''
+                f = False
+                for l in languages:
+                    if f:
+                        self.language += ', ' + l
+                    else:
+                        self.language += l
+                        f = True
+            except:
+                self.language = str('')
+        else:
+            self.language = str('')
 
     def get_notes(self):
         self.notes = ''
@@ -195,81 +212,92 @@ class Plugin(movie.Movie):
             self.o_title = str('')
 
     def get_plot(self):
-        try:
-            a = self.mvie['plot']
-            b = a[0]
-            if '::' in b:
-                self.plot = b.split('::')[0]
-            else:
-                self.plot = b
-        except:
+        if 'plot' in self.mvie:
+            try:
+                a = self.mvie['plot']
+                b = a[0]
+                if '::' in b:
+                    self.plot = b.split('::')[0]
+                else:
+                    self.plot = b
+            except:
+                self.plot = str('')
+        else:
             self.plot = str('')
 
     def get_rating(self):
-        try:
-            self.rating = self.mvie['rating']
-            if self.rating:
-                try:
-                    self.rating = math.trunc(float(self.rating) + 0.5)
-                except Exception as e:
+        if 'rating' in self.mvie:
+            try:
+                self.rating = self.mvie['rating']
+                if self.rating:
+                    try:
+                        self.rating = math.trunc(float(self.rating) + 0.5)
+                    except Exception as e:
+                        self.rating = 0
+                else:
                     self.rating = 0
-            else:
+            except:
                 self.rating = 0
-        except:
-            self.rating = 0
+        else:
+            self.ratinf = 0
 
 #    def get_resolution(self):
 #        self.resolution = mvie
 
     def get_runtime(self):
-        try:
-            r = self.mvie['runtime']
-            self.runtime = gutils.listToString(r, joiner=', ')
-        except:
+        if 'runtimes' in self.mvie:
+            self.runtime = self.mvie['runtimes'][0]
+        else:
             self.runtime = '0'
 
     def get_screenplay(self):
-        try:
-            w = self.mvie['writer']
-            self.screenplay = gutils.listToString(w, joiner=', ')
-        except:
+        if 'writer' in self.mvie:
+            try:
+                w = self.mvie['writer']
+                self.screenplay = gutils.listToString(w, joiner=', ')
+            except:
+                self.screenplay = str('')
+        else:
             self.screenplay = str('')
 
     def get_site(self):
         self.site = "http://www.imdb.com/title/tt%s" % self.movie_id
 
     def get_sound(self):
-        try:
-            sm = self.mvie['sound mix']
-            self.sound = gutils.listToString(sm, ', ')
-        except:
+        if 'sound mix' in self.mvie:
+            try:
+                sm = self.mvie['sound mix']
+                self.sound = gutils.listToString(sm, ', ')
+            except:
+                self.sound = str('')
+        else:
             self.sound = str('')
 
     def get_studio(self):
-        try:
+        if 'studio' in self.mvie:
             self.studio = self.mvie.get('studio')
-        except:
+        else:
             self.studio = str('')
 
     def get_tagline(self):
-        try:
+        if 'taglines' in self.mvie:
             self.tagline = self.mvie.get('taglines')
-        except:
+        else:
             self.tagline =str('')
 
     def get_title(self):
-        try:
+        if 'title' in self.mvie:
             self.title = self.mvie['title']
-        except:
+        else:
             self.title = str('')
 
     def get_trailer(self):
         self.trailer = "http://www.imdb.com/title/tt%s/trailers" % self.movie_id
 
     def get_year(self):
-        try:
+        if 'year' in self.mvie:
             self.year = str(self.mvie['year'])
-        except:
+        else:
             self.year = '1900'
 
 
